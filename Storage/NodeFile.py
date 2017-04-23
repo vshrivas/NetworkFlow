@@ -13,4 +13,87 @@ class NodeFile:
 	def getFileName():
 		return self.fileName
 
+	# This method reads a given node based on nodeID and returns a node object for it
+	def readNode(nodeID, relationshipFile, propertyFile):
+		node = Node(self)
+
+		nodeStore = open(self.fileName, 'r')
+		nodeStartOffset = nodeID * Node.storageSize
+
+		# TODO: refactor some of reading relationships and properties into those classes
+
+		# find all relationships
+		# read first rel ID
+		nodeFile.seek(nodeStartOffset + Node.REL_ID_OFFSET)
+		firstRelID = nodeFile.read(4)
+
+		relationshipStore = open(relationshipFile.getFileName(), 'r')
+		nextRelID = firstRelID
+
+		# while there is a next relationship
+		while(nextRelID != -1):
+			relationshipStartOffset = nextRelID * Relationship.storageSize
+
+			# find ID of first node in relationship
+			relationshipStore.seek(relationshipStartOffset + NODE1_ID_OFFSET)
+			node1ID = relationshipStore.read(3)
+
+			# find ID of second node in relationship
+			relationshipStore.seek(relationshipStartOffset + NODE2_ID_OFFSET)
+			node2ID = relationshipStore.read(3)
+
+			# create relationship and add to node
+			rel = Relationship(node1ID, node2ID, relationshipFile)
+			node.addRelationship(rel)
+
+			# find next rel ID
+			if nodeID == node1ID:
+				relationshipStore.seek(relationshipStartOffset + NODE1_NEXT_REL_ID_OFFSET)
+				nextRelID = relationshipStore.read(4)
+			else:
+				relationshipStore.seek(relationshipStartOffset + NODE2_NEXT_REL_ID_OFFSET)
+				nextRelID = relationshipStore.read(4)
+
+
+		# read first property ID
+		nodeFile.seek(startOffset + Node.PROPERTY_ID_OFFSET)
+		firstPropID = nodeFile.read(4)
+
+		propertyStore = open(propertyFile.getFileName(), 'r')
+		nextPropID = firstPropID
+
+		while(nextPropID != -1):
+			propertyStartOffset = nextPropID * Property.storageSize
+
+			# find key
+			propertyStore.seek(propertyStartOffset + KEY_OFFSET)
+			key = propertyStore.read(4)
+
+			# find value
+			propertyStore.seek(propertyStartOffset + VALUE_OFFSET)
+			value = propertyStore.read(4)
+
+			# create property and add to node
+			prop = Property(key, value, propertyFile)
+			node.addProperty(prop)
+
+			# find next property id
+			propertyStore.seek(propertyStartOffset + NEXT_PROPERTY_ID_OFFSET)
+			nextPropID = propertyStore.read(4)
+
+
+		# TODO: read labels
+
+		return node
+
+
+
+
+
+
+
+
+
+
+
 		

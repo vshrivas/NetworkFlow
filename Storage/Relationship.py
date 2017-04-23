@@ -23,9 +23,9 @@ class Relationship:
 	storageSize = 26
 	numRelationships = 0
 
-	def _init_(self, node1, node2, relationshipFile):
-			self.firstNode = node1
-			self.secondNode = node2
+	def _init_(self, node1ID, node2ID, relationshipFile):
+			self.firstNodeID = node1ID
+			self.secondNodeID = node2ID
 
 			self.relationshipID = numRelationships
 			numRelationships += 1
@@ -47,11 +47,11 @@ class Relationship:
 
 		# write node 1 id
 		storeFile.seek(startOffset + NODE1_ID_OFFSET)
-		storeFile.write(self.firstNode.getID())
+		storeFile.write(self.firstNodeID)
 
 		# write node 2 id
 		storeFile.seek(startOffset + NODE2_ID_OFFSET)
-		storeFile.write(self.secondNode.getID())
+		storeFile.write(self.secondNodeID)
 
 		# find which node relationship is being written for
 		if node.getID() == node1.getID():

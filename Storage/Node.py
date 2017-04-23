@@ -24,7 +24,7 @@ class Node:
 		self.relationships = []
 		# key-value pairs or properties stored within node
 		# e.g. name: Jane
-		self.properties = {}
+		self.properties = []
 		# labels indicate the type of a node, a node can have multiple labels
 		# e.g. person, bank account, id
 		self.labels = []
@@ -42,11 +42,11 @@ class Node:
 			self.relationship.append(rel)
 
 	# This method adds data to a node 
-	def addData(key, value):
+	def addProperty(key, value):
 		self.properties[key] = value
 
 	# This method adds labels to a node
-	def addLabels(nodeLabel):
+	def addLabel(nodeLabel):
 		self.labels.append(nodeLabel)
 
 	def getID():
@@ -67,20 +67,23 @@ class Node:
 		storeFileName = self.nodeFile.getFileName()
 		storeFile = open(storeFileName, 'w')
 
-		# move nodeID * storageSize bytes into nodeFile to get to start of node
-		storeFile.seek(self.nodeID * Node.storageSize)
+		# write node id
+		storeFile.seek(self.startOffset + NODE_ID_OFFSET)
 		storeFile.write(self.nodeID)
 
 		# write in-use flag
 		storeFile.seek(self.startOffset + IN_USE_FLAG_OFFSET)
 		storeFile.write(1)
 
-		# write first rel ID
+		# write first relationship ID
 		storeFile.seek(self.startOffset + REL_ID_OFFSET)
 		firstRel = self.relationships[0]
 		storeFile.write(firstRel.getID())
 
-		#TODO: write first property ID
+		# write first property ID
+		storeFile.seek(self.startOffset + PROPERTY_ID_OFFSET)
+		firstProp = self.properties[0]
+		storeFile.write(firstProp.getID())
 
 		# write relationships to relationship file
 		for relIndex in range(0, len(self.relationships)):
@@ -93,7 +96,24 @@ class Node:
 				rel.writeRelationship(self, self.relationships[relIndex - 1], 
 					self.relationships[relIndex + 1])
 
-		
+		# write properties to property file
+		for propIndex in range(0, len(self.properties)):
+			prop = self.properties[propIndex]
+
+			# no next property
+			if propIndex == len(self.properties) - 1:
+				prop.writeProperty("")
+
+			else:
+				prop.writeProperty(self.properties[propIndex + 1])
+
+
+		# TODO: write labels
+
+
+
+
+
 
 
 
