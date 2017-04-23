@@ -14,5 +14,5 @@ class Relationship:
 			self.firstNode = node1
 			self.secondNode = node2
 
-			numRelationships += 1
 			self.relationshipID = numRelationships
+			numRelationships += 1
