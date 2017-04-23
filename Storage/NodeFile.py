@@ -4,10 +4,13 @@ class NodeFile:
 	def _init_(self):
 		numFiles += 1
 		self.fileID = numFiles
+		
+		# create node file
 		self.fileName = "NodeFile{0}".format(self.fileID)
-		self.file = open(self.fileName, 'w')
+		nodeFile = open(self.fileName, 'w')
+		nodeFile.close()
 
-	def getFile():
-		return self.file
+	def getFileName():
+		return self.fileName
 
 		

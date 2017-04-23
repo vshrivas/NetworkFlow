@@ -4,8 +4,11 @@ class RelationshipFile:
 	def _init_(self):
 		numFiles += 1
 		self.fileID = numFiles
-		self.fileName = "RelationshipFile{0}".format(self.fileID)
-		self.file = open(self.fileName, 'w')
 
-	def getFile():
-		return self.file
+		# create relationship file
+		self.fileName = "RelationshipFile{0}".format(self.fileID)
+		relFile = open(self.fileName, 'w')
+		relFile.close()
+
+	def getFileName():
+		return self.fileName
