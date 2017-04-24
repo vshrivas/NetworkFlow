@@ -14,7 +14,7 @@ class NodeFile:
 		return self.fileName
 
 	# This method reads a given node based on nodeID and returns a node object for it
-	def readNode(nodeID, relationshipFile, propertyFile):
+	def readNode(nodeID, relationshipFile, propertyFile, labelFile):
 		node = Node(self)
 
 		nodeStore = open(self.fileName, 'r')
@@ -81,8 +81,21 @@ class NodeFile:
 			propertyStore.seek(propertyStartOffset + NEXT_PROPERTY_ID_OFFSET)
 			nextPropID = propertyStore.read(4)
 
+        # read first label id
+        nodeFile.seek(startOffset + Node.LABEL_STORE_PTR_OFFSET)
+        firstLabelID = nodeFile.read(3)
+        nextLabelID = firstLabelID
 
-		# TODO: read labels
+        while(nextLabelID != -1)
+            # read label and add it to node
+            labelStartOffset = nextLabelID * Label.storageSize
+            labelFile.seek(labelStartOffset)
+            label = labelFile.readLabel(nextLabelID)
+            node.addLabel(label)
+
+            # find next label id
+            labelFile.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
+            nextLabelID = labelFile.read(3)
 
 		return node
 

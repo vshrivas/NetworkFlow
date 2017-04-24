@@ -108,8 +108,18 @@ class Node:
 				prop.writeProperty(self.properties[propIndex + 1])
 
 
-		# TODO: write labels
+		# write labels
+        for labelIndex in range(0, len(self.labels)):
+            label = self.labels[labelIndex]
 
+            # no next label
+            if labelIndex == len(self.labels) - 1:
+                nextLabel = -1
+            
+            else:
+                nextLabel = self.labels[labelIndex + 1]
+
+            label.writeLabel(nextLabel.labelID)
 
 
 
