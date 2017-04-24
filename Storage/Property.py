@@ -26,19 +26,19 @@ class Property:
 
 		self.startOffset = self.propertyID * Property.storageSize
 
-	def getKey():
+	def getKey(self):
 		return self.key
 
-	def getValue():
+	def getValue(self):
 		return self.value
 
-	def getPropertyFile():
+	def getPropertyFile(self):
 		return self.propertyFile
 
-	def getID():
+	def getID(self):
 		return self.propertyID
 
-	def writeProperty(nextProp):
+	def writeProperty(self, nextProp):
 		# open property file
 		storeFileName = propertyFile.getName()
 		storeFile = open(storeFileName, 'a')

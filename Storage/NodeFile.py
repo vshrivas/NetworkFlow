@@ -10,11 +10,11 @@ class NodeFile:
 		nodeFile = open(self.fileName, 'w')
 		nodeFile.close()
 
-	def getFileName():
+	def getFileName(self):
 		return self.fileName
 
 	# This method reads a given node based on nodeID and returns a node object for it
-	def readNode(nodeID, relationshipFile, propertyFile, labelFile):
+	def readNode(self, nodeID, relationshipFile, propertyFile, labelFile):
 		node = Node(self)
 
 		nodeStore = open(self.fileName, 'r')

@@ -34,7 +34,7 @@ class Relationship:
 
 		self.startOffset = self.relationshipID * Relationship.storageSize 
 
-	def writeRelationship(node, prevRel, nextRel):
+	def writeRelationship(self, node, prevRel, nextRel):
 		# open relationship file
 		storeFileName = self.relationshipFile.getFileName()
 		storeFile = open(storeFileName, 'a')

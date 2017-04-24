@@ -10,5 +10,5 @@ class RelationshipFile:
 		relFile = open(self.fileName, 'w')
 		relFile.close()
 
-	def getFileName():
+	def getFileName(self):
 		return self.fileName

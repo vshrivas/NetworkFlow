@@ -10,11 +10,11 @@ class LabelFile:
 		relFile = open(self.fileName, 'w')
 		relFile.close()
 
-	def getFileName():
+	def getFileName(self):
 		return self.fileName
 
     # This method reads a given label based on labelID and returns a label object for it
-    def readLabel(labelID, labelFile):
+    def readLabel(self, labelID, labelFile):
         nodeStore = open(self.fileName, 'r')
 		nodeStartOffset = labelID * Label.storageSize
         

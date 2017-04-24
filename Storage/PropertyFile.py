@@ -10,5 +10,5 @@ class PropertyFile:
 		nodeFile = open(self.fileName, 'w')
 		nodeFile.close()
 
-	def getFileName():
+	def getFileName(self):
 		return self.fileName

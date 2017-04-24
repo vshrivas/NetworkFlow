@@ -38,31 +38,31 @@ class Node:
 		self.startOffset = self.nodeID * Node.storageSize
 
 	# This method adds a node with a relationship to this node's adj list
-	def addRelationship(rel):
+	def addRelationship(self, rel):
 		self.relationship.append(rel)
 
 	# This method adds data to a node 
-	def addProperty(key, value):
+	def addProperty(self, key, value):
 		self.properties[key] = value
 
 	# This method adds labels to a node
-	def addLabel(nodeLabel):
+	def addLabel(self, nodeLabel):
 		self.labels.append(nodeLabel)
 
-	def getID():
+	def getID(self):
 		return self.nodeID
 
-	def getRelationships():
+	def getRelationships(self):
 		return self.relationships
 
-	def getData():
+	def getData(self):
 		return self.data
 
-	def getLabels():
+	def getLabels(self):
 		return self.labels
 
 	# This method writes this node to the given node file
-	def writeNode():
+	def writeNode(self):
 		# open node file
 		storeFileName = self.nodeFile.getFileName()
 		storeFile = open(storeFileName, 'a')
