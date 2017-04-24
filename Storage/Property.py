@@ -41,7 +41,7 @@ class Property:
 	def writeProperty(nextProp):
 		# open property file
 		storeFileName = propertyFile.getName()
-		storeFile = open(storeFileName, 'w')
+		storeFile = open(storeFileName, 'a')
 
 		# write property id
 		storeFile.seek(self.startOffset + PROPERTY_ID_OFFSET)

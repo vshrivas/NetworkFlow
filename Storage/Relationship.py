@@ -24,20 +24,20 @@ class Relationship:
 	numRelationships = 0
 
 	def _init_(self, node1ID, node2ID, relationshipFile):
-			self.firstNodeID = node1ID
-			self.secondNodeID = node2ID
+		self.firstNodeID = node1ID
+		self.secondNodeID = node2ID
 
-			self.relationshipID = numRelationships
-			numRelationships += 1
+		self.relationshipID = numRelationships
+		numRelationships += 1
 
-			self.relationshipFile = relationshipFile
+		self.relationshipFile = relationshipFile
 
-			self.startOffset = self.relationshipID * Relationship.storageSize 
+		self.startOffset = self.relationshipID * Relationship.storageSize 
 
 	def writeRelationship(node, prevRel, nextRel):
 		# open relationship file
 		storeFileName = self.relationshipFile.getFileName()
-		storeFile = open(storeFileName, 'w')
+		storeFile = open(storeFileName, 'a')
 
 		# seek to location for relationship
 		storeFile.seek(startOffset)

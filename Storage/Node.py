@@ -39,7 +39,7 @@ class Node:
 
 	# This method adds a node with a relationship to this node's adj list
 	def addRelationship(rel):
-			self.relationship.append(rel)
+		self.relationship.append(rel)
 
 	# This method adds data to a node 
 	def addProperty(key, value):
@@ -65,7 +65,7 @@ class Node:
 	def writeNode():
 		# open node file
 		storeFileName = self.nodeFile.getFileName()
-		storeFile = open(storeFileName, 'w')
+		storeFile = open(storeFileName, 'a')
 
 		# write node id
 		storeFile.seek(self.startOffset + NODE_ID_OFFSET)
