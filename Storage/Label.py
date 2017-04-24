@@ -10,7 +10,7 @@ class Label:
     storageSize = 11
     numLabels = 0
 
-    def _init_(self, labelID=numLabels, label, labelFile):
+    def _init_(self, label, labelFile, labelID=numLabels):
         self.labelID = labelID
 
         self.label = label
@@ -22,11 +22,11 @@ class Label:
 
     def writeLabel(self, nextLabelID):
         # open label file
-		storeFileName = self.labelFile.getFileName()
-		storeFile = open(storeFileName, 'a')
+        storeFileName = self.labelFile.getFileName()
+        storeFile = open(storeFileName, 'a')
 
         # seek to location for label and write label ID
-		storeFile.seek(self.startOffset)
+        storeFile.seek(self.startOffset)
         storeFile.write(self.labelID)
 
         # write label

@@ -15,7 +15,7 @@ class Property:
 	storageSize = 16
 	numProperties = 0
 
-	def _init_(self, propertyID=numProperties, key, value, propertyFile):
+	def _init_(self, key, value, propertyFile, propertyID=numProperties):
 		self.key = key
 		self.value = value
 
