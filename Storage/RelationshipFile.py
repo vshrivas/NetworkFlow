@@ -1,9 +1,9 @@
 class RelationshipFile:
 	numFiles = 0
 
-	def _init_(self):
-		numFiles += 1
-		self.fileID = numFiles
+	def __init__(self):
+		RelationshipFile.numFiles += 1
+		self.fileID = RelationshipFile.numFiles
 
 		# create relationship file
 		self.fileName = "RelationshipFile{0}".format(self.fileID)

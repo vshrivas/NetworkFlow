@@ -4,5 +4,5 @@ class NodePage:
 
 	# NodePages will be instantiated through NodeFiles
 	# which will pass in the pageNum
-	def _init_(self, pageNum):
+	def __init__(self, pageNum):
 		self.pageNum = pageNum

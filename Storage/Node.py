@@ -19,7 +19,7 @@ class Node:
     storageSize = 15
     numNodes = 0
 
-    def _init_(self, nodeFile):
+    def __init__(self, nodeFile, nodeID=numNodes):
 		# relationships is the list of relationships this node is in 
         self.relationships = []
 		# key-value pairs or properties stored within node
@@ -29,9 +29,9 @@ class Node:
 		# e.g. person, bank account, id
         self.labels = []
 
-        self.nodeID = numNodes
+        self.nodeID = nodeID
 		# increment number of nodes 
-        numNodes += 1
+        Node.numNodes += 1
 
         self.nodeFile = nodeFile
 
@@ -39,7 +39,7 @@ class Node:
 
 	# This method adds a node with a relationship to this node's adj list
     def addRelationship(self, rel):
-        self.relationship.append(rel)
+        self.relationships.append(rel)
 
 	# This method adds data to a node 
     def addProperty(self, key, value):

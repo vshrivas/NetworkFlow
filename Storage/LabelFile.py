@@ -1,8 +1,8 @@
 class LabelFile:
     numFiles = 0
 
-    def _init_(self):
-        numFiles += 1
+    def __init__(self):
+        LabelFile.numFiles += 1
         self.fileID = numFiles
 
 		# create relationship file

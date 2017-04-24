@@ -23,12 +23,12 @@ class Relationship:
 	storageSize = 26
 	numRelationships = 0
 
-	def _init_(self, node1ID, node2ID, relationshipFile, relationshipID=numRelationships):
+	def __init__(self, node1ID, node2ID, relationshipFile, relationshipID=numRelationships):
 		self.firstNodeID = node1ID
 		self.secondNodeID = node2ID
 
 		self.relationshipID = relationshipID
-		numRelationships += 1
+		Relationship.numRelationships += 1
 
 		self.relationshipFile = relationshipFile
 

@@ -15,12 +15,12 @@ class Property:
 	storageSize = 16
 	numProperties = 0
 
-	def _init_(self, key, value, propertyFile, propertyID=numProperties):
+	def __init__(self, key, value, propertyFile, propertyID=numProperties):
 		self.key = key
 		self.value = value
 
-		self.propertyID = numProperties
-		numProperties += 1
+		self.propertyID = Property.numProperties
+		Property.numProperties += 1
 
 		self.propertyFile = propertyFile
 

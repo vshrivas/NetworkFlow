@@ -1,9 +1,9 @@
 class NodeFile:
     numFiles = 0
 
-    def _init_(self):
-        numFiles += 1
-        self.fileID = numFiles
+    def __init__(self):
+        NodeFile.numFiles += 1
+        self.fileID = NodeFile.numFiles
         
         # create node file
         self.fileName = "NodeFile{0}".format(self.fileID)
