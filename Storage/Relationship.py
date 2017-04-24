@@ -40,32 +40,32 @@ class Relationship:
         storeFile = open(storeFileName, 'ab')
 
         # seek to location for relationship
-        storeFile.seek(startOffset)
+        storeFile.seek(self.startOffset)
 
         # write relationship ID
         storeFile.write(bytearray(self.relationshipID))
 
         # write node 1 id
-        storeFile.seek(startOffset + NODE1_ID_OFFSET)
+        storeFile.seek(self.startOffset + Relationship.NODE1_ID_OFFSET)
         storeFile.write(bytearray(self.firstNodeID))
 
         # write node 2 id
-        storeFile.seek(startOffset + NODE2_ID_OFFSET)
+        storeFile.seek(self.startOffset + Relationship.NODE2_ID_OFFSET)
         storeFile.write(bytearray(self.secondNodeID))
 
         # find which node relationship is being written for
         if node.getID() == node1.getID():
-            storeFile.seek(startOffset + NODE1_NEXT_REL_ID_OFFSET)
+            storeFile.seek(self.startOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
             storeFile.write(bytearray(nextRel.getID()))
 
-            storeFile.seek(startOffset + NODE1_PREV_REL_ID_OFFSET)
+            storeFile.seek(self.startOffset + Relationship.NODE1_PREV_REL_ID_OFFSET)
             storeFile.write(bytearray(prevRel.getID()))
 
         else:
-            storeFile.seek(startOffset + NODE2_PREV_REL_ID_OFFSET)
+            storeFile.seek(self.startOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
             storeFile.write(bytearray(nextRel.getID()))
 
-            storeFile.seek(startOffset + NODE2_PREV_REL_ID_OFFSET)
+            storeFile.seek(self.startOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
             storeFile.write(bytearray(prevRel.getID()))
 
     def getID(self):
