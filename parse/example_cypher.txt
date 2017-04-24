@@ -1,0 +1,5 @@
+MATCH (node:Label) RETURN node.property;
+
+MATCH (node1:Label1)-->(node2:Label2)
+WHERE node1.propertyA = {value}
+RETURN node2.propertyA, node2.propertyB;
