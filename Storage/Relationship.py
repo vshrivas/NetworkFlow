@@ -12,61 +12,64 @@
 # node 1 = B and node 2 = A should not exist 
 
 class Relationship:
-	RELATIONSHIP_ID_OFFSET = 0
-	NODE1_ID_OFFSET = 4
-	NODE2_ID_OFFSET = 7
-	NODE1_NEXT_REL_ID_OFFSET = 10
-	NODE1_PREV_REL_ID_OFFSET = 14
-	NODE2_NEXT_REL_ID_OFFSET = 18
-	NODE2_PREV_REL_ID_OFFSET = 22
+    RELATIONSHIP_ID_OFFSET = 0
+    NODE1_ID_OFFSET = 4
+    NODE2_ID_OFFSET = 7
+    NODE1_NEXT_REL_ID_OFFSET = 10
+    NODE1_PREV_REL_ID_OFFSET = 14
+    NODE2_NEXT_REL_ID_OFFSET = 18
+    NODE2_PREV_REL_ID_OFFSET = 22
 
-	storageSize = 26
-	numRelationships = 0
+    storageSize = 26
+    numRelationships = 0
 
-	def __init__(self, node1ID, node2ID, relationshipFile, relationshipID=numRelationships):
-		self.firstNodeID = node1ID
-		self.secondNodeID = node2ID
+    def __init__(self, node1ID, node2ID, relationshipFile, relationshipID=numRelationships):
+        self.firstNodeID = node1ID
+        self.secondNodeID = node2ID
 
-		self.relationshipID = relationshipID
-		Relationship.numRelationships += 1
+        self.relationshipID = relationshipID
+        Relationship.numRelationships += 1
 
-		self.relationshipFile = relationshipFile
+        self.relationshipFile = relationshipFile
 
-		self.startOffset = self.relationshipID * Relationship.storageSize 
+        self.startOffset = self.relationshipID * Relationship.storageSize
 
-	def writeRelationship(self, node, prevRel, nextRel):
-		# open relationship file
-		storeFileName = self.relationshipFile.getFileName()
-		storeFile = open(storeFileName, 'a')
+    def writeRelationship(self, node, prevRel, nextRel):
+        # open relationship file
+        storeFileName = self.relationshipFile.getFileName()
+        storeFile = open(storeFileName, 'ab')
 
-		# seek to location for relationship
-		storeFile.seek(startOffset)
+        # seek to location for relationship
+        storeFile.seek(startOffset)
 
-		# write relationship ID
-		storeFile.write(self.relationshipID)
+        # write relationship ID
+        storeFile.write(bytearray(self.relationshipID))
 
-		# write node 1 id
-		storeFile.seek(startOffset + NODE1_ID_OFFSET)
-		storeFile.write(self.firstNodeID)
+        # write node 1 id
+        storeFile.seek(startOffset + NODE1_ID_OFFSET)
+        storeFile.write(bytearray(self.firstNodeID))
 
-		# write node 2 id
-		storeFile.seek(startOffset + NODE2_ID_OFFSET)
-		storeFile.write(self.secondNodeID)
+        # write node 2 id
+        storeFile.seek(startOffset + NODE2_ID_OFFSET)
+        storeFile.write(bytearray(self.secondNodeID))
 
-		# find which node relationship is being written for
-		if node.getID() == node1.getID():
-			storeFile.seek(startOffset + NODE1_NEXT_REL_ID_OFFSET)
-			storeFile.write(nextRel.getID())
+        # find which node relationship is being written for
+        if node.getID() == node1.getID():
+            storeFile.seek(startOffset + NODE1_NEXT_REL_ID_OFFSET)
+            storeFile.write(bytearray(nextRel.getID()))
 
-			storeFile.seek(startOffset + NODE1_PREV_REL_ID_OFFSET)
-			storeFile.write(prevRel.getID())
+            storeFile.seek(startOffset + NODE1_PREV_REL_ID_OFFSET)
+            storeFile.write(bytearray(prevRel.getID()))
 
-		else:
-			storeFile.seek(startOffset + NODE2_PREV_REL_ID_OFFSET)
-			storeFile.write(nextRel.getID())
+        else:
+            storeFile.seek(startOffset + NODE2_PREV_REL_ID_OFFSET)
+            storeFile.write(bytearray(nextRel.getID()))
 
-			storeFile.seek(startOffset + NODE2_PREV_REL_ID_OFFSET)
-			storeFile.write(prevRel.getID())
+            storeFile.seek(startOffset + NODE2_PREV_REL_ID_OFFSET)
+            storeFile.write(bytearray(prevRel.getID()))
+
+    def getID(self):
+        return self.relationshipID 
 
 
 

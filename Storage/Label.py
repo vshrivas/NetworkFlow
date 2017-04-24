@@ -23,18 +23,18 @@ class Label:
     def writeLabel(self, nextLabelID):
         # open label file
         storeFileName = self.labelFile.getFileName()
-        storeFile = open(storeFileName, 'a')
+        storeFile = open(storeFileName, 'ab')
 
         # seek to location for label and write label ID
         storeFile.seek(self.startOffset)
-        storeFile.write(self.labelID)
+        storeFile.write(bytearray(self.labelID))
 
         # write label
         storeFile.seek(self.startOffset + Label.LABEL_OFFSET)
-        storeFile.write(self.label)
+        storeFile.write(bytearray(self.label))
 
         # write next label's ID
         storeFile.seek(self.startOffset + Label.NEXT_LABEL_ID_OFFSET)
-        storeFile.write(self.nextLabelID)
+        storeFile.write(bytearray(self.nextLabelID))
 
         

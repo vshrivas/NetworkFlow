@@ -7,7 +7,7 @@ class RelationshipFile:
 
 		# create relationship file
 		self.fileName = "RelationshipFile{0}".format(self.fileID)
-		relFile = open(self.fileName, 'w')
+		relFile = open(self.fileName, 'wb')
 		relFile.close()
 
 	def getFileName(self):

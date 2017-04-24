@@ -7,7 +7,7 @@ class PropertyFile:
 		
 		# create node file
 		self.fileName = "PropertyFile{0}".format(self.fileID)
-		nodeFile = open(self.fileName, 'w')
+		nodeFile = open(self.fileName, 'wb')
 		nodeFile.close()
 
 	def getFileName(self):

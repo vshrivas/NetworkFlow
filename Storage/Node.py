@@ -8,6 +8,10 @@
 # Bytes 9-11: ID of first property (key-value pair) for node
 # Bytes 12-14: points to label store for node
 # Byte 15: flags  
+
+from Relationship import Relationship
+from Property import Property
+
 class Node:
     NODE_ID_OFFSET = 0
     IN_USE_FLAG_OFFSET = 3 
@@ -42,8 +46,8 @@ class Node:
         self.relationships.append(rel)
 
 	# This method adds data to a node 
-    def addProperty(self, key, value):
-        self.properties[key] = value
+    def addProperty(self, property):
+        self.properties.append(property)
 
 	# This method adds labels to a node
     def addLabel(self, nodeLabel):
@@ -65,32 +69,36 @@ class Node:
     def writeNode(self):
         # open node file
         storeFileName = self.nodeFile.getFileName()
-        storeFile = open(storeFileName, 'a')
+        storeFile = open(storeFileName, 'ab')
 
         # write node id
-        storeFile.seek(self.startOffset + NODE_ID_OFFSET)
-        storeFile.write(self.nodeID)
+        storeFile.seek(self.startOffset + Node.NODE_ID_OFFSET)
+        storeFile.write(bytearray(self.nodeID))
 
         # write in-use flag
-        storeFile.seek(self.startOffset + IN_USE_FLAG_OFFSET)
-        storeFile.write(1)
+        storeFile.seek(self.startOffset + Node.IN_USE_FLAG_OFFSET)
+        storeFile.write(bytearray(1))
 
         # write first relationship ID
-        storeFile.seek(self.startOffset + REL_ID_OFFSET)
+        storeFile.seek(self.startOffset + Node.REL_ID_OFFSET)
         firstRel = self.relationships[0]
-        storeFile.write(firstRel.getID())
+        storeFile.write(bytearray(firstRel.getID()))
 
 		# write first property ID
-        storeFile.seek(self.startOffset + PROPERTY_ID_OFFSET)
+        storeFile.seek(self.startOffset + Node.PROPERTY_ID_OFFSET)
         firstProp = self.properties[0]
-        storeFile.write(firstProp.getID())
+        storeFile.write(bytearray(firstProp.getID()))
 
         # write relationships to relationship file
         for relIndex in range(0, len(self.relationships)):
             rel = self.relationships[relIndex]
             if relIndex == 0:
                 nullRelationship = Relationship(-1, -1, -1, "")
-                rel.writeRelationship(self, nullRelationship, self.relationships[relIndex + 1])
+                if relIndex + 1 >= len(self.relationships):
+                    rel.writeRelationship(self, nullRelationship, nullRelationship)
+                else:
+                    nullRelationship = Relationship(-1, -1, -1, "")
+                    rel.writeRelationship(self, nullRelationship, self.relationships[relIndex + 1])
             elif relIndex == len(self.relationships) - 1:
                 nullRelationship = Relationship(-1, -1, -1, "")
                 rel.writeRelationship(self, self.relationships[relIndex - 1], nullRelationship)

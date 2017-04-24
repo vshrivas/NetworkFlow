@@ -16,6 +16,8 @@ class Property:
 	numProperties = 0
 
 	def __init__(self, key, value, propertyFile, propertyID=numProperties):
+        # Note: For reading properties from files, we assume keys and values to be ints.
+        # TODO: Support reading keys and values of other types
 		self.key = key
 		self.value = value
 
@@ -41,23 +43,23 @@ class Property:
 	def writeProperty(self, nextProp):
 		# open property file
 		storeFileName = propertyFile.getName()
-		storeFile = open(storeFileName, 'a')
+		storeFile = open(storeFileName, 'ab')
 
 		# write property id
 		storeFile.seek(self.startOffset + PROPERTY_ID_OFFSET)
-		storeFile.write(self.propertyID)
+		storeFile.write(bytearray(self.propertyID))
 
 		# write key
 		storeFile.seek(self.startOffset + KEY_OFFSET)
-		storeFile.write(self.key)
+		storeFile.write(bytearray(self.key))
 
 		# write value
 		storeFile.seek(self.startOffset + VALUE_OFFSET)
-		storeFile.write(self.value)
+		storeFile.write(bytearray(self.value))
 
 		# write next property id
 		storeFile.seek(self.startOffset + NEXT_PROPERTY_ID_OFFSET)
-		storeFile.write(nextProp.getID())
+		storeFile.write(bytearray(nextProp.getID()))
 
 
 
