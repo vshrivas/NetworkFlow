@@ -89,9 +89,11 @@ class Node:
 		for relIndex in range(0, len(self.relationships)):
 			rel = self.relationships[relIndex]
 			if relIndex == 0:
-				rel.writeRelationship(self, "", self.relationships[relIndex + 1])
+                nullRelationship = Relationship(-1, -1, -1, "")
+				rel.writeRelationship(self, nullRelationship, self.relationships[relIndex + 1])
 			elif relIndex == len(self.relationships) - 1:
-				rel.writeRelationship(self, self.relationships[relIndex - 1], "")
+                nullRelationship = Relationship(-1, -1, -1, "")
+				rel.writeRelationship(self, self.relationships[relIndex - 1], nullRelationship)
 			else:
 				rel.writeRelationship(self, self.relationships[relIndex - 1], 
 					self.relationships[relIndex + 1])
@@ -102,7 +104,8 @@ class Node:
 
 			# no next property
 			if propIndex == len(self.properties) - 1:
-				prop.writeProperty("")
+                nullProperty = Property(-1, -1, -1, "")
+				prop.writeProperty(nullProperty)
 
 			else:
 				prop.writeProperty(self.properties[propIndex + 1])
@@ -119,7 +122,7 @@ class Node:
             else:
                 nextLabel = self.labels[labelIndex + 1]
 
-            label.writeLabel(nextLabel.labelID)
+            label.writeLabel(nextLabel)
 
 
 
