@@ -1110,6 +1110,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitCypher" ):
                 listener.exitCypher(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCypher" ):
+                return visitor.visitCypher(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1183,6 +1189,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitStatement" ):
                 listener.exitStatement(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStatement" ):
+                return visitor.visitStatement(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1226,6 +1238,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitQuery" ):
                 listener.exitQuery(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitQuery" ):
+                return visitor.visitQuery(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1292,6 +1310,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitRegularQuery" ):
                 listener.exitRegularQuery(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRegularQuery" ):
+                return visitor.visitRegularQuery(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1361,6 +1385,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitSingleQuery" ):
                 listener.exitSingleQuery(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSingleQuery" ):
+                return visitor.visitSingleQuery(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1433,6 +1463,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitUnion" ):
                 listener.exitUnion(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitUnion" ):
+                return visitor.visitUnion(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1548,6 +1584,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitClause" ):
                 listener.exitClause(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitClause" ):
+                return visitor.visitClause(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1657,6 +1699,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitMatch_" ):
                 listener.exitMatch_(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMatch_" ):
+                return visitor.visitMatch_(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1750,6 +1798,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitUnwind" ):
                 listener.exitUnwind(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitUnwind" ):
+                return visitor.visitUnwind(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1824,6 +1878,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitMerge" ):
                 listener.exitMerge(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMerge" ):
+                return visitor.visitMerge(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -1904,6 +1964,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitMergeAction" ):
                 listener.exitMergeAction(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMergeAction" ):
+                return visitor.visitMergeAction(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -1979,6 +2045,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitCreate" ):
                 listener.exitCreate(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCreate" ):
+                return visitor.visitCreate(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2038,6 +2110,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitSet_" ):
                 listener.exitSet_(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSet_" ):
+                return visitor.visitSet_(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2119,6 +2197,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitSetItem" ):
                 listener.exitSetItem(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSetItem" ):
+                return visitor.visitSetItem(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2271,6 +2355,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitDelete" ):
                 listener.exitDelete(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDelete" ):
+                return visitor.visitDelete(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2373,6 +2463,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitRemove" ):
                 listener.exitRemove(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRemove" ):
+                return visitor.visitRemove(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2455,6 +2551,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitRemoveItem" ):
                 listener.exitRemoveItem(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRemoveItem" ):
+                return visitor.visitRemoveItem(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2525,6 +2627,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitInQueryCall" ):
                 listener.exitInQueryCall(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitInQueryCall" ):
+                return visitor.visitInQueryCall(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2611,6 +2719,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitStandaloneCall" ):
                 listener.exitStandaloneCall(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStandaloneCall" ):
+                return visitor.visitStandaloneCall(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2689,6 +2803,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitYieldItems" ):
                 listener.exitYieldItems(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitYieldItems" ):
+                return visitor.visitYieldItems(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2786,6 +2906,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitYieldItem" ):
                 listener.exitYieldItem(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitYieldItem" ):
+                return visitor.visitYieldItem(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -2855,6 +2981,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitWith_" ):
                 listener.exitWith_(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitWith_" ):
+                return visitor.visitWith_(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -2945,6 +3077,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitReturn_" ):
                 listener.exitReturn_(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitReturn_" ):
+                return visitor.visitReturn_(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3024,6 +3162,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitReturnBody" ):
                 listener.exitReturnBody(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitReturnBody" ):
+                return visitor.visitReturnBody(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3102,6 +3246,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitReturnItems" ):
                 listener.exitReturnItems(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitReturnItems" ):
+                return visitor.visitReturnItems(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3228,6 +3378,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitReturnItem" ):
                 listener.exitReturnItem(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitReturnItem" ):
+                return visitor.visitReturnItem(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3304,6 +3460,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitOrder" ):
                 listener.exitOrder(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOrder" ):
+                return visitor.visitOrder(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3379,6 +3541,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitSkip" ):
                 listener.exitSkip(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSkip" ):
+                return visitor.visitSkip(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3428,6 +3596,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitLimit" ):
                 listener.exitLimit(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLimit" ):
+                return visitor.visitLimit(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3487,6 +3661,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitSortItem" ):
                 listener.exitSortItem(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSortItem" ):
+                return visitor.visitSortItem(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3556,6 +3736,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitWhere" ):
                 listener.exitWhere(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitWhere" ):
+                return visitor.visitWhere(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3608,6 +3794,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitPattern" ):
                 listener.exitPattern(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPattern" ):
+                return visitor.visitPattern(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3689,6 +3881,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitPatternPart" ):
                 listener.exitPatternPart(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPatternPart" ):
+                return visitor.visitPatternPart(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3763,6 +3961,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitAnonymousPatternPart" ):
                 listener.exitAnonymousPatternPart(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAnonymousPatternPart" ):
+                return visitor.visitAnonymousPatternPart(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -3819,6 +4023,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitPatternElement" ):
                 listener.exitPatternElement(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPatternElement" ):
+                return visitor.visitPatternElement(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -3910,6 +4120,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitNodePattern" ):
                 listener.exitNodePattern(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitNodePattern" ):
+                return visitor.visitNodePattern(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4017,6 +4233,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitPatternElementChain" ):
                 listener.exitPatternElementChain(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPatternElementChain" ):
+                return visitor.visitPatternElementChain(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4088,6 +4310,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitRelationshipPattern" ):
                 listener.exitRelationshipPattern(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRelationshipPattern" ):
+                return visitor.visitRelationshipPattern(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4317,6 +4545,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitRelationshipDetail" ):
                 listener.exitRelationshipDetail(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRelationshipDetail" ):
+                return visitor.visitRelationshipDetail(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4428,6 +4662,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitProperties" ):
                 listener.exitProperties(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitProperties" ):
+                return visitor.visitProperties(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4489,6 +4729,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitRelationshipTypes" ):
                 listener.exitRelationshipTypes(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRelationshipTypes" ):
+                return visitor.visitRelationshipTypes(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4587,6 +4833,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitNodeLabels" ):
                 listener.exitNodeLabels(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitNodeLabels" ):
+                return visitor.visitNodeLabels(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4650,6 +4902,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitNodeLabel" ):
                 listener.exitNodeLabel(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitNodeLabel" ):
+                return visitor.visitNodeLabel(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4709,6 +4967,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitRangeLiteral" ):
                 listener.exitRangeLiteral(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRangeLiteral" ):
+                return visitor.visitRangeLiteral(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4807,6 +5071,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitLabelName" ):
                 listener.exitLabelName(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLabelName" ):
+                return visitor.visitLabelName(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4847,6 +5117,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitRelTypeName" ):
                 listener.exitRelTypeName(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRelTypeName" ):
+                return visitor.visitRelTypeName(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -4886,6 +5162,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitExpression" ):
                 listener.exitExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitExpression" ):
+                return visitor.visitExpression(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -4941,6 +5223,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitOrExpression" ):
                 listener.exitOrExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitOrExpression" ):
+                return visitor.visitOrExpression(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5014,6 +5302,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitXorExpression" ):
                 listener.exitXorExpression(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitXorExpression" ):
+                return visitor.visitXorExpression(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5086,6 +5380,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitAndExpression" ):
                 listener.exitAndExpression(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAndExpression" ):
+                return visitor.visitAndExpression(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5154,6 +5454,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitNotExpression" ):
                 listener.exitNotExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitNotExpression" ):
+                return visitor.visitNotExpression(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5227,6 +5533,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitComparisonExpression" ):
                 listener.exitComparisonExpression(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitComparisonExpression" ):
+                return visitor.visitComparisonExpression(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5295,6 +5607,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitAddOrSubtractExpression" ):
                 listener.exitAddOrSubtractExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAddOrSubtractExpression" ):
+                return visitor.visitAddOrSubtractExpression(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5404,6 +5722,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitMultiplyDivideModuloExpression" ):
                 listener.exitMultiplyDivideModuloExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMultiplyDivideModuloExpression" ):
+                return visitor.visitMultiplyDivideModuloExpression(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5537,6 +5861,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitPowerOfExpression" ):
                 listener.exitPowerOfExpression(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPowerOfExpression" ):
+                return visitor.visitPowerOfExpression(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -5612,6 +5942,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitUnaryAddOrSubtractExpression" ):
                 listener.exitUnaryAddOrSubtractExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitUnaryAddOrSubtractExpression" ):
+                return visitor.visitUnaryAddOrSubtractExpression(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5740,6 +6076,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitStringListNullOperatorExpression" ):
                 listener.exitStringListNullOperatorExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStringListNullOperatorExpression" ):
+                return visitor.visitStringListNullOperatorExpression(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -5957,6 +6299,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitPropertyOrLabelsExpression" ):
                 listener.exitPropertyOrLabelsExpression(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPropertyOrLabelsExpression" ):
+                return visitor.visitPropertyOrLabelsExpression(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6095,6 +6443,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitAtom" ):
                 listener.exitAtom(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitAtom" ):
+                return visitor.visitAtom(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6480,6 +6834,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitLiteral" ):
                 listener.exitLiteral(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLiteral" ):
+                return visitor.visitLiteral(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6555,6 +6915,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitBooleanLiteral" ):
                 listener.exitBooleanLiteral(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitBooleanLiteral" ):
+                return visitor.visitBooleanLiteral(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6609,6 +6975,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitListLiteral" ):
                 listener.exitListLiteral(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitListLiteral" ):
+                return visitor.visitListLiteral(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6707,6 +7079,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitPartialComparisonExpression" ):
                 listener.exitPartialComparisonExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPartialComparisonExpression" ):
+                return visitor.visitPartialComparisonExpression(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -6848,6 +7226,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitParenthesizedExpression" ):
                 listener.exitParenthesizedExpression(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitParenthesizedExpression" ):
+                return visitor.visitParenthesizedExpression(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6922,6 +7306,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitRelationshipsPattern" ):
                 listener.exitRelationshipsPattern(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRelationshipsPattern" ):
+                return visitor.visitRelationshipsPattern(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -6991,6 +7381,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFilterExpression" ):
                 listener.exitFilterExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFilterExpression" ):
+                return visitor.visitFilterExpression(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7062,6 +7458,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitIdInColl" ):
                 listener.exitIdInColl(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitIdInColl" ):
+                return visitor.visitIdInColl(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7125,6 +7527,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitFunctionInvocation" ):
                 listener.exitFunctionInvocation(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunctionInvocation" ):
+                return visitor.visitFunctionInvocation(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7250,6 +7658,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitFunctionName" ):
                 listener.exitFunctionName(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFunctionName" ):
+                return visitor.visitFunctionName(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7315,6 +7729,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitExplicitProcedureInvocation" ):
                 listener.exitExplicitProcedureInvocation(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitExplicitProcedureInvocation" ):
+                return visitor.visitExplicitProcedureInvocation(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7421,6 +7841,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitImplicitProcedureInvocation" ):
                 listener.exitImplicitProcedureInvocation(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitImplicitProcedureInvocation" ):
+                return visitor.visitImplicitProcedureInvocation(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7461,6 +7887,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitProcedureResultField" ):
                 listener.exitProcedureResultField(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitProcedureResultField" ):
+                return visitor.visitProcedureResultField(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7500,6 +7932,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitProcedureName" ):
                 listener.exitProcedureName(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitProcedureName" ):
+                return visitor.visitProcedureName(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7550,6 +7988,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitListComprehension" ):
                 listener.exitListComprehension(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitListComprehension" ):
+                return visitor.visitListComprehension(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7657,6 +8101,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitPatternComprehension" ):
                 listener.exitPatternComprehension(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPatternComprehension" ):
+                return visitor.visitPatternComprehension(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -7794,6 +8244,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitPropertyLookup" ):
                 listener.exitPropertyLookup(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPropertyLookup" ):
+                return visitor.visitPropertyLookup(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -7869,6 +8325,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitCaseExpression" ):
                 listener.exitCaseExpression(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCaseExpression" ):
+                return visitor.visitCaseExpression(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8028,6 +8490,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitCaseAlternatives" ):
                 listener.exitCaseAlternatives(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitCaseAlternatives" ):
+                return visitor.visitCaseAlternatives(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -8099,6 +8567,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitVariable" ):
                 listener.exitVariable(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitVariable" ):
+                return visitor.visitVariable(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -8142,6 +8616,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitNumberLiteral" ):
                 listener.exitNumberLiteral(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitNumberLiteral" ):
+                return visitor.visitNumberLiteral(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8211,6 +8691,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitMapLiteral" ):
                 listener.exitMapLiteral(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMapLiteral" ):
+                return visitor.visitMapLiteral(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8350,6 +8836,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitParameter" ):
                 listener.exitParameter(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitParameter" ):
+                return visitor.visitParameter(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -8417,6 +8909,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitPropertyExpression" ):
                 listener.exitPropertyExpression(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPropertyExpression" ):
+                return visitor.visitPropertyExpression(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -8480,6 +8978,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitPropertyKeyName" ):
                 listener.exitPropertyKeyName(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitPropertyKeyName" ):
+                return visitor.visitPropertyKeyName(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -8524,6 +9028,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitIntegerLiteral" ):
                 listener.exitIntegerLiteral(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitIntegerLiteral" ):
+                return visitor.visitIntegerLiteral(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8572,6 +9082,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitDoubleLiteral" ):
                 listener.exitDoubleLiteral(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDoubleLiteral" ):
+                return visitor.visitDoubleLiteral(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8622,6 +9138,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitSchemaName" ):
                 listener.exitSchemaName(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSchemaName" ):
+                return visitor.visitSchemaName(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 
@@ -8816,6 +9338,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitReservedWord" ):
                 listener.exitReservedWord(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitReservedWord" ):
+                return visitor.visitReservedWord(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -8888,6 +9416,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitSymbolicName" ):
                 listener.exitSymbolicName(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitSymbolicName" ):
+                return visitor.visitSymbolicName(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -8931,6 +9465,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitLeftArrowHead" ):
                 listener.exitLeftArrowHead(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLeftArrowHead" ):
+                return visitor.visitLeftArrowHead(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -8968,6 +9508,12 @@ class CypherParser ( Parser ):
             if hasattr( listener, "exitRightArrowHead" ):
                 listener.exitRightArrowHead(self)
 
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitRightArrowHead" ):
+                return visitor.visitRightArrowHead(self)
+            else:
+                return visitor.visitChildren(self)
+
 
 
 
@@ -9004,6 +9550,12 @@ class CypherParser ( Parser ):
         def exitRule(self, listener:ParseTreeListener):
             if hasattr( listener, "exitDash" ):
                 listener.exitDash(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitDash" ):
+                return visitor.visitDash(self)
+            else:
+                return visitor.visitChildren(self)
 
 
 

@@ -1,0 +1,1 @@
+CREATE (n {name: "value", another: "yay"}), (m {otherName: 'otherValue'})

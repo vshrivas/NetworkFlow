@@ -15,8 +15,11 @@ def main(argv):
     walker = antlr4.ParseTreeWalker()
     walker.walk(listener, tree)
 
+    print("Printing node-variables and their new properties:")
+    print(listener.to_create)
+
     # For now, just print the parse tree
-    print("Here it comes!")
+    print("\nHere is the whole parse tree...")
     print(antlr4.tree.Trees.Trees.toStringTree(tree, None, parser))
 
 
