@@ -2,6 +2,7 @@ import sys
 import antlr4
 from CypherLexer import CypherLexer
 from CypherParser import CypherParser
+from CypherListener import CypherListener
 
 def main(argv):
     # Set up antlr4 parser...
@@ -10,6 +11,9 @@ def main(argv):
     stream = antlr4.CommonTokenStream(lexer)
     parser = CypherParser(stream)
     tree = parser.cypher()
+    listener = CypherListener()
+    walker = antlr4.ParseTreeWalker()
+    walker.walk(listener, tree)
 
     # For now, just print the parse tree
     print("Here it comes!")

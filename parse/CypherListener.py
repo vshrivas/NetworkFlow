@@ -1,4 +1,4 @@
-# Generated from Cypher.g4 by ANTLR 4.5.3
+# Generated from Cypher.g4 by ANTLR 4.7
 from antlr4 import *
 if __name__ is not None and "." in __name__:
     from .CypherParser import CypherParser
@@ -158,6 +158,42 @@ class CypherListener(ParseTreeListener):
 
     # Exit a parse tree produced by CypherParser#removeItem.
     def exitRemoveItem(self, ctx:CypherParser.RemoveItemContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#inQueryCall.
+    def enterInQueryCall(self, ctx:CypherParser.InQueryCallContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#inQueryCall.
+    def exitInQueryCall(self, ctx:CypherParser.InQueryCallContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#standaloneCall.
+    def enterStandaloneCall(self, ctx:CypherParser.StandaloneCallContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#standaloneCall.
+    def exitStandaloneCall(self, ctx:CypherParser.StandaloneCallContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#yieldItems.
+    def enterYieldItems(self, ctx:CypherParser.YieldItemsContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#yieldItems.
+    def exitYieldItems(self, ctx:CypherParser.YieldItemsContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#yieldItem.
+    def enterYieldItem(self, ctx:CypherParser.YieldItemContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#yieldItem.
+    def exitYieldItem(self, ctx:CypherParser.YieldItemContext):
         pass
 
 
@@ -395,102 +431,102 @@ class CypherListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by CypherParser#expression12.
-    def enterExpression12(self, ctx:CypherParser.Expression12Context):
+    # Enter a parse tree produced by CypherParser#orExpression.
+    def enterOrExpression(self, ctx:CypherParser.OrExpressionContext):
         pass
 
-    # Exit a parse tree produced by CypherParser#expression12.
-    def exitExpression12(self, ctx:CypherParser.Expression12Context):
-        pass
-
-
-    # Enter a parse tree produced by CypherParser#expression11.
-    def enterExpression11(self, ctx:CypherParser.Expression11Context):
-        pass
-
-    # Exit a parse tree produced by CypherParser#expression11.
-    def exitExpression11(self, ctx:CypherParser.Expression11Context):
+    # Exit a parse tree produced by CypherParser#orExpression.
+    def exitOrExpression(self, ctx:CypherParser.OrExpressionContext):
         pass
 
 
-    # Enter a parse tree produced by CypherParser#expression10.
-    def enterExpression10(self, ctx:CypherParser.Expression10Context):
+    # Enter a parse tree produced by CypherParser#xorExpression.
+    def enterXorExpression(self, ctx:CypherParser.XorExpressionContext):
         pass
 
-    # Exit a parse tree produced by CypherParser#expression10.
-    def exitExpression10(self, ctx:CypherParser.Expression10Context):
-        pass
-
-
-    # Enter a parse tree produced by CypherParser#expression9.
-    def enterExpression9(self, ctx:CypherParser.Expression9Context):
-        pass
-
-    # Exit a parse tree produced by CypherParser#expression9.
-    def exitExpression9(self, ctx:CypherParser.Expression9Context):
+    # Exit a parse tree produced by CypherParser#xorExpression.
+    def exitXorExpression(self, ctx:CypherParser.XorExpressionContext):
         pass
 
 
-    # Enter a parse tree produced by CypherParser#expression8.
-    def enterExpression8(self, ctx:CypherParser.Expression8Context):
+    # Enter a parse tree produced by CypherParser#andExpression.
+    def enterAndExpression(self, ctx:CypherParser.AndExpressionContext):
         pass
 
-    # Exit a parse tree produced by CypherParser#expression8.
-    def exitExpression8(self, ctx:CypherParser.Expression8Context):
-        pass
-
-
-    # Enter a parse tree produced by CypherParser#expression7.
-    def enterExpression7(self, ctx:CypherParser.Expression7Context):
-        pass
-
-    # Exit a parse tree produced by CypherParser#expression7.
-    def exitExpression7(self, ctx:CypherParser.Expression7Context):
+    # Exit a parse tree produced by CypherParser#andExpression.
+    def exitAndExpression(self, ctx:CypherParser.AndExpressionContext):
         pass
 
 
-    # Enter a parse tree produced by CypherParser#expression6.
-    def enterExpression6(self, ctx:CypherParser.Expression6Context):
+    # Enter a parse tree produced by CypherParser#notExpression.
+    def enterNotExpression(self, ctx:CypherParser.NotExpressionContext):
         pass
 
-    # Exit a parse tree produced by CypherParser#expression6.
-    def exitExpression6(self, ctx:CypherParser.Expression6Context):
-        pass
-
-
-    # Enter a parse tree produced by CypherParser#expression5.
-    def enterExpression5(self, ctx:CypherParser.Expression5Context):
-        pass
-
-    # Exit a parse tree produced by CypherParser#expression5.
-    def exitExpression5(self, ctx:CypherParser.Expression5Context):
+    # Exit a parse tree produced by CypherParser#notExpression.
+    def exitNotExpression(self, ctx:CypherParser.NotExpressionContext):
         pass
 
 
-    # Enter a parse tree produced by CypherParser#expression4.
-    def enterExpression4(self, ctx:CypherParser.Expression4Context):
+    # Enter a parse tree produced by CypherParser#comparisonExpression.
+    def enterComparisonExpression(self, ctx:CypherParser.ComparisonExpressionContext):
         pass
 
-    # Exit a parse tree produced by CypherParser#expression4.
-    def exitExpression4(self, ctx:CypherParser.Expression4Context):
-        pass
-
-
-    # Enter a parse tree produced by CypherParser#expression3.
-    def enterExpression3(self, ctx:CypherParser.Expression3Context):
-        pass
-
-    # Exit a parse tree produced by CypherParser#expression3.
-    def exitExpression3(self, ctx:CypherParser.Expression3Context):
+    # Exit a parse tree produced by CypherParser#comparisonExpression.
+    def exitComparisonExpression(self, ctx:CypherParser.ComparisonExpressionContext):
         pass
 
 
-    # Enter a parse tree produced by CypherParser#expression2.
-    def enterExpression2(self, ctx:CypherParser.Expression2Context):
+    # Enter a parse tree produced by CypherParser#addOrSubtractExpression.
+    def enterAddOrSubtractExpression(self, ctx:CypherParser.AddOrSubtractExpressionContext):
         pass
 
-    # Exit a parse tree produced by CypherParser#expression2.
-    def exitExpression2(self, ctx:CypherParser.Expression2Context):
+    # Exit a parse tree produced by CypherParser#addOrSubtractExpression.
+    def exitAddOrSubtractExpression(self, ctx:CypherParser.AddOrSubtractExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#multiplyDivideModuloExpression.
+    def enterMultiplyDivideModuloExpression(self, ctx:CypherParser.MultiplyDivideModuloExpressionContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#multiplyDivideModuloExpression.
+    def exitMultiplyDivideModuloExpression(self, ctx:CypherParser.MultiplyDivideModuloExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#powerOfExpression.
+    def enterPowerOfExpression(self, ctx:CypherParser.PowerOfExpressionContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#powerOfExpression.
+    def exitPowerOfExpression(self, ctx:CypherParser.PowerOfExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#unaryAddOrSubtractExpression.
+    def enterUnaryAddOrSubtractExpression(self, ctx:CypherParser.UnaryAddOrSubtractExpressionContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#unaryAddOrSubtractExpression.
+    def exitUnaryAddOrSubtractExpression(self, ctx:CypherParser.UnaryAddOrSubtractExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#stringListNullOperatorExpression.
+    def enterStringListNullOperatorExpression(self, ctx:CypherParser.StringListNullOperatorExpressionContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#stringListNullOperatorExpression.
+    def exitStringListNullOperatorExpression(self, ctx:CypherParser.StringListNullOperatorExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#propertyOrLabelsExpression.
+    def enterPropertyOrLabelsExpression(self, ctx:CypherParser.PropertyOrLabelsExpressionContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#propertyOrLabelsExpression.
+    def exitPropertyOrLabelsExpression(self, ctx:CypherParser.PropertyOrLabelsExpressionContext):
         pass
 
 
@@ -593,6 +629,42 @@ class CypherListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by CypherParser#explicitProcedureInvocation.
+    def enterExplicitProcedureInvocation(self, ctx:CypherParser.ExplicitProcedureInvocationContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#explicitProcedureInvocation.
+    def exitExplicitProcedureInvocation(self, ctx:CypherParser.ExplicitProcedureInvocationContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#implicitProcedureInvocation.
+    def enterImplicitProcedureInvocation(self, ctx:CypherParser.ImplicitProcedureInvocationContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#implicitProcedureInvocation.
+    def exitImplicitProcedureInvocation(self, ctx:CypherParser.ImplicitProcedureInvocationContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#procedureResultField.
+    def enterProcedureResultField(self, ctx:CypherParser.ProcedureResultFieldContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#procedureResultField.
+    def exitProcedureResultField(self, ctx:CypherParser.ProcedureResultFieldContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#procedureName.
+    def enterProcedureName(self, ctx:CypherParser.ProcedureNameContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#procedureName.
+    def exitProcedureName(self, ctx:CypherParser.ProcedureNameContext):
+        pass
+
+
     # Enter a parse tree produced by CypherParser#listComprehension.
     def enterListComprehension(self, ctx:CypherParser.ListComprehensionContext):
         pass
@@ -617,6 +689,24 @@ class CypherListener(ParseTreeListener):
 
     # Exit a parse tree produced by CypherParser#propertyLookup.
     def exitPropertyLookup(self, ctx:CypherParser.PropertyLookupContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#caseExpression.
+    def enterCaseExpression(self, ctx:CypherParser.CaseExpressionContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#caseExpression.
+    def exitCaseExpression(self, ctx:CypherParser.CaseExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#caseAlternatives.
+    def enterCaseAlternatives(self, ctx:CypherParser.CaseAlternativesContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#caseAlternatives.
+    def exitCaseAlternatives(self, ctx:CypherParser.CaseAlternativesContext):
         pass
 
 
@@ -689,6 +779,24 @@ class CypherListener(ParseTreeListener):
 
     # Exit a parse tree produced by CypherParser#doubleLiteral.
     def exitDoubleLiteral(self, ctx:CypherParser.DoubleLiteralContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#schemaName.
+    def enterSchemaName(self, ctx:CypherParser.SchemaNameContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#schemaName.
+    def exitSchemaName(self, ctx:CypherParser.SchemaNameContext):
+        pass
+
+
+    # Enter a parse tree produced by CypherParser#reservedWord.
+    def enterReservedWord(self, ctx:CypherParser.ReservedWordContext):
+        pass
+
+    # Exit a parse tree produced by CypherParser#reservedWord.
+    def exitReservedWord(self, ctx:CypherParser.ReservedWordContext):
         pass
 
 
