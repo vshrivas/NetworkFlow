@@ -2,6 +2,8 @@
 # Bytes 1-3: Label ID
 # Bytes 4-7: Label
 # Bytes 8-11: Next Label ID
+import sys
+
 class Label:
     LABEL_ID_OFFSET = 0
     LABEL_OFFSET = 3
@@ -34,10 +36,11 @@ class Label:
 
         # write label
         storeFile.seek(self.startOffset + Label.LABEL_OFFSET)
-        storeFile.write(bytearray(self.label))
+        storeFile.write(bytearray(self.label, 'utf8'))
 
         # write next label's ID
         storeFile.seek(self.startOffset + Label.NEXT_LABEL_ID_OFFSET)
-        storeFile.write(bytearray(self.nextLabelID))
+        storeFile.write(nextLabelID.to_bytes(3, 
+            byteorder = sys.byteorder, signed=True))
 
         

@@ -36,6 +36,8 @@ class NodeFile(object):
         relationshipStore = open(relationshipFile.getFileName(), 'rb')
         nextRelID = firstRelID
 
+        print("reading relationships")
+
         # while there is a next relationship
         while nextRelID != -1:
             relationshipStartOffset = nextRelID * Relationship.storageSize
@@ -61,7 +63,7 @@ class NodeFile(object):
                 relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
                 nextRelID = int.from_bytes(relationshipStore.read(4), sys.byteorder, signed=True)
         
-
+        print("reading properties")
 
         # read first property ID
         nodeStore.seek(nodeStartOffset + Node.PROPERTY_ID_OFFSET)
@@ -101,6 +103,7 @@ class NodeFile(object):
 
         labelStore = open(labelFile.getFileName(), 'rb')
 
+        print("reading labels")
         while nextLabelID != -1:
             # read label and add it to node
             labelStartOffset = nextLabelID * Label.storageSize

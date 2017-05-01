@@ -30,6 +30,9 @@ def testCase():
 
     relationship1 = Relationship(node1.getID(), node2.getID(), relationshipFile)
     node1.addRelationship(relationship1)
+
+    label1 = Label('Person', labelFile)
+    node1.addLabel(label1)
     #node2.addRelationship(relationship1)
 
     node1.writeNode()

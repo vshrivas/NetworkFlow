@@ -18,17 +18,17 @@ class LabelFile:
 
     # This method reads a given label based on labelID and returns a label object for it
     def readLabel(self, labelID):
-        nodeStore = open(self.fileName, 'rb')
-        nodeStartOffset = labelID * Label.storageSize
+        labelStore = open(self.fileName, 'rb')
+        labelStartOffset = labelID * Label.storageSize
         
-        nodeStore.seek(nodeStartOffset)
+        labelStore.seek(labelStartOffset)
         # Requires Python >= 3.2 for the function int.from_bytes
-        labelID = int.from_bytes(nodeStore.read(3), byteorder=sys.byteorder, signed=True)
+        labelID = int.from_bytes(labelStore.read(3), byteorder=sys.byteorder, signed=True)
 
-        nodeStore.seek(nodeStartOffset + Label.LABEL_OFFSET)
-        labelString = nodeStore.read(4).decode("utf-8")
+        labelStore.seek(labelStartOffset + Label.LABEL_OFFSET)
+        labelString = labelStore.read(4).decode('utf8')
 
-        nodeStore.seek(nodeStartOffset + Label.NEXT_LABEL_ID_OFFSET)
+        labelStore.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
         nextLabelID = int.from_bytes(nodeStore.read(3), byteorder=sys.byteorder, signed=True)
 
         label = Label(labelID, labelString, nextLabelID)
