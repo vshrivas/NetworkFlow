@@ -17,13 +17,16 @@ class Label:
             labelID = Label.numLabels
 
         self.labelID = labelID
+        Label.numLabels += 1
 
         self.label = label
-        Label.numLabels += 1
 
         self.labelFile = labelFile
 
         self.startOffset = self.labelID * Label.storageSize
+
+    def getLabelID():
+        return self.labelID
 
     def writeLabel(self, nextLabelID):
         # open label file
@@ -32,7 +35,8 @@ class Label:
 
         # seek to location for label and write label ID
         storeFile.seek(self.startOffset)
-        storeFile.write(bytearray(self.labelID))
+        storeFile.write(self.labelID.to_bytes(3, 
+            byteorder = sys.byteorder, signed=True))
 
         # write label
         storeFile.seek(self.startOffset + Label.LABEL_OFFSET)

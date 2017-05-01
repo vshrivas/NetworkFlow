@@ -107,6 +107,8 @@ class NodeFile(object):
         while nextLabelID != -1:
             # read label and add it to node
             labelStartOffset = nextLabelID * Label.storageSize
+            print('label start offset:{0}'.format(labelStartOffset))
+
             labelStore.seek(labelStartOffset)
             label = labelFile.readLabel(nextLabelID)
             node.addLabel(label)
@@ -114,6 +116,7 @@ class NodeFile(object):
             # find next label id
             labelStore.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
             nextLabelID = int.from_bytes(labelStore.read(3), sys.byteorder, signed=True)
+            print (nextLabelID)
 
         return node
 

@@ -11,6 +11,7 @@
 
 from Relationship import Relationship
 from Property import Property
+from Label import Label
 import sys
 
 class Node:
@@ -158,12 +159,12 @@ class Node:
 
             # no next label
             if labelIndex == len(self.labels) - 1:
-                nextLabel = -1
+                nextLabelID = -1
             
             else:
-                nextLabel = self.labels[labelIndex + 1]
+                nextLabelID = self.labels[labelIndex + 1].getLabelID()
 
-            label.writeLabel(nextLabel)
+            label.writeLabel(nextLabelID)
 
 
 

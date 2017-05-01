@@ -21,7 +21,7 @@ class LabelFile:
         labelStore = open(self.fileName, 'rb')
         labelStartOffset = labelID * Label.storageSize
         
-        labelStore.seek(labelStartOffset)
+        labelStore.seek(labelStartOffset + Label.LABEL_ID_OFFSET)
         # Requires Python >= 3.2 for the function int.from_bytes
         labelID = int.from_bytes(labelStore.read(3), byteorder=sys.byteorder, signed=True)
 
@@ -29,7 +29,7 @@ class LabelFile:
         labelString = labelStore.read(4).decode('utf8')
 
         labelStore.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
-        nextLabelID = int.from_bytes(nodeStore.read(3), byteorder=sys.byteorder, signed=True)
+        nextLabelID = int.from_bytes(labelStore.read(3), byteorder=sys.byteorder, signed=True)
 
         label = Label(labelID, labelString, nextLabelID)
         return label
