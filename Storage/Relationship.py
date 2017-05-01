@@ -33,8 +33,8 @@ class Relationship:
         self.secondNodeID = node2ID
 
         if relationshipID is None:
-            relationshipID = numRelationships
-            
+            relationshipID = Relationship.numRelationships
+
         self.relationshipID = relationshipID
         Relationship.numRelationships += 1
 

@@ -37,7 +37,7 @@ class Node:
         self.labels = []
 
         if nodeID is None:
-            nodeID = numNodes
+            nodeID = Node.numNodes
 
         self.nodeID = nodeID
         # increment number of nodes 

@@ -25,7 +25,7 @@ class Property:
         self.value = value
 
         if propertyID is None:
-            propertyID = numProperties
+            propertyID = Property.numProperties
 
         self.propertyID = propertyID
         Property.numProperties += 1

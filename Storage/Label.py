@@ -12,8 +12,8 @@ class Label:
 
     def __init__(self, label, labelFile, labelID=None):
         if labelID is None:
-            labelID = numLabels
-            
+            labelID = Label.numLabels
+
         self.labelID = labelID
 
         self.label = label
