@@ -31,30 +31,33 @@ class Node:
             nodeID = Node.numNodes
 		# relationships is the list of relationships this node is in 
         self.relationships = []
-		# key-value pairs or properties stored within node
-		# e.g. name: Jane
+        # key-value pairs or properties stored within node
+        # e.g. name: Jane
         self.properties = []
-		# labels indicate the type of a node, a node can have multiple labels
-		# e.g. person, bank account, id
+        # labels indicate the type of a node, a node can have multiple labels
+        # e.g. person, bank account, id
         self.labels = []
 
+        if nodeID is None:
+            nodeID = Node.numNodes
+
         self.nodeID = nodeID
-		# increment number of nodes 
+        # increment number of nodes 
         Node.numNodes += 1
 
         self.nodeFile = nodeFile
 
         self.startOffset = self.nodeID * Node.storageSize
 
-	# This method adds a node with a relationship to this node's adj list
+    # This method adds a node with a relationship to this node's adj list
     def addRelationship(self, rel):
         self.relationships.append(rel)
 
-	# This method adds data to a node 
+    # This method adds data to a node 
     def addProperty(self, prop):
         self.properties.append(prop)
 
-	# This method adds labels to a node
+    # This method adds labels to a node
     def addLabel(self, nodeLabel):
         self.labels.append(nodeLabel)
 
@@ -104,7 +107,7 @@ class Node:
 
         print("wrote first rel ID: {0}". format(firstRel.getID()))
 
-		# write first property ID
+        # write first property ID
         storeFile.seek(self.startOffset + Node.PROPERTY_ID_OFFSET)
         firstProp = self.properties[0]
         storeFile.write(firstProp.getID().to_bytes(Property.propIDByteSize, 
@@ -138,7 +141,7 @@ class Node:
 
         print("writing properties to property file ...")
 
-		# write properties to property file
+        # write properties to property file
         for propIndex in range(0, len(self.properties)):
             print("writing {0} property ".format(propIndex))
 
@@ -146,6 +149,7 @@ class Node:
 
             # no next property
             if propIndex == len(self.properties) - 1:
+                print("no next property")
                 nullProperty = Property("", "", "", -1)
                 prop.writeProperty(nullProperty)
 

@@ -36,6 +36,8 @@ class NodeFile(object):
         relationshipStore = open(relationshipFile.getFileName(), 'rb')
         nextRelID = firstRelID
 
+        print("reading relationships")
+
         # while there is a next relationship
         while nextRelID != -1:
             relationshipStartOffset = nextRelID * Relationship.storageSize
@@ -57,10 +59,12 @@ class NodeFile(object):
             if nodeID == node1ID:
                 relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
                 nextRelID = int.from_bytes(relationshipStore.read(4), sys.byteorder, signed=True)
+                
             else:
                 relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
                 nextRelID = int.from_bytes(relationshipStore.read(4), sys.byteorder, signed=True)
-
+        
+        print("reading properties")
 
         # read first property ID
         nodeStore.seek(nodeStartOffset + Node.PROPERTY_ID_OFFSET)
@@ -75,10 +79,14 @@ class NodeFile(object):
             # find key
             propertyStore.seek(propertyStartOffset + Property.KEY_OFFSET)
             key = propertyStore.read(4).decode("utf-8")
+            #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+            print('key: {0}'.format(key))
 
             # find value
             propertyStore.seek(propertyStartOffset + Property.VALUE_OFFSET)
+            #value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
             value = propertyStore.read(4).decode("utf-8")
+            print('value: {0}'.format(value))
 
             print(key)
             print(value)
@@ -90,14 +98,16 @@ class NodeFile(object):
             # find next property id
             propertyStore.seek(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET)
             nextPropID = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
-            print(nextPropID)
+            print("next prop id is {0}".format(nextPropID))
 
         # read first label id
         nodeStore.seek(nodeStartOffset + Node.LABEL_STORE_PTR_OFFSET)
         firstLabelID = int.from_bytes(nodeStore.read(3), sys.byteorder, signed=True)
         nextLabelID = firstLabelID
+
         labelStore = open(labelFile.getFileName(), 'rb')
 
+        print("reading labels")
         while nextLabelID != -1:
             # read label and add it to node
             labelStartOffset = nextLabelID * Label.storageSize

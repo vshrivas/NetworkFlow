@@ -67,6 +67,7 @@ class Property:
 
         # write next property id
         storeFile.seek(self.startOffset + Property.NEXT_PROPERTY_ID_OFFSET)
+        print("next property has index:{0}".format(nextProp.getID()))
         storeFile.write(nextProp.getID().to_bytes(Property.propIDByteSize, 
                 byteorder = sys.byteorder, signed = True))
 
