@@ -109,8 +109,8 @@ class NodeFile(object):
             node.addLabel(label)
 
             # find next label id
-            labelFile.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
-            nextLabelID = int.from_bytes(labelFile.read(3), sys.byteorder, signed=True)
+            labelStore.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
+            nextLabelID = int.from_bytes(labelStore.read(3), sys.byteorder, signed=True)
 
         return node
 
