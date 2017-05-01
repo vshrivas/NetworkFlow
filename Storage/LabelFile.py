@@ -7,7 +7,7 @@ class LabelFile:
         LabelFile.numFiles += 1
         self.fileID = LabelFile.numFiles
 
-		# create relationship file
+        # create relationship file
         self.fileName = "LabelFile{0}".format(self.fileID)
         relFile = open(self.fileName, 'wb')
         relFile.close()
