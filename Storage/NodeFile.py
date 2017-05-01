@@ -40,6 +40,7 @@ class NodeFile(object):
 
         # while there is a next relationship
         while nextRelID != -1:
+            print(nextRelID)
             relationshipStartOffset = nextRelID * Relationship.storageSize
 
             # find ID of first node in relationship

@@ -166,7 +166,7 @@ class Node:
                 nextLabel = -1
             
             else:
-                nextLabel = self.labels[labelIndex + 1]
+                nextLabel = self.labels[labelIndex + 1].labelID
 
             label.writeLabel(nextLabel)
 

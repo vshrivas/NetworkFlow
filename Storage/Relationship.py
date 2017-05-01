@@ -82,7 +82,7 @@ class Relationship:
 
         else:
             print("writing relationship for second node")
-            storeFile.seek(self.startOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
+            storeFile.seek(self.startOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
             storeFile.write(nextRel.getID().to_bytes(Relationship.relIDByteSize, 
                 byteorder = sys.byteorder, signed = True))
 
