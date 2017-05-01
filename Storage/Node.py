@@ -26,7 +26,7 @@ class Node:
     storageSize = 15
     numNodes = 0
 
-    def __init__(self, nodeFile, nodeID=numNodes):
+    def __init__(self, nodeFile, nodeID=None):
         # relationships is the list of relationships this node is in 
         self.relationships = []
         # key-value pairs or properties stored within node
@@ -35,6 +35,9 @@ class Node:
         # labels indicate the type of a node, a node can have multiple labels
         # e.g. person, bank account, id
         self.labels = []
+
+        if nodeID is None:
+            nodeID = numNodes
 
         self.nodeID = nodeID
         # increment number of nodes 

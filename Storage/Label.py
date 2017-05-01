@@ -10,7 +10,10 @@ class Label:
     storageSize = 11
     numLabels = 0
 
-    def __init__(self, label, labelFile, labelID=numLabels):
+    def __init__(self, label, labelFile, labelID=None):
+        if labelID is None:
+            labelID = numLabels
+            
         self.labelID = labelID
 
         self.label = label

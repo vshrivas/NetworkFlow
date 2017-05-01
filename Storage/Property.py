@@ -18,11 +18,14 @@ class Property:
 
     propIDByteSize = 4
 
-    def __init__(self, key, value, propertyFile, propertyID=numProperties):
+    def __init__(self, key, value, propertyFile, propertyID=None):
         # Note: For reading properties from files, we assume keys and values to be ints.
         # TODO: Support reading keys and values of other types
         self.key = key
         self.value = value
+
+        if propertyID is None:
+            propertyID = numProperties
 
         self.propertyID = propertyID
         Property.numProperties += 1

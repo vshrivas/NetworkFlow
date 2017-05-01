@@ -28,10 +28,13 @@ class Relationship:
 
     relIDByteSize = 4
 
-    def __init__(self, node1ID, node2ID, relationshipFile, relationshipID=numRelationships):
+    def __init__(self, node1ID, node2ID, relationshipFile, relationshipID=None):
         self.firstNodeID = node1ID
         self.secondNodeID = node2ID
 
+        if relationshipID is None:
+            relationshipID = numRelationships
+            
         self.relationshipID = relationshipID
         Relationship.numRelationships += 1
 
