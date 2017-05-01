@@ -1,6 +1,7 @@
 from Node import Node
 from Property import Property
 from Relationship import Relationship
+from Label import Label
 import sys
 
 class NodeFile(object):
@@ -49,6 +50,7 @@ class NodeFile(object):
 
             # create relationship and add to node
             rel = Relationship(node1ID, node2ID, relationshipFile)
+            rel.relationshipID = nextRelID
             node.addRelationship(rel)
 
             # find next rel ID
@@ -72,11 +74,14 @@ class NodeFile(object):
 
             # find key
             propertyStore.seek(propertyStartOffset + Property.KEY_OFFSET)
-            key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+            key = propertyStore.read(4).decode("utf-8")
 
             # find value
             propertyStore.seek(propertyStartOffset + Property.VALUE_OFFSET)
-            value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+            value = propertyStore.read(4).decode("utf-8")
+
+            print(key)
+            print(value)
 
             # create property and add to node
             prop = Property(key, value, propertyFile)
@@ -85,22 +90,24 @@ class NodeFile(object):
             # find next property id
             propertyStore.seek(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET)
             nextPropID = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+            print(nextPropID)
 
         # read first label id
         nodeStore.seek(nodeStartOffset + Node.LABEL_STORE_PTR_OFFSET)
-        firstLabelID = int.from_bytes(nodeFile.read(3), sys.byteorder, signed=True)
+        firstLabelID = int.from_bytes(nodeStore.read(3), sys.byteorder, signed=True)
         nextLabelID = firstLabelID
+        labelStore = open(labelFile.getFileName(), 'rb')
 
         while nextLabelID != -1:
             # read label and add it to node
             labelStartOffset = nextLabelID * Label.storageSize
-            labelFile.seek(labelStartOffset)
+            labelStore.seek(labelStartOffset)
             label = labelFile.readLabel(nextLabelID)
             node.addLabel(label)
 
             # find next label id
-            labelFile.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
-            nextLabelID = int.from_bytes(labelFile.read(3), sys.byteorder, signed=True)
+            labelStore.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
+            nextLabelID = int.from_bytes(labelStore.read(3), sys.byteorder, signed=True)
 
         return node
 

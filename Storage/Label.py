@@ -1,3 +1,5 @@
+import sys
+
 # Storage
 # Bytes 1-3: Label ID
 # Bytes 4-7: Label
@@ -10,7 +12,9 @@ class Label:
     storageSize = 11
     numLabels = 0
 
-    def __init__(self, label, labelFile, labelID=numLabels):
+    def __init__(self, label, labelFile, labelID=None, nextLabelID=-1):
+        if labelID is None:
+            labelID = Label.numLabels
         self.labelID = labelID
 
         self.label = label
@@ -19,6 +23,7 @@ class Label:
         self.labelFile = labelFile
 
         self.startOffset = self.labelID * Label.storageSize
+        self.nextLabelID = nextLabelID
 
     def writeLabel(self, nextLabelID):
         # open label file
@@ -27,14 +32,16 @@ class Label:
 
         # seek to location for label and write label ID
         storeFile.seek(self.startOffset)
-        storeFile.write(bytearray(self.labelID))
+        storeFile.write(self.labelID.to_bytes(Label.LABEL_OFFSET, 
+                byteorder = sys.byteorder, signed = True))
 
         # write label
         storeFile.seek(self.startOffset + Label.LABEL_OFFSET)
-        storeFile.write(bytearray(self.label))
+        storeFile.write(bytearray(self.label, "utf8"))
 
         # write next label's ID
         storeFile.seek(self.startOffset + Label.NEXT_LABEL_ID_OFFSET)
-        storeFile.write(bytearray(self.nextLabelID))
+        storeFile.write(nextLabelID.to_bytes(Label.LABEL_OFFSET, 
+                byteorder = sys.byteorder, signed = True))
 
         

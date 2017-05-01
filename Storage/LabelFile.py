@@ -1,5 +1,7 @@
 import sys
 
+from Label import Label
+
 class LabelFile:
     numFiles = 0
 
@@ -16,7 +18,7 @@ class LabelFile:
         return self.fileName
 
     # This method reads a given label based on labelID and returns a label object for it
-    def readLabel(self, labelID, labelFile):
+    def readLabel(self, labelID):
         nodeStore = open(self.fileName, 'rb')
         nodeStartOffset = labelID * Label.storageSize
         
@@ -30,5 +32,5 @@ class LabelFile:
         nodeStore.seek(nodeStartOffset + Label.NEXT_LABEL_ID_OFFSET)
         nextLabelID = int.from_bytes(nodeStore.read(3), byteorder=sys.byteorder, signed=True)
 
-        label = Label(labelID, labelString, nextLabelID)
+        label = Label(labelString, self, labelID, nextLabelID)
         return label
