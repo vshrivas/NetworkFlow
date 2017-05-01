@@ -1,4 +1,9 @@
-class NodeFile:
+from Node import Node
+from Property import Property
+from Relationship import Relationship
+import sys
+
+class NodeFile(object):
     numFiles = 0
 
     def __init__(self):
@@ -24,8 +29,8 @@ class NodeFile:
 
         # find all relationships
         # read first rel ID
-        nodeFile.seek(nodeStartOffset + Node.REL_ID_OFFSET)
-        firstRelID = int.from_bytes(nodeFile.read(4), byte_order=sys.byteorder, signed=True)
+        nodeStore.seek(nodeStartOffset + Node.REL_ID_OFFSET)
+        firstRelID = int.from_bytes(nodeStore.read(4), byteorder=sys.byteorder, signed=True)
 
         relationshipStore = open(relationshipFile.getFileName(), 'rb')
         nextRelID = firstRelID
@@ -35,11 +40,11 @@ class NodeFile:
             relationshipStartOffset = nextRelID * Relationship.storageSize
 
             # find ID of first node in relationship
-            relationshipStore.seek(relationshipStartOffset + NODE1_ID_OFFSET)
+            relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_ID_OFFSET)
             node1ID = int.from_bytes(relationshipStore.read(3), sys.byteorder, signed=True)
 
             # find ID of second node in relationship
-            relationshipStore.seek(relationshipStartOffset + NODE2_ID_OFFSET)
+            relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_ID_OFFSET)
             node2ID = int.from_bytes(relationshipStore.read(3), sys.byteorder, signed=True)
 
             # create relationship and add to node
@@ -48,16 +53,16 @@ class NodeFile:
 
             # find next rel ID
             if nodeID == node1ID:
-                relationshipStore.seek(relationshipStartOffset + NODE1_NEXT_REL_ID_OFFSET)
+                relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
                 nextRelID = int.from_bytes(relationshipStore.read(4), sys.byteorder, signed=True)
             else:
-                relationshipStore.seek(relationshipStartOffset + NODE2_NEXT_REL_ID_OFFSET)
+                relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
                 nextRelID = int.from_bytes(relationshipStore.read(4), sys.byteorder, signed=True)
 
 
         # read first property ID
-        nodeFile.seek(startOffset + Node.PROPERTY_ID_OFFSET)
-        firstPropID = int.from_bytes(nodeFile.read(4), sys.byteorder, signed=True)
+        nodeStore.seek(nodeStartOffset + Node.PROPERTY_ID_OFFSET)
+        firstPropID = int.from_bytes(nodeStore.read(4), sys.byteorder, signed=True)
 
         propertyStore = open(propertyFile.getFileName(), 'rb')
         nextPropID = firstPropID
@@ -66,11 +71,11 @@ class NodeFile:
             propertyStartOffset = nextPropID * Property.storageSize
 
             # find key
-            propertyStore.seek(propertyStartOffset + KEY_OFFSET)
+            propertyStore.seek(propertyStartOffset + Property.KEY_OFFSET)
             key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
 
             # find value
-            propertyStore.seek(propertyStartOffset + VALUE_OFFSET)
+            propertyStore.seek(propertyStartOffset + Property.VALUE_OFFSET)
             value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
 
             # create property and add to node
@@ -78,11 +83,11 @@ class NodeFile:
             node.addProperty(prop)
 
             # find next property id
-            propertyStore.seek(propertyStartOffset + NEXT_PROPERTY_ID_OFFSET)
+            propertyStore.seek(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET)
             nextPropID = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
 
         # read first label id
-        nodeFile.seek(startOffset + Node.LABEL_STORE_PTR_OFFSET)
+        nodeStore.seek(nodeStartOffset + Node.LABEL_STORE_PTR_OFFSET)
         firstLabelID = int.from_bytes(nodeFile.read(3), sys.byteorder, signed=True)
         nextLabelID = firstLabelID
 

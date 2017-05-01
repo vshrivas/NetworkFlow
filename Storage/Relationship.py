@@ -9,7 +9,10 @@
 
 # Uniqueness:
 # If relationship with node 1 = A and node 2 = B exists, a relationship with 
-# node 1 = B and node 2 = A should not exist 
+# node 1 = B and node 2 = A should not exist
+#from Node import Node 
+import sys
+
 
 class Relationship:
     RELATIONSHIP_ID_OFFSET = 0
@@ -22,6 +25,8 @@ class Relationship:
 
     storageSize = 26
     numRelationships = 0
+
+    relIDByteSize = 4
 
     def __init__(self, node1ID, node2ID, relationshipFile, relationshipID=numRelationships):
         self.firstNodeID = node1ID
@@ -43,30 +48,43 @@ class Relationship:
         storeFile.seek(self.startOffset)
 
         # write relationship ID
-        storeFile.write(bytearray(self.relationshipID))
+        storeFile.write(self.relationshipID.to_bytes(Relationship.relIDByteSize, 
+            byteorder = sys.byteorder, signed=True))
+        print("wrote relationship id")
 
         # write node 1 id
         storeFile.seek(self.startOffset + Relationship.NODE1_ID_OFFSET)
-        storeFile.write(bytearray(self.firstNodeID))
+        storeFile.write(self.firstNodeID.to_bytes(3, 
+            byteorder = sys.byteorder, signed=True))
+        print("wrote first node id")
 
         # write node 2 id
         storeFile.seek(self.startOffset + Relationship.NODE2_ID_OFFSET)
-        storeFile.write(bytearray(self.secondNodeID))
+        storeFile.write(self.secondNodeID.to_bytes(3, 
+            byteorder = sys.byteorder, signed=True))
+        print("wrote second node id")
 
         # find which node relationship is being written for
-        if node.getID() == node1.getID():
+        if node.getID() == self.firstNodeID:
+            print("writing relationship for first node")
+
             storeFile.seek(self.startOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
-            storeFile.write(bytearray(nextRel.getID()))
+            storeFile.write(nextRel.getID().to_bytes(Relationship.relIDByteSize, 
+                byteorder = sys.byteorder, signed=True))
 
             storeFile.seek(self.startOffset + Relationship.NODE1_PREV_REL_ID_OFFSET)
-            storeFile.write(bytearray(prevRel.getID()))
+            storeFile.write(prevRel.getID().to_bytes(Relationship.relIDByteSize, 
+                byteorder = sys.byteorder, signed=True))
 
         else:
+            print("writing relationship for second node")
             storeFile.seek(self.startOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
-            storeFile.write(bytearray(nextRel.getID()))
+            storeFile.write(nextRel.getID().to_bytes(Relationship.relIDByteSize, 
+                byteorder = sys.byteorder, signed = True))
 
             storeFile.seek(self.startOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
-            storeFile.write(bytearray(prevRel.getID()))
+            storeFile.write(prevRel.getID().to_bytes(Relationship.relIDByteSize, 
+                byteorder = sys.byteorder, signed = True))
 
     def getID(self):
         return self.relationshipID 

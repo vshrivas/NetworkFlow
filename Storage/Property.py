@@ -5,6 +5,7 @@
 # Bytes 5-8: Key
 # Bytes 9-12: Value
 # Bytes 13-16: Next Property ID
+import sys
 
 class Property:
 	PROPERTY_ID_OFFSET = 0
@@ -14,6 +15,8 @@ class Property:
 
 	storageSize = 16
 	numProperties = 0
+
+	propIDByteSize = 4
 
 	def __init__(self, key, value, propertyFile, propertyID=numProperties):
         # Note: For reading properties from files, we assume keys and values to be ints.
@@ -42,24 +45,26 @@ class Property:
 
 	def writeProperty(self, nextProp):
 		# open property file
-		storeFileName = propertyFile.getName()
+		storeFileName = self.getPropertyFile().getFileName()
 		storeFile = open(storeFileName, 'ab')
 
 		# write property id
-		storeFile.seek(self.startOffset + PROPERTY_ID_OFFSET)
-		storeFile.write(bytearray(self.propertyID))
+		storeFile.seek(self.startOffset + Property.PROPERTY_ID_OFFSET)
+		storeFile.write(self.propertyID.to_bytes(Property.propIDByteSize, 
+                byteorder = sys.byteorder, signed = True))
 
 		# write key
-		storeFile.seek(self.startOffset + KEY_OFFSET)
-		storeFile.write(bytearray(self.key))
+		storeFile.seek(self.startOffset + Property.KEY_OFFSET)
+		storeFile.write(bytearray(self.key, 'utf8'))
 
 		# write value
-		storeFile.seek(self.startOffset + VALUE_OFFSET)
-		storeFile.write(bytearray(self.value))
+		storeFile.seek(self.startOffset + Property.VALUE_OFFSET)
+		storeFile.write(bytearray(self.value, 'utf8'))
 
 		# write next property id
-		storeFile.seek(self.startOffset + NEXT_PROPERTY_ID_OFFSET)
-		storeFile.write(bytearray(nextProp.getID()))
+		storeFile.seek(self.startOffset + Property.NEXT_PROPERTY_ID_OFFSET)
+		storeFile.write(nextProp.getID().to_bytes(Property.propIDByteSize, 
+                byteorder = sys.byteorder, signed = True))
 
 
 

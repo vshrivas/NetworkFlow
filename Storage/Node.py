@@ -11,6 +11,7 @@
 
 from Relationship import Relationship
 from Property import Property
+import sys
 
 class Node:
     NODE_ID_OFFSET = 0
@@ -19,6 +20,8 @@ class Node:
     PROPERTY_ID_OFFSET = 8
     LABEL_STORE_PTR_OFFSET = 11
     FLAGS_OFFSET = 14
+
+    nodeIDByteLen = 3
 
     storageSize = 15
     numNodes = 0
@@ -46,8 +49,8 @@ class Node:
         self.relationships.append(rel)
 
 	# This method adds data to a node 
-    def addProperty(self, property):
-        self.properties.append(property)
+    def addProperty(self, prop):
+        self.properties.append(prop)
 
 	# This method adds labels to a node
     def addLabel(self, nodeLabel):
@@ -67,52 +70,78 @@ class Node:
 
     # This method writes this node to the given node file
     def writeNode(self):
+        print("writing node...")
+
         # open node file
         storeFileName = self.nodeFile.getFileName()
         storeFile = open(storeFileName, 'ab')
 
+        print("opened store file: {0}". format(storeFileName))
+
         # write node id
         storeFile.seek(self.startOffset + Node.NODE_ID_OFFSET)
-        storeFile.write(bytearray(self.nodeID))
+        storeFile.write((self.nodeID).to_bytes(Node.nodeIDByteLen, 
+            byteorder = sys.byteorder, signed=True))
+
+        print("wrote node ID: {0}". format(self.nodeID))
 
         # write in-use flag
         storeFile.seek(self.startOffset + Node.IN_USE_FLAG_OFFSET)
         storeFile.write(bytearray(1))
 
+        print("wrote in-use flag: {0}". format(1))
+
         # write first relationship ID
         storeFile.seek(self.startOffset + Node.REL_ID_OFFSET)
         firstRel = self.relationships[0]
-        storeFile.write(bytearray(firstRel.getID()))
+        storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteSize, 
+            byteorder = sys.byteorder, signed=True))
+
+        print("wrote first rel ID: {0}". format(firstRel.getID()))
 
 		# write first property ID
         storeFile.seek(self.startOffset + Node.PROPERTY_ID_OFFSET)
         firstProp = self.properties[0]
-        storeFile.write(bytearray(firstProp.getID()))
+        storeFile.write(firstProp.getID().to_bytes(Property.propIDByteSize, 
+            byteorder = sys.byteorder, signed=True))
+
+        print("wrote first property ID: {0}". format(firstProp.getID()))
+
+        print("writing relationships to relationship file ...")
 
         # write relationships to relationship file
         for relIndex in range(0, len(self.relationships)):
+            print("writing {0} relationship ".format(relIndex))
             rel = self.relationships[relIndex]
+
+            # first relationship
             if relIndex == 0:
-                nullRelationship = Relationship(-1, -1, -1, "")
-                if relIndex + 1 >= len(self.relationships):
+                nullRelationship = Relationship(-1, -1, "", -1)
+                # no next relationship
+                if relIndex == len(self.relationships) - 1:
+                    print("only one relationship")
                     rel.writeRelationship(self, nullRelationship, nullRelationship)
                 else:
-                    nullRelationship = Relationship(-1, -1, -1, "")
+                    nullRelationship = Relationship(-1, -1, "", -1)
                     rel.writeRelationship(self, nullRelationship, self.relationships[relIndex + 1])
             elif relIndex == len(self.relationships) - 1:
-                nullRelationship = Relationship(-1, -1, -1, "")
+                nullRelationship = Relationship(-1, -1, "", -1)
                 rel.writeRelationship(self, self.relationships[relIndex - 1], nullRelationship)
             else:
                 rel.writeRelationship(self, self.relationships[relIndex - 1], 
                     self.relationships[relIndex + 1])
 
+        print("writing properties to property file ...")
+
 		# write properties to property file
         for propIndex in range(0, len(self.properties)):
+            print("writing {0} property ".format(propIndex))
+
             prop = self.properties[propIndex]
 
             # no next property
             if propIndex == len(self.properties) - 1:
-                nullProperty = Property(-1, -1, -1, "")
+                nullProperty = Property("", "", "", -1)
                 prop.writeProperty(nullProperty)
 
             else:
