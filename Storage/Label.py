@@ -1,7 +1,7 @@
 # Storage
 # Bytes 1-3: Label ID
 # Bytes 4-7: Label
-# Bytes 8-11: Next Label ID
+# Bytes 8-10: Next Label ID
 import sys
 
 class Label:
@@ -9,7 +9,7 @@ class Label:
     LABEL_OFFSET = 3
     NEXT_LABEL_ID_OFFSET = 7
 
-    storageSize = 11
+    storageSize = 10
     numLabels = 0
 
     def __init__(self, label, labelFile, labelID=None):
@@ -44,6 +44,7 @@ class Label:
 
         # write next label's ID
         storeFile.seek(self.startOffset + Label.NEXT_LABEL_ID_OFFSET)
+        print("writing next label id: {0}".format(nextLabelID))
         storeFile.write(nextLabelID.to_bytes(3, 
             byteorder = sys.byteorder, signed=True))
 
