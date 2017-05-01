@@ -141,6 +141,7 @@ class Node:
 
             # no next property
             if propIndex == len(self.properties) - 1:
+                print("no next property")
                 nullProperty = Property("", "", "", -1)
                 prop.writeProperty(nullProperty)
 

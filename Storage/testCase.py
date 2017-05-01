@@ -19,12 +19,12 @@ def testCase():
 
 	# create node, create property
 	node1 = Node(nodeFile)
-	property1 = Property('Name', 'Vaishnavi', propertyFile)
+	property1 = Property('Name', 'John', propertyFile)
 
 	node1.addProperty(property1)
 
 	node2 = Node(nodeFile)
-	property2 = Property('Name', 'Pupper', propertyFile)
+	property2 = Property('Name', 'Pupp', propertyFile)
 
 	node2.addProperty(property2)
 
