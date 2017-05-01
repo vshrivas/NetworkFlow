@@ -11,8 +11,14 @@ def main(argv):
     stream = antlr4.CommonTokenStream(lexer)
     parser = CypherParser(stream)
     tree = parser.cypher()
+    tree_string  = antlr4.tree.Trees.Trees.toStringTree(tree, None, parser)
     visitor = CypherVisitor()
+    print("Here's the tree: \n", tree_string, "\n\n")
+    print("In we go!")
     visitor.visit(tree)
+
+    print("Printing node-variables and their new properties:")
+    print(visitor.to_create)
 
 
 if __name__ == '__main__':

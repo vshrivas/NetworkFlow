@@ -1,1 +1,1 @@
-CREATE (n {name: "value", another: "yay"}), (m {otherName: 'otherValue'})
+CREATE (n { another: 1+1}), (m {otherName: 1-1})
