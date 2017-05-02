@@ -28,7 +28,9 @@ class Node:
     numNodes = 0
 
     def __init__(self, nodeFile, nodeID=None):
-        # relationships is the list of relationships this node is in 
+        if nodeID is None:
+            nodeID = Node.numNodes
+		# relationships is the list of relationships this node is in 
         self.relationships = []
         # key-value pairs or properties stored within node
         # e.g. name: Jane
@@ -72,6 +74,9 @@ class Node:
     def getLabels(self):
         return self.labels
 
+    def getProperties(self):
+        return self.properties
+
     # This method writes this node to the given node file
     def writeNode(self):
         print("writing node...")
@@ -91,7 +96,7 @@ class Node:
 
         # write in-use flag
         storeFile.seek(self.startOffset + Node.IN_USE_FLAG_OFFSET)
-        storeFile.write(bytearray(1))
+        storeFile.write((1).to_bytes(1, byteorder = sys.byteorder, signed=True))
 
         print("wrote in-use flag: {0}". format(1))
 

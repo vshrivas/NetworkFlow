@@ -21,14 +21,15 @@ class Property:
     def __init__(self, key, value, propertyFile, propertyID=None):
         # Note: For reading properties from files, we assume keys and values to be ints.
         # TODO: Support reading keys and values of other types
+        if propertyID is None:
+            propertyID = Property.numProperties
         self.key = key
         self.value = value
 
-        if propertyID is None:
-            propertyID = Property.numProperties
-
         self.propertyID = propertyID
-        Property.numProperties += 1
+
+        if propertyID != -1:
+            Property.numProperties += 1
 
         self.propertyFile = propertyFile
 

@@ -22,6 +22,7 @@ def testCase():
     property1 = Property('Name', 'John', propertyFile)
 
     node1.addProperty(property1)
+    node1.addLabel(Label("blab", labelFile))
 
     node2 = Node(nodeFile)
     property2 = Property('Name', 'Pupp', propertyFile)
@@ -30,9 +31,6 @@ def testCase():
 
     relationship1 = Relationship(node1.getID(), node2.getID(), relationshipFile)
     node1.addRelationship(relationship1)
-
-    label1 = Label('Person', labelFile)
-    node1.addLabel(label1)
     #node2.addRelationship(relationship1)
 
     node1.writeNode()
@@ -42,8 +40,18 @@ def testCase():
     node3 = nodeFile.readNode(0, relationshipFile, propertyFile, labelFile)
 
     rels = node3.getRelationships()
+    labels = node3.getLabels()
+    properties = node3.getProperties()
 
-    print(rels[0])
+    print(rels[0].firstNodeID)
+    print(rels[0].secondNodeID)
+    print(rels[0].relationshipID)
+    print(labels[0])
+    print(labels[0].labelID)
+    print(labels[0].labelFile)
+    print(properties[0])
+    print(properties[0].key)
+    print(properties[0].value)
 
 
 testCase()

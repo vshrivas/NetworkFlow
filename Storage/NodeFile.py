@@ -52,6 +52,7 @@ class NodeFile(object):
 
             # create relationship and add to node
             rel = Relationship(node1ID, node2ID, relationshipFile)
+            rel.relationshipID = nextRelID
             node.addRelationship(rel)
 
             # find next rel ID
@@ -86,6 +87,9 @@ class NodeFile(object):
             #value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
             value = propertyStore.read(4).decode("utf-8")
             print('value: {0}'.format(value))
+
+            print(key)
+            print(value)
 
             # create property and add to node
             prop = Property(key, value, propertyFile)
