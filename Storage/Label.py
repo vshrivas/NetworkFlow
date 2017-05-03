@@ -26,7 +26,7 @@ class Label:
         self.startOffset = self.labelID * Label.storageSize
         self.nextLabelID = nextLabelID
 
-    def getLabelID():
+    def getLabelID(self):
         return self.labelID
 
     def writeLabel(self, nextLabelID):
