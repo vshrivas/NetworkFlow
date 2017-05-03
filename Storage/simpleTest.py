@@ -43,8 +43,8 @@ node1.writeNode()
 node2.writeNode()
 # node3.writeNode()
 
-node1read = nodeFile.readNode(1, relationshipFile, propertyFile, labelFile)
-node2read = nodeFile.readNode(2, relationshipFile, propertyFile, labelFile)
+node1read = nodeFile.readNode(0, relationshipFile, propertyFile, labelFile)
+node2read = nodeFile.readNode(1, relationshipFile, propertyFile, labelFile)
 # node3read = nodeFile.readNode(3, relationshipFile, propertyFile, labelFile)
 
 print(node1read.nodeID)
