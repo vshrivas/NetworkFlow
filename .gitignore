@@ -1,5 +1,14 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
 *.py[cod]
 *$py.class
 .DS_Store
