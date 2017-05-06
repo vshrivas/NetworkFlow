@@ -25,7 +25,7 @@ propertyFile = PropertyFile()
 property1 = Property("1", "2", propertyFile)
 property2 = Property("3", "4", propertyFile)
 property3 = Property("5", "1", propertyFile)
-node1.addProperty(property1)
+#node1.addProperty(property1)
 node2.addProperty(property2)
 node1.addProperty(property3)
 
@@ -47,7 +47,7 @@ node1read = nodeFile.readNode(0, relationshipFile, propertyFile, labelFile)
 node2read = nodeFile.readNode(1, relationshipFile, propertyFile, labelFile)
 # node3read = nodeFile.readNode(3, relationshipFile, propertyFile, labelFile)
 
-print(node1read.nodeID)
+'''print(node1read.nodeID)
 print(node1read.relationships)
 print(node1read.properties)
 print(node1read.labels)
@@ -55,7 +55,7 @@ print(node1read.labels)
 print(node2read.nodeID)
 print(node2read.relationships)
 print(node2read.properties)
-print(node2read.labels)
+print(node2read.labels)'''
 
 '''
 print(node3read.nodeID)
