@@ -12,10 +12,11 @@ class Property:
     KEY_OFFSET = 4
     VALUE_OFFSET = 8
     NEXT_PROPERTY_ID_OFFSET = 12
+    MAX_KEY_SIZE = 4
+    MAX_VALUE_SIZE = 4
 
     storageSize = 16
     numProperties = 0
-
     propIDByteSize = 4
 
     def __init__(self, key, value, propertyFile, propertyID=None):
@@ -59,10 +60,24 @@ class Property:
 
         # write key
         storeFile.seek(self.startOffset + Property.KEY_OFFSET)
+
+        # key is not of max size
+        if(sys.getsizeof(self.key) != self.MAX_KEY_SIZE):
+            # pad key up to max size
+            while len(self.key.encode('utf-8')) != self.MAX_KEY_SIZE:
+                self.key += ' '
+
         storeFile.write(bytearray(self.key, 'utf8'))
 
         # write value
         storeFile.seek(self.startOffset + Property.VALUE_OFFSET)
+
+        # value is not of max size
+        if(sys.getsizeof(self.value) != self.MAX_VALUE_SIZE):
+            # pad value up to max size
+            while len(self.value.encode('utf-8')) != self.MAX_VALUE_SIZE:
+                self.value += ' '
+
         storeFile.write(bytearray(self.value, 'utf8'))
 
         # write next property id

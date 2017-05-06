@@ -75,6 +75,7 @@ class NodeFile(object):
         nextPropID = firstPropID
 
         while nextPropID != -1:
+            print('for node: {0}'.format(nodeID))
             propertyStartOffset = nextPropID * Property.storageSize
 
             # find key
@@ -109,6 +110,7 @@ class NodeFile(object):
         labelStore = open(labelFile.getFileName(), 'rb')
 
         print("reading labels")
+         
         while nextLabelID != -1:
             # read label and add it to node
             labelStartOffset = nextLabelID * Label.storageSize
