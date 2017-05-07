@@ -19,12 +19,12 @@ class Node:
     IN_USE_FLAG_OFFSET = 3 
     REL_ID_OFFSET = 4
     PROPERTY_ID_OFFSET = 8
-    LABEL_STORE_PTR_OFFSET = 11
-    FLAGS_OFFSET = 14
+    LABEL_STORE_PTR_OFFSET = 12
+    FLAGS_OFFSET = 15
 
     nodeIDByteLen = 3
 
-    storageSize = 15
+    storageSize = 16
     numNodes = 0
 
     def __init__(self, nodeFile, nodeID=None):
