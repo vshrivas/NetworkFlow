@@ -60,6 +60,8 @@ class Node:
 
     # This method adds labels to a node
     def addLabel(self, nodeLabel):
+        if len(self.labels) > 0:
+            self.labels[len(self.labels) - 1].nextLabelID = nodeLabel.labelID
         self.labels.append(nodeLabel)
 
     def getID(self):
