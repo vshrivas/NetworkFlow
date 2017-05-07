@@ -35,7 +35,9 @@ label2 = Label("number2", labelFile)
 label3 = Label("number", labelFile)
 label4 = Label("number", labelFile)
 node1.addLabel(label1)
-node1.addLabel(label2)
+#node1.addLabel(label2)
+#label1.setNextLabelID(label2.getLabelID())
+
 node2.addLabel(label3)
 # node3.addLabel(label4)
 

@@ -29,6 +29,9 @@ class Label:
     def getLabelID(self):
         return self.labelID
 
+    def setNextLabelID(self, nextLabelID):
+        self.nextLabelID = nextLabelID
+
     def writeLabel(self, nextLabelID):
         # open label file
         storeFileName = self.labelFile.getFileName()

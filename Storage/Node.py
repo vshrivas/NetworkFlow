@@ -144,9 +144,8 @@ class Node:
 
         # write properties to property file
         for propIndex in range(0, len(self.properties)):
-            print("writing {0} property ".format(propIndex))
-
             prop = self.properties[propIndex]
+            print("writing {0} property ".format(prop.getID()))
 
             # no next property
             if propIndex == len(self.properties) - 1:
@@ -161,9 +160,11 @@ class Node:
         # write labels
         for labelIndex in range(0, len(self.labels)):
             label = self.labels[labelIndex]
+            print("writing {0} label ".format(label.getLabelID()))
 
             # no next label
             if labelIndex == len(self.labels) - 1:
+                print("no next label")
                 nextLabelID = -1
             
             else:

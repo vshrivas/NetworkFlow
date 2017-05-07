@@ -75,30 +75,40 @@ class NodeFile(object):
         nextPropID = firstPropID
 
         while nextPropID != -1:
+            print()
             print('for node: {0}'.format(nodeID))
+            print('first prop id: {0}'. format(firstPropID))
+            print(nextPropID)
             propertyStartOffset = nextPropID * Property.storageSize
+
+            # find ID
+            propertyStore.seek(propertyStartOffset)
+            print("seek to {0} for ID". format(propertyStartOffset))
+            ID = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+            #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+            print('id: {0}'.format(ID))
 
             # find key
             propertyStore.seek(propertyStartOffset + Property.KEY_OFFSET)
+            print("seek to {0} for key". format(propertyStartOffset + Property.KEY_OFFSET))
             key = propertyStore.read(4).decode("utf-8")
             #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
             print('key: {0}'.format(key))
 
             # find value
             propertyStore.seek(propertyStartOffset + Property.VALUE_OFFSET)
+            print("seek to {0} for value". format(propertyStartOffset + Property.VALUE_OFFSET))
             #value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
             value = propertyStore.read(4).decode("utf-8")
             print('value: {0}'.format(value))
 
-            print(key)
-            print(value)
-
             # create property and add to node
-            prop = Property(key, value, propertyFile)
+            prop = Property(key, value, propertyFile, nextPropID)
             node.addProperty(prop)
 
             # find next property id
             propertyStore.seek(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET)
+            print("seek to {0} for next property id". format(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET))
             nextPropID = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
             print("next prop id is {0}".format(nextPropID))
 
@@ -112,6 +122,7 @@ class NodeFile(object):
         print("reading labels")
          
         while nextLabelID != -1:
+            print('for node: {0}'.format(nodeID))
             # read label and add it to node
             labelStartOffset = nextLabelID * Label.storageSize
             print('label start offset:{0}'.format(labelStartOffset))

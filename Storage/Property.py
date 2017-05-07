@@ -49,9 +49,13 @@ class Property:
         return self.propertyID
 
     def writeProperty(self, nextProp):
+        print() 
+
         # open property file
         storeFileName = self.getPropertyFile().getFileName()
         storeFile = open(storeFileName, 'ab')
+
+        print("writing property id {0} at {1}".format(self.propertyID, self.startOffset + Property.PROPERTY_ID_OFFSET))
 
         # write property id
         storeFile.seek(self.startOffset + Property.PROPERTY_ID_OFFSET)
@@ -67,6 +71,8 @@ class Property:
             while len(self.key.encode('utf-8')) != self.MAX_KEY_SIZE:
                 self.key += ' '
 
+        print("writing key {0} at {1}".format(self.key, self.startOffset + Property.KEY_OFFSET))
+
         storeFile.write(bytearray(self.key, 'utf8'))
 
         # write value
@@ -78,13 +84,19 @@ class Property:
             while len(self.value.encode('utf-8')) != self.MAX_VALUE_SIZE:
                 self.value += ' '
 
+        print("writing value {0} at {1}".format(self.value, self.startOffset + Property.VALUE_OFFSET))
+
         storeFile.write(bytearray(self.value, 'utf8'))
 
         # write next property id
         storeFile.seek(self.startOffset + Property.NEXT_PROPERTY_ID_OFFSET)
         print("next property has index:{0}".format(nextProp.getID()))
+
+        print("writing next property index {0} at {1}".format(nextProp.getID(), self.startOffset + Property.NEXT_PROPERTY_ID_OFFSET))
         storeFile.write(nextProp.getID().to_bytes(Property.propIDByteSize, 
                 byteorder = sys.byteorder, signed = True))
+
+        print()
 
 
 
