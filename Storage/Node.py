@@ -5,9 +5,9 @@
 # Bytes 1-3: Node ID
 # Byte 4: In-use flag (1 for in-use, 0 for not)
 # Bytes 5-8: ID of first relationship connected to node
-# Bytes 9-11: ID of first property (key-value pair) for node
-# Bytes 12-14: points to label store for node
-# Byte 15: flags  
+# Bytes 9-12: ID of first property (key-value pair) for node
+# Bytes 13-15: ID of first label for node
+# Byte 16: flags  
 
 from Relationship import Relationship
 from Property import Property
@@ -19,7 +19,7 @@ class Node:
     IN_USE_FLAG_OFFSET = 3 
     REL_ID_OFFSET = 4
     PROPERTY_ID_OFFSET = 8
-    LABEL_STORE_PTR_OFFSET = 12
+    LABEL_ID_OFFSET = 12
     FLAGS_OFFSET = 15
 
     nodeIDByteLen = 3
@@ -115,6 +115,12 @@ class Node:
             byteorder = sys.byteorder, signed=True))
 
         print("wrote first property ID: {0}". format(firstProp.getID()))
+
+        # write first label ID
+        storeFile.seek(self.startOffset + Node.LABEL_ID_OFFSET)
+        firstLabel = self.labels[0]
+        storeFile.write(firstLabel.getLabelID().to_bytes(Label.LABEL_OFFSET,
+            byteorder = sys.byteorder, signed=True))
 
         print("writing relationships to relationship file ...")
 
