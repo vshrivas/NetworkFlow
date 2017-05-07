@@ -113,7 +113,7 @@ class NodeFile(object):
             print("next prop id is {0}".format(nextPropID))
 
         # read first label id
-        nodeStore.seek(nodeStartOffset + Node.LABEL_STORE_PTR_OFFSET)
+        nodeStore.seek(nodeStartOffset + Node.LABEL_ID_OFFSET)
         firstLabelID = int.from_bytes(nodeStore.read(3), sys.byteorder, signed=True)
         nextLabelID = firstLabelID
 
