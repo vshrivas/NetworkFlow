@@ -20,12 +20,10 @@ class CypherVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by CypherParser#cypher.
     def visitCypher(self, ctx:CypherParser.CypherContext):
-        print("I'm in Cypher now!")
         return self.visitChildren(ctx)
 
 
     def visitCreate(self, ctx:CypherParser.CreateContext):
-        print("In a create statement.")
         for part in ctx.pattern().patternPart():
             # TODO: Error catching.
             node = part.anonymousPatternPart().patternElement().nodePattern()
@@ -179,7 +177,6 @@ class CypherVisitor(ParseTreeVisitor):
     def visitUnaryAddOrSubtractExpression(self, ctx:CypherParser.UnaryAddOrSubtractExpressionContext):
         res = self.visitStringListNullOperatorExpression(ctx.stringListNullOperatorExpression())
 
-        print(list(ctx.getChildren()))
         if (list([child.getText() for child in ctx.getChildren()]).count('-')) % 2 == 0:
             return res
         else:
@@ -246,6 +243,16 @@ class CypherVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by CypherParser#doubleLiteral.
     def visitDoubleLiteral(self, ctx:CypherParser.DoubleLiteralContext):
         return float(ctx.getText())
+
+
+    # Visit a parse tree produced by CypherParser#literal.
+    def visitLiteral(self, ctx:CypherParser.LiteralContext):
+        if ctx.StringLiteral():
+            # The list slicing strips out the quote characters at the beginning
+            # and the end.
+            return ctx.StringLiteral().getText()[1:-1]
+        else:
+            return self.visitChildren(ctx)
 
 
 del CypherParser
