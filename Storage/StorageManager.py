@@ -23,23 +23,40 @@ class StorageManager:
         self.fileID = StorageManager.numFiles
 
         # create storage files to keep track of free space
-        self.nodeFreeSpaceFile = "NodeFreeSpaceFile"
-        self.relFreeSpaceFile = "RelationshipFreeSpaceFile"
-        self.propFreeSpaceFile = "PropFreeSpaceFile"
-        self.labelFreeSpaceFile = "LabelFreeSpaceFile"
-
         # all lists of free spaces start with space at ID 0 being free
         # list of locations in node file with free space for nodes (specified by nodeIDs)
-        self.node_free_space = [0]
+        # try to load lists from disk, if no lists currently exist, create new ones
+        self.nodeFreeSpaceFileName = "NodeFreeSpaceFile"
+        nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'rb')
 
-        # list of locations in relationship file with free space for relationships (specified by relationshipIDs)
-        self.rel_free_space = [0]
+        try:
+            self.node_free_space = pickle.load(nodeSpaceFile, 'rb')
+        except EOFError:
+            self.node_free_space = [0]
 
-        # list of locations in property file with free space for property (specified by propertyIDs)
-        self.prop_free_space = [0]
+        self.relFreeSpaceFileName = "RelationshipFreeSpaceFile"
+        relSpaceFile = open(self.relFreeSpaceFileName, 'rb')
 
-        # list of locations in label file with free space for labels (specified by labelIDs)
-        self.label_free_space = [0]
+        try:
+            self.rel_free_space = pickle.load(relSpaceFile, 'rb')
+        except EOFError:
+            self.rel_free_space = [0]
+
+        self.propFreeSpaceFileName = "PropFreeSpaceFile"
+        propSpaceFile = open(self.propFreeSpaceFileName, 'rb')
+
+        try:
+            self.prop_free_space = pickle.load(propSpaceFile)
+        except EOFError:
+            self.prop_free_space = [0]
+
+        self.labelFreeSpaceFileName = "LabelFreeSpaceFile"
+        labelSpaceFile = open(self.labelFreeSpaceFileName, 'rb')
+
+        try:
+            self.label_free_space = pickle.load(labelSpaceFile)
+        except EOFError:
+            self.label_free_space = [0]
 
     # opening files in write mode so that previous lists are cleared before new ones are written
     def openNodeSpaceFile():
