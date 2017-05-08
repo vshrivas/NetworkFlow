@@ -54,7 +54,7 @@ class Property:
 
         # open property file
         storeFileName = self.getPropertyFile().getFileName()
-        storeFile = open(storeFileName, 'ab')
+        storeFile = open(storeFileName, 'r+b')
 
         print("writing property id {0} at {1}".format(self.propertyID, self.startOffset + Property.PROPERTY_ID_OFFSET))
 

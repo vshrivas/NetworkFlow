@@ -35,7 +35,7 @@ class Label:
     def writeLabel(self, nextLabelID):
         # open label file
         storeFileName = self.labelFile.getFileName()
-        storeFile = open(storeFileName, 'ab')
+        storeFile = open(storeFileName, 'r+b')
 
         # seek to location for label and write label ID
         storeFile.seek(self.startOffset)

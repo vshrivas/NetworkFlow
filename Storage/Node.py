@@ -110,7 +110,7 @@ class Node:
 
         # open node file
         storeFileName = self.nodeFile.getFileName()
-        storeFile = open(storeFileName, 'ab')
+        storeFile = open(storeFileName, 'r+b')
 
         print("opened store file: {0}". format(storeFileName))
 

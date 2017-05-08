@@ -55,7 +55,7 @@ class Relationship:
     def writeRelationship(self, node, prevRel, nextRel):
         # open relationship file
         storeFileName = self.relationshipFile.getFileName()
-        storeFile = open(storeFileName, 'ab')
+        storeFile = open(storeFileName, 'r+b')
 
         # seek to location for relationship
         storeFile.seek(self.startOffset)
