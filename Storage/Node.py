@@ -64,27 +64,27 @@ class Node:
 
     # This method removes a relationship from a node and writes the node
     def removeRelationship(self, relID):
-        for(index in range(0, len(self.relationships))):
+        for index in range(0, len(self.relationships)):
             rel = self.relationships[index]
-            if(rel.getID() == relID):
+            if rel.getID() == relID:
                 self.relationships.pop(index)
 
         self.writeNode()
 
     # This method removes a property from a node and writes the node
     def removeProperty(self, propID):
-        for(index in range(0, len(self.properties))):
+        for index in range(0, len(self.properties)):
             prop = self.properties[index]
-            if(prop.getID() == propID):
+            if prop.getID() == propID:
                 self.properties.pop(propID)
 
         self.writeNode()
 
     # This method removes a label from a node and writes the node
     def removeLabel(self, labelID):
-        for(index in range(0, len(self.labels))):
+        for index in range(0, len(self.labels)):
             label = self.labels[index]
-            if(label.getID() == labelID):
+            if label.getID() == labelID:
                 self.labels.pop(index)
 
         self.writeNode()
