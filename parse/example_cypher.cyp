@@ -1,1 +1,1 @@
-CREATE (n { another: 1+1}), (m {otherName: 1-1})
+CREATE (a {math: 1     -   2 + 1+ 8 * 20 - 10 / 5  * 2 + 10000 - 0 + 0 + 513 - 23  -8})
