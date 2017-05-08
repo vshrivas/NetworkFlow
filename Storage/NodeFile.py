@@ -51,6 +51,8 @@ class NodeFile(object):
             relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_ID_OFFSET)
             node2ID = int.from_bytes(relationshipStore.read(3), sys.byteorder, signed=True)
 
+            print('Node 1 id: {0}'.format(node1ID))
+            print('Node 2 id: {0}'.format(node2ID))
             # create relationship and add to node
             rel = Relationship(node1ID, node2ID, relationshipFile)
             rel.relationshipID = nextRelID
@@ -130,6 +132,7 @@ class NodeFile(object):
             labelStore.seek(labelStartOffset)
             label = labelFile.readLabel(nextLabelID)
             node.addLabel(label)
+            print(label.label)
 
             # find next label id
             labelStore.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
