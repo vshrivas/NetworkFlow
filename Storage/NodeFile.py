@@ -102,15 +102,15 @@ class NodeFile(object):
             value = propertyStore.read(4).decode("utf-8")
             print('value: {0}'.format(value))
 
-            # create property and add to node
-            prop = Property(key, value, propertyFile, nextPropID)
-            node.addProperty(prop)
-
             # find next property id
             propertyStore.seek(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET)
             print("seek to {0} for next property id". format(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET))
             nextPropID = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
             print("next prop id is {0}".format(nextPropID))
+
+            # create property and add to node
+            prop = Property(key, value, propertyFile, nextPropID)
+            node.addProperty(prop)
 
         # read first label id
         nodeStore.seek(nodeStartOffset + Node.LABEL_ID_OFFSET)
