@@ -10,7 +10,7 @@ class LabelFile:
         self.fileID = LabelFile.numFiles
 
 		# create relationship file
-        self.fileName = "LabelFile{0}".format(self.fileID)
+        self.fileName = "LabelFile{0}.store".format(self.fileID)
         relFile = open(self.fileName, 'wb')
         relFile.close()
 
@@ -21,7 +21,7 @@ class LabelFile:
     def readLabel(self, labelID):
         labelStore = open(self.fileName, 'rb')
         labelStartOffset = labelID * Label.storageSize
-        
+
         labelStore.seek(labelStartOffset + Label.LABEL_ID_OFFSET)
         # Requires Python >= 3.2 for the function int.from_bytes
         labelID = int.from_bytes(labelStore.read(3), byteorder=sys.byteorder, signed=True)

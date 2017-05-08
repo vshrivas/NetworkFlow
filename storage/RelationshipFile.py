@@ -6,7 +6,7 @@ class RelationshipFile:
         self.fileID = RelationshipFile.numFiles
 
         # create relationship file
-        self.fileName = "RelationshipFile{0}".format(self.fileID)
+        self.fileName = "RelationshipFile{0}.store".format(self.fileID)
         relFile = open(self.fileName, 'wb')
         relFile.close()
 

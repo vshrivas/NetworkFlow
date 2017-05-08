@@ -10,9 +10,9 @@ class NodeFile(object):
     def __init__(self):
         NodeFile.numFiles += 1
         self.fileID = NodeFile.numFiles
-        
+
         # create node file
-        self.fileName = "NodeFile{0}".format(self.fileID)
+        self.fileName = "NodeFile{0}.store".format(self.fileID)
         nodeFile = open(self.fileName, 'wb')
         nodeFile.close()
 
@@ -62,11 +62,11 @@ class NodeFile(object):
             if nodeID == node1ID:
                 relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
                 nextRelID = int.from_bytes(relationshipStore.read(4), sys.byteorder, signed=True)
-                
+
             else:
                 relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
                 nextRelID = int.from_bytes(relationshipStore.read(4), sys.byteorder, signed=True)
-        
+
         print("reading properties")
 
         # read first property ID
@@ -124,7 +124,7 @@ class NodeFile(object):
         labelStore = open(labelFile.getFileName(), 'rb')
 
         print("reading labels")
-         
+
         while nextLabelID != -1:
             print('for node: {0}'.format(nodeID))
             # read label and add it to node
@@ -153,4 +153,4 @@ class NodeFile(object):
 
 
 
-        
+
