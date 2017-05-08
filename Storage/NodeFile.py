@@ -94,6 +94,7 @@ class NodeFile(object):
             propertyStore.seek(propertyStartOffset + Property.KEY_OFFSET)
             print("seek to {0} for key". format(propertyStartOffset + Property.KEY_OFFSET))
             key = propertyStore.read(4).decode("utf-8")
+            key = key.rstrip(' ')
             #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
             print('key: {0}'.format(key))
 
@@ -102,6 +103,7 @@ class NodeFile(object):
             print("seek to {0} for value". format(propertyStartOffset + Property.VALUE_OFFSET))
             #value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
             value = propertyStore.read(4).decode("utf-8")
+            value = value.rstrip(' ')
             print('value: {0}'.format(value))
 
             # find next property id
