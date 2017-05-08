@@ -1,27 +1,25 @@
-import sys
+#import sys
 import antlr4
-from CypherLexer import CypherLexer
-from CypherParser import CypherParser
-from CypherListener import CypherListener
+from .CypherLexer import CypherLexer
+from .CypherParser import CypherParser
+from .CypherVisitor import CypherVisitor
 
-def main(argv):
+def parse(query):
     # Set up antlr4 parser...
-    input_stream = antlr4.FileStream(argv[1])
+    input_stream = antlr4.InputStream(query)
     lexer = CypherLexer(input_stream)
     stream = antlr4.CommonTokenStream(lexer)
     parser = CypherParser(stream)
     tree = parser.cypher()
-    listener = CypherListener()
-    walker = antlr4.ParseTreeWalker()
-    walker.walk(listener, tree)
+    tree_string  = antlr4.tree.Trees.Trees.toStringTree(tree, None, parser)
+    visitor = CypherVisitor()
 
-    print("Printing node-variables and their new properties:")
-    print(listener.to_create)
+    # # Here lie some helpful print statements. Bring them back as you
+    # # figure out more things to parse:
+    # print("Here's the tree: \n", tree_string, "\n\n")
 
-    # For now, just print the parse tree
-    print("\nHere is the whole parse tree...")
-    print(antlr4.tree.Trees.Trees.toStringTree(tree, None, parser))
+    visitor.visit(tree)
 
-
-if __name__ == '__main__':
-    main(sys.argv)
+    # For now, return the nodes and the properties to be created.
+    print("Trying to create this dict:")
+    return visitor.to_create

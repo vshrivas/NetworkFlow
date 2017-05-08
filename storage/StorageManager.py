@@ -1,11 +1,11 @@
-from Label import Label
-from LabelFile import LabelFile
-from Node import Node
-from NodeFile import NodeFile
-from Property import Property
-from PropertyFile import PropertyFile
-from Relationship import Relationship
-from RelationshipFile import RelationshipFile
+from .Label import Label
+from .LabelFile import LabelFile
+from .Node import Node
+from .NodeFile import NodeFile
+from .Property import Property
+from .PropertyFile import PropertyFile
+from .Relationship import Relationship
+from .RelationshipFile import RelationshipFile
 
 import pickle
 
@@ -19,39 +19,41 @@ class StorageManager:
         self.propertyFile = propertyFile
         self.labelFile = labelFile
 
-        StorageManager.numFiles += 1
-        self.fileID = StorageManager.numFiles
+        # ?????????????????????????????????????????
+        # StorageManager.numFiles += 1
+        # self.fileID = StorageManager.numFiles
+        # ?????????????????????????????????????????
 
         # create storage files to keep track of free space
         # all lists of free spaces start with space at ID 0 being free
         # list of locations in node file with free space for nodes (specified by nodeIDs)
         # try to load lists from disk, if no lists currently exist, create new ones
-        self.nodeFreeSpaceFileName = "NodeFreeSpaceFile"
-        nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'rb')
+        self.nodeFreeSpaceFileName = "NodeFreeSpaceFile.store"
+        nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'w')
 
         try:
-            self.node_free_space = pickle.load(nodeSpaceFile, 'rb')
+            self.node_free_space = pickle.load(nodeSpaceFile, 'w')
         except EOFError:
             self.node_free_space = [0]
 
-        self.relFreeSpaceFileName = "RelationshipFreeSpaceFile"
-        relSpaceFile = open(self.relFreeSpaceFileName, 'rb')
+        self.relFreeSpaceFileName = "RelationshipFreeSpaceFile.store"
+        relSpaceFile = open(self.relFreeSpaceFileName, 'w')
 
         try:
-            self.rel_free_space = pickle.load(relSpaceFile, 'rb')
+            self.rel_free_space = pickle.load(relSpaceFile, 'w')
         except EOFError:
             self.rel_free_space = [0]
 
-        self.propFreeSpaceFileName = "PropFreeSpaceFile"
-        propSpaceFile = open(self.propFreeSpaceFileName, 'rb')
+        self.propFreeSpaceFileName = "PropFreeSpaceFile.store"
+        propSpaceFile = open(self.propFreeSpaceFileName, 'w')
 
         try:
             self.prop_free_space = pickle.load(propSpaceFile)
         except EOFError:
             self.prop_free_space = [0]
 
-        self.labelFreeSpaceFileName = "LabelFreeSpaceFile"
-        labelSpaceFile = open(self.labelFreeSpaceFileName, 'rb')
+        self.labelFreeSpaceFileName = "LabelFreeSpaceFile.store"
+        labelSpaceFile = open(self.labelFreeSpaceFileName, 'w')
 
         try:
             self.label_free_space = pickle.load(labelSpaceFile)
@@ -74,8 +76,8 @@ class StorageManager:
     def openLabelSpaceFile():
         labelSpaceFile = open(self.labelFreeSpaceFile, 'wb')
         return labelSpaceFile
-    
-    # Finds free space for node (potentially location to the right of all nodes if 
+
+    # Finds free space for node (potentially location to the right of all nodes if
     # there is no free space), creates a node, and writes the node to the node file.
     # It returns the created node.
     def createNode(self):
@@ -100,7 +102,7 @@ class StorageManager:
         node.writeNode()
         return node
 
-    # Finds free space for relationship (potentially location to the right of all relationships if 
+    # Finds free space for relationship (potentially location to the right of all relationships if
     # there is no free space), creates a relationship, and writes the relationship to the relationship file.
     # It returns the created relationship.
     def createRelationship(self, node1, node2):
@@ -122,7 +124,7 @@ class StorageManager:
         relationship = Relationship(relationshipFile, node1.getID(), node2.getID())
         return relationship
 
-    # Finds free space for property (potentially location to the right of all properties if 
+    # Finds free space for property (potentially location to the right of all properties if
     # there is no free space), creates a property, and writes the property to the property file.
     # It returns the created property.
     def createProperty(self, key, value):
@@ -144,7 +146,7 @@ class StorageManager:
         prop = Property(key, value, propertyFile)
         return prop
 
-    # Finds free space for label (potentially location to the right of all label if 
+    # Finds free space for label (potentially location to the right of all label if
     # there is no free space), creates a label, and writes the label to the label file.
     # It returns the created label.
     def createLabel(self, labelStr):
@@ -174,7 +176,7 @@ class StorageManager:
         # delete associated relationships, properties, and labels
 
         # remove relationships from sibling node
-        for (rel in node.relationships):
+        for rel in node.relationships:
             otherNodeID = rel.getOtherNodeID()
             otherNode = self.nodeFile.readNode(otherNodeID, self.relationshipFile, self.propertyFile, self.labelFile)
             otherNode.removeRelationship(rel.getID())
@@ -186,7 +188,7 @@ class StorageManager:
         pickle.dump(self.rel_free_space, relSpaceFile)
         relSpaceFile.close()
 
-        for (prop in node.properties):
+        for prop in node.properties:
             self.prop_free_space.append(prop.getID())
 
         # write changes to list
@@ -194,7 +196,7 @@ class StorageManager:
         pickle.dump(self.prop_free_space, propSpaceFile)
         propSpaceFile.close()
 
-        for (label in node.labels):
+        for label in node.labels:
             self.label_free_space.append(label.getID())
 
         # write changes to list
@@ -211,6 +213,6 @@ class StorageManager:
 
 
 
-        
-    
-    
+
+
+

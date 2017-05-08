@@ -1,22 +1,22 @@
 # Node class: stores data
 
-# Storage: Nodes will be stored as fixed size records which are 9 bytes in 
+# Storage: Nodes will be stored as fixed size records which are 9 bytes in
 # length.
 # Bytes 1-3: Node ID
 # Byte 4: In-use flag (1 for in-use, 0 for not)
 # Bytes 5-8: ID of first relationship connected to node
 # Bytes 9-12: ID of first property (key-value pair) for node
 # Bytes 13-15: ID of first label for node
-# Byte 16: flags  
+# Byte 16: flags
 
-from Relationship import Relationship
-from Property import Property
-from Label import Label
+from .Relationship import Relationship
+from .Property import Property
+from .Label import Label
 import sys
 
 class Node:
     NODE_ID_OFFSET = 0
-    IN_USE_FLAG_OFFSET = 3 
+    IN_USE_FLAG_OFFSET = 3
     REL_ID_OFFSET = 4
     PROPERTY_ID_OFFSET = 8
     LABEL_ID_OFFSET = 12
@@ -31,7 +31,7 @@ class Node:
         if nodeID is None:
             nodeID = Node.numNodes
 
-		# relationships is the list of relationships this node is in 
+		# relationships is the list of relationships this node is in
         self.relationships = []
         # key-value pairs or properties stored within node
         # e.g. name: Jane
@@ -41,7 +41,7 @@ class Node:
         self.labels = []
 
         self.nodeID = nodeID
-        # increment number of nodes 
+        # increment number of nodes
         Node.numNodes += 1
 
         self.nodeFile = nodeFile
@@ -52,7 +52,7 @@ class Node:
     def addRelationship(self, rel):
         self.relationships.append(rel)
 
-    # This method adds data to a node 
+    # This method adds data to a node
     def addProperty(self, prop):
         self.properties.append(prop)
 
@@ -116,7 +116,7 @@ class Node:
 
         # write node id
         storeFile.seek(self.startOffset + Node.NODE_ID_OFFSET)
-        storeFile.write((self.nodeID).to_bytes(Node.nodeIDByteLen, 
+        storeFile.write((self.nodeID).to_bytes(Node.nodeIDByteLen,
             byteorder = sys.byteorder, signed=True))
 
         print("wrote node ID: {0}". format(self.nodeID))
@@ -130,11 +130,11 @@ class Node:
         # write first relationship ID
         storeFile.seek(self.startOffset + Node.REL_ID_OFFSET)
         if len(self.relationships) == 0:
-            storeFile.write((-1).to_bytes(Relationship.relIDByteSize, 
+            storeFile.write((-1).to_bytes(Relationship.relIDByteSize,
                 byteorder = sys.byteorder, signed=True))
         else:
             firstRel = self.relationships[0]
-            storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteSize, 
+            storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteSize,
                 byteorder = sys.byteorder, signed=True))
 
         print("wrote first rel ID: {0}". format(firstRel.getID()))
@@ -142,11 +142,11 @@ class Node:
         # write first property ID
         storeFile.seek(self.startOffset + Node.PROPERTY_ID_OFFSET)
         if len(self.properties) == 0:
-            storeFile.write((-1).to_bytes(Property.propIDByteSize, 
+            storeFile.write((-1).to_bytes(Property.propIDByteSize,
                 byteorder = sys.byteorder, signed=True))
         else:
             firstProp = self.properties[0]
-            storeFile.write(firstProp.getID().to_bytes(Property.propIDByteSize, 
+            storeFile.write(firstProp.getID().to_bytes(Property.propIDByteSize,
                 byteorder = sys.byteorder, signed=True))
 
         print("wrote first property ID: {0}". format(firstProp.getID()))
@@ -182,7 +182,7 @@ class Node:
                 nullRelationship = Relationship(-1, -1, "", -1)
                 rel.writeRelationship(self, self.relationships[relIndex - 1], nullRelationship)
             else:
-                rel.writeRelationship(self, self.relationships[relIndex - 1], 
+                rel.writeRelationship(self, self.relationships[relIndex - 1],
                     self.relationships[relIndex + 1])
 
         print("writing properties to property file ...")
@@ -211,7 +211,7 @@ class Node:
             if labelIndex == len(self.labels) - 1:
                 print("no next label")
                 nextLabelID = -1
-            
+
             else:
                 nextLabelID = (self.labels[labelIndex + 1]).getLabelID()
 
