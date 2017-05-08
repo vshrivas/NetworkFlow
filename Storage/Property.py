@@ -24,6 +24,7 @@ class Property:
         # TODO: Support reading keys and values of other types
         if propertyID is None:
             propertyID = Property.numProperties
+            
         self.key = key
         self.value = value
 

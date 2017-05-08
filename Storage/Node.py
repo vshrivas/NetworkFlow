@@ -39,9 +39,6 @@ class Node:
         # e.g. person, bank account, id
         self.labels = []
 
-        if nodeID is None:
-            nodeID = Node.numNodes
-
         self.nodeID = nodeID
         # increment number of nodes 
         Node.numNodes += 1
