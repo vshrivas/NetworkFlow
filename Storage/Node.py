@@ -129,25 +129,37 @@ class Node:
 
         # write first relationship ID
         storeFile.seek(self.startOffset + Node.REL_ID_OFFSET)
-        firstRel = self.relationships[0]
-        storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteSize, 
-            byteorder = sys.byteorder, signed=True))
+        if len(self.relationships) == 0:
+            storeFile.write((-1).to_bytes(Relationship.relIDByteSize, 
+                byteorder = sys.byteorder, signed=True))
+        else:
+            firstRel = self.relationships[0]
+            storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteSize, 
+                byteorder = sys.byteorder, signed=True))
 
         print("wrote first rel ID: {0}". format(firstRel.getID()))
 
         # write first property ID
         storeFile.seek(self.startOffset + Node.PROPERTY_ID_OFFSET)
-        firstProp = self.properties[0]
-        storeFile.write(firstProp.getID().to_bytes(Property.propIDByteSize, 
-            byteorder = sys.byteorder, signed=True))
+        if len(self.properties) == 0:
+            storeFile.write((-1).to_bytes(Property.propIDByteSize, 
+                byteorder = sys.byteorder, signed=True))
+        else:
+            firstProp = self.properties[0]
+            storeFile.write(firstProp.getID().to_bytes(Property.propIDByteSize, 
+                byteorder = sys.byteorder, signed=True))
 
         print("wrote first property ID: {0}". format(firstProp.getID()))
 
         # write first label ID
         storeFile.seek(self.startOffset + Node.LABEL_ID_OFFSET)
-        firstLabel = self.labels[0]
-        storeFile.write(firstLabel.getLabelID().to_bytes(Label.LABEL_OFFSET,
-            byteorder = sys.byteorder, signed=True))
+        if len(self.labels) == 0:
+            storeFile.write((-1).to_bytes(Label.LABEL_OFFSET,
+                byteorder = sys.byteorder, signed=True))
+        else:
+            firstLabel = self.labels[0]
+            storeFile.write(firstLabel.getLabelID().to_bytes(Label.LABEL_OFFSET,
+                byteorder = sys.byteorder, signed=True))
 
         print("writing relationships to relationship file ...")
 
