@@ -43,6 +43,15 @@ class Relationship:
 
         self.startOffset = self.relationshipID * Relationship.storageSize
 
+    def getID(self):
+        return self.relationshipID 
+
+    def getOtherNodeID(node):
+        if(node.getID() == node1ID):
+            return node2ID
+
+        return node1ID
+
     def writeRelationship(self, node, prevRel, nextRel):
         # open relationship file
         storeFileName = self.relationshipFile.getFileName()
@@ -90,8 +99,7 @@ class Relationship:
             storeFile.write(prevRel.getID().to_bytes(Relationship.relIDByteSize, 
                 byteorder = sys.byteorder, signed = True))
 
-    def getID(self):
-        return self.relationshipID 
+    
 
 
 

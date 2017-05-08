@@ -96,6 +96,31 @@ class StorageManager:
         label = Label(labelStr, labelFile)
         return label
 
+    # delete node by recording its ID in list of free space
+    # also delete all corresponding relationships, properties, and labels
+    def deleteNode(self, nodeID):
+        node = self.nodeFile.readNode(nodeID, self.relationshipFile, self.propertyFile, self.labelFile)
+
+        # delete associated relationships, properties, and labels
+        
+        # remove relationships from sibling node
+        for (rel in node.relationships):
+            otherNodeID = rel.getOtherNodeID()
+            otherNode = self.nodeFile.readNode(otherNodeID, self.relationshipFile, self.propertyFile, self.labelFile)
+            otherNode.removeRelationship(rel.getID())
+
+            self.rel_free_space.append(rel.getID())
+
+        for (prop in node.properties):
+            self.prop_free_space.append(prop.getID())
+
+        for (label in node.labels):
+            self.label_free_space.append(label.getID())
+
+        # add node id to node free space list
+        self.node_free_space.append(nodeID)
+
+
 
 
 

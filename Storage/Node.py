@@ -30,6 +30,7 @@ class Node:
     def __init__(self, nodeFile, nodeID=None):
         if nodeID is None:
             nodeID = Node.numNodes
+
 		# relationships is the list of relationships this node is in 
         self.relationships = []
         # key-value pairs or properties stored within node
@@ -60,6 +61,33 @@ class Node:
         if len(self.labels) > 0:
             self.labels[len(self.labels) - 1].nextLabelID = nodeLabel.labelID
         self.labels.append(nodeLabel)
+
+    # This method removes a relationship from a node and writes the node
+    def removeRelationship(self, relID):
+        for(index in range(0, len(self.relationships))):
+            rel = self.relationships[index]
+            if(rel.getID() == relID):
+                self.relationships.pop(index)
+
+        self.writeNode()
+
+    # This method removes a property from a node and writes the node
+    def removeProperty(self, propID):
+        for(index in range(0, len(self.properties))):
+            prop = self.properties[index]
+            if(prop.getID() == propID):
+                self.properties.pop(propID)
+
+        self.writeNode()
+
+    # This method removes a label from a node and writes the node
+    def removeLabel(self, labelID):
+        for(index in range(0, len(self.labels))):
+            label = self.labels[index]
+            if(label.getID() == labelID):
+                self.labels.pop(index)
+
+        self.writeNode()
 
     def getID(self):
         return self.nodeID
