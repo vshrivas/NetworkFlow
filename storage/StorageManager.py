@@ -1,11 +1,11 @@
-from .Label import Label
-from .LabelFile import LabelFile
-from .Node import Node
-from .NodeFile import NodeFile
-from .Property import Property
-from .PropertyFile import PropertyFile
-from .Relationship import Relationship
-from .RelationshipFile import RelationshipFile
+from Label import Label
+from LabelFile import LabelFile
+from Node import Node
+from NodeFile import NodeFile
+from Property import Property
+from PropertyFile import PropertyFile
+from Relationship import Relationship
+from RelationshipFile import RelationshipFile
 
 import pickle
 
@@ -29,36 +29,47 @@ class StorageManager:
         # list of locations in node file with free space for nodes (specified by nodeIDs)
         # try to load lists from disk, if no lists currently exist, create new ones
         self.nodeFreeSpaceFileName = "NodeFreeSpaceFile.store"
-        nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'w')
-
         try:
-            self.node_free_space = pickle.load(nodeSpaceFile, 'w')
-        except EOFError:
+            nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'rb')
+            self.node_free_space = pickle.load(nodeSpaceFile)
+
+        except FileNotFoundError:
+            nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'wb')
             self.node_free_space = [0]
+            pickle.dump(self.node_free_space, nodeSpaceFile)
+            
 
         self.relFreeSpaceFileName = "RelationshipFreeSpaceFile.store"
-        relSpaceFile = open(self.relFreeSpaceFileName, 'w')
-
         try:
-            self.rel_free_space = pickle.load(relSpaceFile, 'w')
-        except EOFError:
+            relSpaceFile = open(self.relFreeSpaceFileName, 'rb')
+            self.rel_free_space = pickle.load(relSpaceFile)
+
+        except FileNotFoundError:
+            relSpaceFile = open(self.relFreeSpaceFileName, 'wb')
             self.rel_free_space = [0]
+            pickle.dump(self.rel_free_space, relSpaceFile)
+
 
         self.propFreeSpaceFileName = "PropFreeSpaceFile.store"
-        propSpaceFile = open(self.propFreeSpaceFileName, 'w')
-
         try:
+            propSpaceFile = open(self.propFreeSpaceFileName, 'rb')
             self.prop_free_space = pickle.load(propSpaceFile)
-        except EOFError:
+
+        except FileNotFoundError:
+            propSpaceFile = open(self.propFreeSpaceFileName, 'wb')
             self.prop_free_space = [0]
+            pickle.dump(self.prop_free_space, propSpaceFile)
+            
 
         self.labelFreeSpaceFileName = "LabelFreeSpaceFile.store"
-        labelSpaceFile = open(self.labelFreeSpaceFileName, 'w')
-
         try:
+            labelSpaceFile = open(self.labelFreeSpaceFileName, 'rb')
             self.label_free_space = pickle.load(labelSpaceFile)
-        except EOFError:
+
+        except FileNotFoundError:
+            labelSpaceFile = open(self.labelFreeSpaceFileName, 'wb')
             self.label_free_space = [0]
+            pickle.dump(self.label_free_space, labelSpaceFile)
 
     # opening files in write mode so that previous lists are cleared before new ones are written
     def openNodeSpaceFile():

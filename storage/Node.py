@@ -9,9 +9,9 @@
 # Bytes 13-15: ID of first label for node
 # Byte 16: flags
 
-from .Relationship import Relationship
-from .Property import Property
-from .Label import Label
+from Relationship import Relationship
+from Property import Property
+from Label import Label
 import sys
 
 class Node:

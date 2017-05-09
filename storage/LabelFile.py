@@ -1,6 +1,6 @@
 import sys
 
-from .Label import Label
+from Label import Label
 
 class LabelFile:
     numFiles = 0
