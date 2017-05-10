@@ -21,8 +21,7 @@ class NodeFile(object):
 
     # This method reads a given node based on nodeID and returns a node object for it
     def readNode(self, nodeID, relationshipFile, propertyFile, labelFile):
-        node = Node(self)
-
+        node = Node(self, nodeID)
         nodeStore = open(self.fileName, 'rb')
         nodeStartOffset = nodeID * Node.storageSize
 

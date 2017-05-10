@@ -47,34 +47,42 @@ node1.writeNode()
 node1read = nodeFile.readNode(0, relationshipFile, propFile, labelFile)
 node2read = nodeFile.readNode(1, relationshipFile, propFile, labelFile)
 
+print()
 print("printing nodes....")
 
 print("printing node 1")
-print("node1 id")
-print(node1read.nodeID)
+print("node1 id: {0}".format(node1read.nodeID))
 print("print node1 relationships")
 for rel in node1read.relationships:
-	print(rel)
+	print("in a relationship with node: {0}".format(rel.getOtherNodeID(node1read)))
 print("print node1 properties")
 for prop in node1read.properties:
-	print(prop)
+	print("key: {0}".format(prop.getKey()))
+	print("value: {0}".format(prop.getValue()))
 print("print node1 labels")
 for label in node1read.labels:
-	print(label)
+	print(label.getLabelStr())
 
+
+print()
 print("printing node 2")
-print("node2 id")
-print(node2read.nodeID)
+print("node2 id: {0}".format(node2read.nodeID))
 print("print node2 relationships")
 for rel in node2read.relationships:
-	print(rel.getOtherNode(node2read))
+	print("in a relationship with node: {0}".format(rel.getOtherNodeID(node2read)))
 print("print node2 properties")
 for prop in node2read.properties:
-	print(prop.getKey())
-	print(prop.getValue())
+	print("key: {0}".format(prop.getKey()))
+	print("value: {0}".format(prop.getValue()))
 print("print node2 labels")
 for label in node2read.labels:
 	print(label.getLabelStr())
+
+
+print(storageManager.node_free_space)
+print(storageManager.rel_free_space)
+print(storageManager.prop_free_space)
+print(storageManager.label_free_space)
 
 '''
 print(node3read.nodeID)

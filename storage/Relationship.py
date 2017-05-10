@@ -47,10 +47,10 @@ class Relationship:
         return self.relationshipID 
 
     def getOtherNodeID(self, node):
-        if(node.getID() == node1ID):
-            return node2ID
+        if(node.getID() == self.firstNodeID):
+            return self.secondNodeID
 
-        return node1ID
+        return self.firstNodeID
 
     def writeRelationship(self, node, prevRel, nextRel):
         # open relationship file
