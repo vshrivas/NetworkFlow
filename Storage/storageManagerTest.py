@@ -44,8 +44,45 @@ node1.addLabel(label1)
 node0.writeNode()
 node1.writeNode()
 
-node1read = nodeFile.readNode(0, relationshipFile, propertyFile, labelFile)
-node2read = nodeFile.readNode(1, relationshipFile, propertyFile, labelFile)
+node1read = nodeFile.readNode(0, relationshipFile, propFile, labelFile)
+node2read = nodeFile.readNode(1, relationshipFile, propFile, labelFile)
+
+print("printing nodes....")
+
+print("printing node 1")
+print("node1 id")
+print(node1read.nodeID)
+print("print node1 relationships")
+for rel in node1read.relationships:
+	print(rel)
+print("print node1 properties")
+for prop in node1read.properties:
+	print(prop)
+print("print node1 labels")
+for label in node1read.labels:
+	print(label)
+
+print("printing node 2")
+print("node2 id")
+print(node2read.nodeID)
+print("print node2 relationships")
+for rel in node2read.relationships:
+	print(rel.getOtherNode(node2read))
+print("print node2 properties")
+for prop in node2read.properties:
+	print(prop.getKey())
+	print(prop.getValue())
+print("print node2 labels")
+for label in node2read.labels:
+	print(label.getLabelStr())
+
+'''
+print(node3read.nodeID)
+print(node3read.relationships)
+print(node3read.properties)
+print(node3read.labels)
+'''
+
 
 
 

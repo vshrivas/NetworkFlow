@@ -46,7 +46,7 @@ class Relationship:
     def getID(self):
         return self.relationshipID 
 
-    def getOtherNodeID(node):
+    def getOtherNodeID(self, node):
         if(node.getID() == node1ID):
             return node2ID
 
@@ -54,6 +54,7 @@ class Relationship:
 
     def writeRelationship(self, node, prevRel, nextRel):
         # open relationship file
+        print(self.relationshipFile)
         storeFileName = self.relationshipFile.getFileName()
         storeFile = open(storeFileName, 'r+b')
 

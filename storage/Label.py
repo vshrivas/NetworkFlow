@@ -26,6 +26,9 @@ class Label:
         self.startOffset = self.labelID * Label.storageSize
         self.nextLabelID = nextLabelID
 
+    def getLabelStr(self):
+        return self.label
+        
     def getLabelID(self):
         return self.labelID
 

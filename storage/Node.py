@@ -137,7 +137,7 @@ class Node:
             storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteSize,
                 byteorder = sys.byteorder, signed=True))
 
-        print("wrote first rel ID: {0}". format(firstRel.getID()))
+            print("wrote first rel ID: {0}". format(firstRel.getID()))
 
         # write first property ID
         storeFile.seek(self.startOffset + Node.PROPERTY_ID_OFFSET)
@@ -149,7 +149,7 @@ class Node:
             storeFile.write(firstProp.getID().to_bytes(Property.propIDByteSize,
                 byteorder = sys.byteorder, signed=True))
 
-        print("wrote first property ID: {0}". format(firstProp.getID()))
+            print("wrote first property ID: {0}". format(firstProp.getID()))
 
         # write first label ID
         storeFile.seek(self.startOffset + Node.LABEL_ID_OFFSET)

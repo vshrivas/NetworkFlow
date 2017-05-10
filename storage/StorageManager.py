@@ -14,6 +14,13 @@ import pickle
 class StorageManager:
 
     def __init__(self, nodeFile, relationshipFile, propertyFile, labelFile):
+        print("*****")
+        print(nodeFile)
+        print(relationshipFile)
+        print(propertyFile)
+        print(labelFile)
+        print("*****")
+
         self.nodeFile = nodeFile
         self.relationshipFile = relationshipFile
         self.propertyFile = propertyFile
@@ -59,7 +66,7 @@ class StorageManager:
             propSpaceFile = open(self.propFreeSpaceFileName, 'wb')
             self.prop_free_space = [0]
             pickle.dump(self.prop_free_space, propSpaceFile)
-            
+
 
         self.labelFreeSpaceFileName = "LabelFreeSpaceFile.store"
         try:
@@ -71,22 +78,6 @@ class StorageManager:
             self.label_free_space = [0]
             pickle.dump(self.label_free_space, labelSpaceFile)
 
-    # opening files in write mode so that previous lists are cleared before new ones are written
-    def openNodeSpaceFile():
-        nodeSpaceFile = open(self.nodeFreeSpaceFile, 'wb')
-        return nodeSpaceFile
-
-    def openRelSpaceFile():
-        relSpaceFile = open(self.relFreeSpaceFile, 'wb')
-        return relSpaceFile
-
-    def openPropSpaceFile():
-        propSpaceFile = open(self.propFreeSpaceFile, 'wb')
-        return propSpaceFile
-
-    def openLabelSpaceFile():
-        labelSpaceFile = open(self.labelFreeSpaceFile, 'wb')
-        return labelSpaceFile
 
     # Finds free space for node (potentially location to the right of all nodes if
     # there is no free space), creates a node, and writes the node to the node file.
@@ -95,21 +86,22 @@ class StorageManager:
         # there is free space
         if len(self.node_free_space) > 0:
             freeNodeID = self.node_free_space[len(self.node_free_space) - 1]
-            node = Node(nodeFile, freeNodeID)
+            node = Node(self.nodeFile, freeNodeID)
             node.writeNode()
 
             # remove block from list of node free space
             self.node_free_space.pop()
 
             # write changes to list
-            nodeSpaceFile = openNodeSpaceFile()
+            nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'wb')
+
             pickle.dump(self.node_free_space, nodeSpaceFile)
             nodeSpaceFile.close()
 
             return node
 
         # no free space, write node to right of all current nodes
-        node = Node(nodeFile)
+        node = Node(self.nodeFile)
         node.writeNode()
         return node
 
@@ -118,21 +110,21 @@ class StorageManager:
     # It returns the created relationship.
     def createRelationship(self, node1, node2):
         # there is free space
-        if len(self.relationship_free_space) > 0:
+        if len(self.rel_free_space) > 0:
             freeRelID = self.rel_free_space[len(self.rel_free_space) - 1]
-            relationship = Relationship(relationshipFile, node1.getID(), node2.getID(), freeRelID)
+            relationship = Relationship(node1.getID(), node2.getID(), self.relationshipFile, freeRelID)
 
             # remove block from list of relationship free space
             self.rel_free_space.pop()
 
             # write changes to list
-            relSpaceFile = openRelSpaceFile()
+            relSpaceFile = open(self.relFreeSpaceFileName, 'wb')
             pickle.dump(self.rel_free_space, relSpaceFile)
             relSpaceFile.close()
 
             return relationship
 
-        relationship = Relationship(relationshipFile, node1.getID(), node2.getID())
+        relationship = Relationship(node1.getID(), node2.getID(), self.relationshipFile)
         return relationship
 
     # Finds free space for property (potentially location to the right of all properties if
@@ -142,19 +134,19 @@ class StorageManager:
         # there is free space
         if len(self.prop_free_space) > 0:
             freePropID = self.prop_free_space[len(self.prop_free_space) - 1]
-            prop = Property(key, value, propertyFile, freePropID)
+            prop = Property(key, value, self.propertyFile, freePropID)
 
             # remove block from list of property free space
             self.prop_free_space.pop()
 
             # write changes to list
-            propSpaceFile = openPropSpaceFile()
+            propSpaceFile = open(self.propFreeSpaceFileName, 'wb')
             pickle.dump(self.prop_free_space, propSpaceFile)
             propSpaceFile.close()
 
             return prop
 
-        prop = Property(key, value, propertyFile)
+        prop = Property(key, value, self.propertyFile)
         return prop
 
     # Finds free space for label (potentially location to the right of all label if
@@ -164,19 +156,19 @@ class StorageManager:
         # there is free space
         if len(self.label_free_space) > 0:
             freeLabelID = self.label_free_space[len(self.label_free_space) - 1]
-            label = Label(labelStr, labelFile, freeLabelID)
+            label = Label(labelStr, self.labelFile, freeLabelID)
 
             # remove block from list of property free space
             self.label_free_space.pop()
 
             # write changes to list
-            labelSpaceFile = openLabelSpaceFile()
+            labelSpaceFile = open(self.labelFreeSpaceFileName, 'wb')
             pickle.dump(self.label_free_space, labelSpaceFile)
             labelSpaceFile.close()
 
             return label
 
-        label = Label(labelStr, labelFile)
+        label = Label(labelStr, self.labelFile)
         return label
 
     # delete node by recording its ID in list of free space
@@ -217,6 +209,23 @@ class StorageManager:
 
         # add node id to node free space list
         self.node_free_space.append(nodeID)
+
+    '''# opening files in write mode so that previous lists are cleared before new ones are written
+    def openNodeSpaceFile(self):
+        nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'wb')
+        return nodeSpaceFile
+
+    def openRelSpaceFile(self):
+        relSpaceFile = open(self.relFreeSpaceFileName, 'wb')
+        return relSpaceFile
+
+    def openPropSpaceFile(self):
+        propSpaceFile = open(self.propFreeSpaceFileName, 'wb')
+        return propSpaceFile
+
+    def openLabelSpaceFile(self):
+        labelSpaceFile = open(self.labelFreeSpaceFileName, 'wb')
+        return labelSpaceFile'''
 
 
 
