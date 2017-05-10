@@ -35,7 +35,7 @@ label1 = storageManager.createLabel("numb")
 label2 = storageManager.createLabel("numb")
 label3 = storageManager.createLabel("numb")
 
-node0.addProperty(prop0)
+node0.addProperty(prop2)
 node1.addProperty(prop1)
 
 node0.addLabel(label0)
@@ -57,6 +57,7 @@ for rel in node1read.relationships:
 	print("in a relationship with node: {0}".format(rel.getOtherNodeID(node1read.getID())))
 print("print node1 properties")
 for prop in node1read.properties:
+	print("id {0}".format(prop.getID()))
 	print("key: {0}".format(prop.getKey()))
 	print("value: {0}".format(prop.getValue()))
 print("print node1 labels")
@@ -72,6 +73,7 @@ for rel in node2read.relationships:
 	print("in a relationship with node: {0}".format(rel.getOtherNodeID(node2read.getID())))
 print("print node2 properties")
 for prop in node2read.properties:
+	print("id {0}".format(prop.getID()))
 	print("key: {0}".format(prop.getKey()))
 	print("value: {0}".format(prop.getValue()))
 print("print node2 labels")

@@ -64,10 +64,13 @@ class Node:
 
     # This method removes a relationship from a node and writes the node
     def removeRelationship(self, relID):
+        toRemove = 0
         for index in range(0, len(self.relationships)):
             rel = self.relationships[index]
             if rel.getID() == relID:
-                self.relationships.pop(index)
+                toRemove = relID
+
+        self.relationships.pop(toRemove)
 
         self.writeNode()
 
@@ -106,6 +109,10 @@ class Node:
 
     # This method writes this node to the given node file
     def writeNode(self):
+        print("properties in node")
+        for prop in self.properties:
+            print(prop.getID())
+
         print("writing node...")
 
         # open node file
@@ -130,8 +137,10 @@ class Node:
         # write first relationship ID
         storeFile.seek(self.startOffset + Node.REL_ID_OFFSET)
         if len(self.relationships) == 0:
+            firstRel = -1
             storeFile.write((-1).to_bytes(Relationship.relIDByteSize,
                 byteorder = sys.byteorder, signed=True))
+            print("wrote first rel ID: -1")
         else:
             firstRel = self.relationships[0]
             storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteSize,
@@ -142,8 +151,11 @@ class Node:
         # write first property ID
         storeFile.seek(self.startOffset + Node.PROPERTY_ID_OFFSET)
         if len(self.properties) == 0:
+            firstProp = -1
             storeFile.write((-1).to_bytes(Property.propIDByteSize,
                 byteorder = sys.byteorder, signed=True))
+            print("wrote first property ID: -1")
+
         else:
             firstProp = self.properties[0]
             storeFile.write(firstProp.getID().to_bytes(Property.propIDByteSize,

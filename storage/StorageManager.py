@@ -175,6 +175,9 @@ class StorageManager:
     # also delete all corresponding relationships, properties, and labels
     def deleteNode(self, nodeID):
         node = self.nodeFile.readNode(nodeID, self.relationshipFile, self.propertyFile, self.labelFile)
+        print("***properties in node 0***")
+        for prop in node.properties:
+            print(prop.getID())
 
         # delete associated relationships, properties, and labels
 
@@ -182,12 +185,15 @@ class StorageManager:
         for rel in node.relationships:
             otherNodeID = rel.getOtherNodeID(nodeID)
             otherNode = self.nodeFile.readNode(otherNodeID, self.relationshipFile, self.propertyFile, self.labelFile)
+            print("***properties in node 1***")
+            for prop in otherNode.properties:
+                print(prop.getID())
             otherNode.removeRelationship(rel.getID())
 
             self.rel_free_space.append(rel.getID())
 
         # write changes to list
-        relSpaceFile = openRelSpaceFile()
+        relSpaceFile = open(self.relFreeSpaceFileName, 'wb')
         pickle.dump(self.rel_free_space, relSpaceFile)
         relSpaceFile.close()
 
@@ -195,15 +201,15 @@ class StorageManager:
             self.prop_free_space.append(prop.getID())
 
         # write changes to list
-        propSpaceFile = openPropSpaceFile()
+        propSpaceFile = open(self.propFreeSpaceFileName, 'wb')
         pickle.dump(self.prop_free_space, propSpaceFile)
         propSpaceFile.close()
 
         for label in node.labels:
-            self.label_free_space.append(label.getID())
+            self.label_free_space.append(label.getLabelID())
 
         # write changes to list
-        labelSpaceFile = openLabelSpaceFile()
+        labelSpaceFile = open(self.labelFreeSpaceFileName, 'wb')
         pickle.dump(self.label_free_space, labelSpaceFile)
         labelSpaceFile.close()
 
