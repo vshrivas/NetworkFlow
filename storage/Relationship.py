@@ -46,8 +46,8 @@ class Relationship:
     def getID(self):
         return self.relationshipID 
 
-    def getOtherNodeID(self, node):
-        if(node.getID() == self.firstNodeID):
+    def getOtherNodeID(self, nodeID):
+        if(nodeID == self.firstNodeID):
             return self.secondNodeID
 
         return self.firstNodeID

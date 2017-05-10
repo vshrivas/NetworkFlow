@@ -54,7 +54,7 @@ print("printing node 1")
 print("node1 id: {0}".format(node1read.nodeID))
 print("print node1 relationships")
 for rel in node1read.relationships:
-	print("in a relationship with node: {0}".format(rel.getOtherNodeID(node1read)))
+	print("in a relationship with node: {0}".format(rel.getOtherNodeID(node1read.getID())))
 print("print node1 properties")
 for prop in node1read.properties:
 	print("key: {0}".format(prop.getKey()))
@@ -69,7 +69,7 @@ print("printing node 2")
 print("node2 id: {0}".format(node2read.nodeID))
 print("print node2 relationships")
 for rel in node2read.relationships:
-	print("in a relationship with node: {0}".format(rel.getOtherNodeID(node2read)))
+	print("in a relationship with node: {0}".format(rel.getOtherNodeID(node2read.getID())))
 print("print node2 properties")
 for prop in node2read.properties:
 	print("key: {0}".format(prop.getKey()))
@@ -78,6 +78,13 @@ print("print node2 labels")
 for label in node2read.labels:
 	print(label.getLabelStr())
 
+
+print(storageManager.node_free_space)
+print(storageManager.rel_free_space)
+print(storageManager.prop_free_space)
+print(storageManager.label_free_space)
+
+storageManager.deleteNode(0)
 
 print(storageManager.node_free_space)
 print(storageManager.rel_free_space)

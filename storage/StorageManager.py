@@ -180,7 +180,7 @@ class StorageManager:
 
         # remove relationships from sibling node
         for rel in node.relationships:
-            otherNodeID = rel.getOtherNodeID()
+            otherNodeID = rel.getOtherNodeID(nodeID)
             otherNode = self.nodeFile.readNode(otherNodeID, self.relationshipFile, self.propertyFile, self.labelFile)
             otherNode.removeRelationship(rel.getID())
 
