@@ -1,11 +1,11 @@
-from Label import Label
-from LabelFile import LabelFile
-from Node import Node
-from NodeFile import NodeFile
-from Property import Property
-from PropertyFile import PropertyFile
-from Relationship import Relationship
-from RelationshipFile import RelationshipFile
+from .Label import Label
+from .LabelFile import LabelFile
+from .Node import Node
+from .NodeFile import NodeFile
+from .Property import Property
+from .PropertyFile import PropertyFile
+from .Relationship import Relationship
+from .RelationshipFile import RelationshipFile
 
 import pickle
 
@@ -14,13 +14,6 @@ import pickle
 class StorageManager:
 
     def __init__(self, nodeFile, relationshipFile, propertyFile, labelFile):
-        print("*****")
-        print(nodeFile)
-        print(relationshipFile)
-        print(propertyFile)
-        print(labelFile)
-        print("*****")
-
         self.nodeFile = nodeFile
         self.relationshipFile = relationshipFile
         self.propertyFile = propertyFile

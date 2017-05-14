@@ -1,15 +1,16 @@
-import storage.Node as Node
-import storage.NodeFile as NodeFile
-import storage.NodePage as NodePage
-import storage.Property as Property
-import storage.PropertyFile as PropertyFile
-import storage.Relationship as Relationship
-import storage.RelationshipFile as RelationshipFile
-import storage.Label as Label
-import storage.LabelFile as LabelFile
-import storage.StorageManager as StorageManager
+from storage.Node import Node
+from storage.NodeFile import NodeFile
+from storage.NodePage import NodePage
+from storage.Property import Property
+from storage.PropertyFile import PropertyFile
+from storage.Relationship import Relationship
+from storage.RelationshipFile import RelationshipFile
+from storage.Label import Label
+from storage.LabelFile import LabelFile
+from storage.StorageManager import StorageManager
 
-nodeFile = NodeFile.NodeFile()
+
+nodeFile = NodeFile()
 relationshipFile = RelationshipFile()
 propFile = PropertyFile()
 labelFile = LabelFile()
