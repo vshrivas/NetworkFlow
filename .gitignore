@@ -1,6 +1,9 @@
 # Ignore stored information
 *.store
 
+# Mac OS X folder custom attributes
+*.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
