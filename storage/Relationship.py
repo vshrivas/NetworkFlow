@@ -6,6 +6,7 @@
 # Bytes 15-18: Node 1 Prev Rel ID
 # Bytes 19-22: Node 2 Next Rel ID
 # Bytes 23-26: Node 2 Prev Rel ID
+# Bytes 27-126: Relationship Type
 
 # Uniqueness:
 # If relationship with node 1 = A and node 2 = B exists, a relationship with 
@@ -22,17 +23,22 @@ class Relationship:
     NODE1_PREV_REL_ID_OFFSET = 14
     NODE2_NEXT_REL_ID_OFFSET = 18
     NODE2_PREV_REL_ID_OFFSET = 22
+    RELATIONSHIP_TYPE_OFFSET = 26
+    MAX_TYPE_SIZE = 100
 
-    storageSize = 26
+    storageSize = 126
     numRelationships = 0
 
     relIDByteSize = 4
 
-    def __init__(self, node1ID, node2ID, relationshipFile, relationshipID=None):
+    def __init__(self, node1ID, node2ID, relType, relationshipFile, relationshipID=None):
         if relationshipID is None:
             relationshipID = Relationship.numRelationships
+
         self.firstNodeID = node1ID
         self.secondNodeID = node2ID
+
+        self.type = relType 
 
         self.relationshipID = relationshipID
 
@@ -51,6 +57,9 @@ class Relationship:
             return self.secondNodeID
 
         return self.firstNodeID
+
+    def getRelType(self):
+        return self.type
 
     def writeRelationship(self, node, prevRel, nextRel):
         # open relationship file
@@ -99,6 +108,20 @@ class Relationship:
             storeFile.seek(self.startOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
             storeFile.write(prevRel.getID().to_bytes(Relationship.relIDByteSize, 
                 byteorder = sys.byteorder, signed = True))
+
+
+        # write relationship type
+        print("writing relationship type")
+        storeFile.seek(self.startOffset + Relationship.RELATIONSHIP_TYPE_OFFSET)
+
+        # type is not of max size
+        if(sys.getsizeof(self.type) != self.MAX_TYPE_SIZE):
+            # pad value up to max size
+            while len(self.type.encode('utf-8')) != self.MAX_TYPE_SIZE:
+                self.type += ' '
+
+        storeFile.write(bytearray(self.type, 'utf8'))
+
 
     
 

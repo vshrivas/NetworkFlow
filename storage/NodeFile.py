@@ -50,10 +50,16 @@ class NodeFile(object):
             relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_ID_OFFSET)
             node2ID = int.from_bytes(relationshipStore.read(3), sys.byteorder, signed=True)
 
+            # read in type of relationship
+            relationshipStore.seek(relationshipStartOffset + Relationship.RELATIONSHIP_TYPE_OFFSET)
+            relType = relationshipStore.read(Relationship.MAX_TYPE_SIZE).decode("utf-8")
+
             print('Node 1 id: {0}'.format(node1ID))
             print('Node 2 id: {0}'.format(node2ID))
+            print('Relationship type: {0}'.format(relType))
+
             # create relationship and add to node
-            rel = Relationship(node1ID, node2ID, relationshipFile)
+            rel = Relationship(node1ID, node2ID, relType, relationshipFile)
             rel.relationshipID = nextRelID
             node.addRelationship(rel)
 

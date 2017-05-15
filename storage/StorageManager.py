@@ -101,11 +101,11 @@ class StorageManager:
     # Finds free space for relationship (potentially location to the right of all relationships if
     # there is no free space), creates a relationship, and writes the relationship to the relationship file.
     # It returns the created relationship.
-    def createRelationship(self, node1, node2):
+    def createRelationship(self, node1, node2, relType):
         # there is free space
         if len(self.rel_free_space) > 0:
             freeRelID = self.rel_free_space[len(self.rel_free_space) - 1]
-            relationship = Relationship(node1.getID(), node2.getID(), self.relationshipFile, freeRelID)
+            relationship = Relationship(node1.getID(), node2.getID(), relType, self.relationshipFile, freeRelID)
 
             # remove block from list of relationship free space
             self.rel_free_space.pop()
@@ -117,7 +117,7 @@ class StorageManager:
 
             return relationship
 
-        relationship = Relationship(node1.getID(), node2.getID(), self.relationshipFile)
+        relationship = Relationship(node1.getID(), node2.getID(), relType, self.relationshipFile)
         return relationship
 
     # Finds free space for property (potentially location to the right of all properties if

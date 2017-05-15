@@ -21,7 +21,7 @@ storageManager = StorageManager(nodeFile, relationshipFile, propFile, labelFile)
 node0 = storageManager.createNode()
 node1 = storageManager.createNode()
 
-rel0 = storageManager.createRelationship(node0, node1)
+rel0 = storageManager.createRelationship(node0, node1, "friend")
 node0.addRelationship(rel0)
 node1.addRelationship(rel0)
 
@@ -54,6 +54,7 @@ print("node1 id: {0}".format(node1read.nodeID))
 print("print node1 relationships")
 for rel in node1read.relationships:
 	print("in a relationship with node: {0}".format(rel.getOtherNodeID(node1read.getID())))
+	print("rel type: {0}".format(rel.type))
 print("print node1 properties")
 for prop in node1read.properties:
 	print("id {0}".format(prop.getID()))

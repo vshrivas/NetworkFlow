@@ -182,16 +182,16 @@ class Node:
 
             # first relationship
             if relIndex == 0:
-                nullRelationship = Relationship(-1, -1, "", -1)
+                nullRelationship = Relationship(-1, -1, "", "",-1)
                 # no next relationship
                 if relIndex == len(self.relationships) - 1:
                     print("only one relationship")
                     rel.writeRelationship(self, nullRelationship, nullRelationship)
                 else:
-                    nullRelationship = Relationship(-1, -1, "", -1)
+                    nullRelationship = Relationship(-1, -1, "", "", -1)
                     rel.writeRelationship(self, nullRelationship, self.relationships[relIndex + 1])
             elif relIndex == len(self.relationships) - 1:
-                nullRelationship = Relationship(-1, -1, "", -1)
+                nullRelationship = Relationship(-1, -1, "", "", -1)
                 rel.writeRelationship(self, self.relationships[relIndex - 1], nullRelationship)
             else:
                 rel.writeRelationship(self, self.relationships[relIndex - 1],
