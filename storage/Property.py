@@ -2,20 +2,20 @@
 
 # Storage: 
 # Bytes 1-4: Property ID
-# Bytes 5-8: Key
-# Bytes 9-12: Value
-# Bytes 13-16: Next Property ID
+# Bytes 5-104: Key
+# Bytes 105-204: Value
+# Bytes 205-208: Next Property ID
 import sys
 
 class Property:
     PROPERTY_ID_OFFSET = 0
     KEY_OFFSET = 4
-    VALUE_OFFSET = 8
-    NEXT_PROPERTY_ID_OFFSET = 12
-    MAX_KEY_SIZE = 4
-    MAX_VALUE_SIZE = 4
+    VALUE_OFFSET = 104
+    NEXT_PROPERTY_ID_OFFSET = 204
+    MAX_KEY_SIZE = 100
+    MAX_VALUE_SIZE = 100
 
-    storageSize = 16
+    storageSize = 208
     numProperties = 0
     propIDByteSize = 4
 

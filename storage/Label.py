@@ -2,15 +2,16 @@ import sys
 
 # Storage
 # Bytes 1-3: Label ID
-# Bytes 4-7: Label
-# Bytes 8-10: Next Label ID
+# Bytes 4-103: Label
+# Bytes 104-106: Next Label ID
 
 class Label:
     LABEL_ID_OFFSET = 0
     LABEL_OFFSET = 3
-    NEXT_LABEL_ID_OFFSET = 7
+    NEXT_LABEL_ID_OFFSET = 103
+    MAX_LABEL_SIZE = 100
 
-    storageSize = 10
+    storageSize = 106
     numLabels = 0
 
     def __init__(self, label, labelFile, labelID=None, nextLabelID=-1):
