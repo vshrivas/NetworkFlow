@@ -48,6 +48,11 @@ class Label:
 
         # write label
         storeFile.seek(self.startOffset + Label.LABEL_OFFSET)
+        # label is not of max size
+        if(sys.getsizeof(self.label) != self.MAX_LABEL_SIZE):
+            # pad key up to max size
+            while len(self.label.encode('utf-8')) != self.MAX_LABEL_SIZE:
+                self.label += ' '
         storeFile.write(bytearray(self.label, "utf8"))
 
         # write next label's ID

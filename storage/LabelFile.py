@@ -27,7 +27,7 @@ class LabelFile:
         labelID = int.from_bytes(labelStore.read(3), byteorder=sys.byteorder, signed=True)
 
         labelStore.seek(labelStartOffset + Label.LABEL_OFFSET)
-        labelString = labelStore.read(Label.MAX_LABEL_SIZE).decode('utf8')
+        labelString = labelStore.read(Label.MAX_LABEL_SIZE).decode('utf8').rstrip(' ')
 
         labelStore.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
         nextLabelID = int.from_bytes(labelStore.read(3), byteorder=sys.byteorder, signed=True)
