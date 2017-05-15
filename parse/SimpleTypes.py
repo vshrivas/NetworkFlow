@@ -12,4 +12,12 @@ class SimpleRelationship:
         self.node1 = node1
         self.node2 = node2
 
+        self.varname = None
         self.properties = {}
+
+class MatchRelationship:
+    def __init__(self, label):
+        self.label = label
+
+        self.varname = None
+        self.properties = 

@@ -28,6 +28,17 @@ class CypherVisitor(ParseTreeVisitor):
         # the properties this node has (e.g. {"name": "Donnie"})
         self.nodes_to_create = []
 
+        # Represents the nodes and properties to be matched on a MATCH command
+        # They have the same structure as previous.
+        self.nodes_to_match = []
+
+        # Represents the relationship and node to be matched on a MATCH command
+        # These will be the equivalent of the patternElementChain, or each node
+        # that each relationship matches to.  They will be tuples of
+        # (relationship, node)
+        self.chains_to_match = []
+
+
     # Visit a parse tree produced by CypherParser#cypher.
     def visitCypher(self, ctx:CypherParser.CypherContext):
         return self.visitChildren(ctx)
@@ -36,30 +47,85 @@ class CypherVisitor(ParseTreeVisitor):
     def visitCreate(self, ctx:CypherParser.CreateContext):
         # Each pattern part is associated with a particular node to create.
         for part in ctx.pattern().patternPart():
-            # Get the variable associated with the node in question.
+            # Get the context of the node in question.
             node = part.anonymousPatternPart().patternElement().nodePattern()
-            node_variable = (node.variable().symbolicName().getText())
-
-            # Extract any properties we must give this new node.
-            if node.properties() is not None:
-                properties = dict_from_mapLiteral(self, (node.properties().mapLiteral()))
-            else:
-                properties = {}
-
-            # Extract any labels we must give the node.
-            if node.nodeLabels() is not None:
-                labels = [label.labelName().getText()
-                          for label in node.nodeLabels().nodeLabel()]
-            else:
-                labels = []
 
             # Add this node to the list, and move on.
-            node_to_add = SimpleNode(node_variable)
-            node_to_add.properties = properties
-            node_to_add.labels = labels
+            node_to_add = visitNodePattern(node)
             self.nodes_to_create.append(node_to_add)
 
         return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CypherParser#match_.
+    def visitMatch_(self, ctx:CypherParser.Match_Context):
+        # The first anon pattern part will always be a node, so get that info.
+        anon = ctx.pattern().patternPart().anonymousPatternPart()
+        for elem in anon.patternElement():
+            if isinstance(elem, CypherParser.NodePatternContext):
+                node = elem.nodePattern()
+                nodes_to_match.append(visitNodePattern(node))
+            else: # elem is patternElementChain
+                rel = visitRelationshipPattern(elem.relationshipPattern())
+                node = visitNodePattern(elem.NodePattern())
+
+        return self.visitChildren(ctx)      
+
+
+    # Visit a parse tree produced by CypherParser#nodePattern.
+    def visitNodePattern(self, ctx:CypherParser.NodePatternContext):
+        # Get the node variable
+        node_variable = (ctx.variable().symbolicName().getText())
+
+        # Extract any properties this node has.
+        if ctx.properties() is not None:
+            properties = dict_from_mapLiteral(self, (node.properties().mapLiteral()))
+        else:
+            properties = {}
+
+        # Extract any labels this node has.
+        if ctx.nodeLabels() is not None:
+            labels = [label.labelName().getText()
+                      for label in ctx.nodeLabels().nodeLabel()]
+        else:
+            labels = []
+
+        # Make a SimpleNode with all this node's info
+        node = SimpleNode(node_variable)
+        node.properties = properties
+        node.labels = labels
+
+        # Don't forget to visit your kids.
+        self.visitChildren(ctx)  
+
+        return node
+
+
+    # Visit a parse tree produced by CypherParser#relationshipPattern.
+    def visitRelationshipPattern(self, ctx:CypherParser.RelationshipPatternContext):
+        rel = ctx.relationshipDetail()
+        # Get the relationship variable
+        rel_variable = rel.variable().symbolicName().getText()
+
+        # Get the relationship types
+        types = []
+        for relType in rel.relationshipTypes():
+            types.append(relType.relTypeName().schemaName().symbolicName().getText())
+
+        # Extract any properties
+        if rel.properties() is not None:
+            properties = dict_from_mapLiteral(self, (rel.properties().mapLiteral()))
+        else:
+            properties = {}
+
+        # Make a MatchRelationship with the info
+        relation = MatchRelationship(types)
+        relation.varname = rel_variable
+        relation.properties = properties
+
+        self.visitChildren(ctx)
+        return relation
+
 
     # Visit a parse tree produced by CypherParser#expression.
     def visitExpression(self, ctx:CypherParser.ExpressionContext):

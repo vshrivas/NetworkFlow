@@ -18,6 +18,19 @@ def parse(query):
     # figure out more things to parse:
     print("Here's the tree: \n", tree_string, "\n\n")
 
+    openParens = 0
+    for char in tree_string:
+        if char == '(':
+            print("\n", end="")
+            openParens += 1
+            print("." * openParens, end="")
+        elif char == ')':
+            openParens -= 1
+        else:
+            print(char, end="")
+    print("\n\n", end="")
+
+
     visitor.visit(tree)
 
     # Package everything up nicely and pass it to the database to make it all.
