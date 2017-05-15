@@ -28,7 +28,10 @@ class CypherVisitor(ParseTreeVisitor):
             # TODO: Error catching.
             node = part.anonymousPatternPart().patternElement().nodePattern()
             node_variable = (node.variable().symbolicName().getText())
-            properties = dict_from_mapLiteral(self, (node.properties().mapLiteral()))
+            if node.properties() is not None:
+                properties = dict_from_mapLiteral(self, (node.properties().mapLiteral()))
+            else:
+                properties = {}
             # Add this node to the list, and move on.
             self.to_create[node_variable] = properties
         return self.visitChildren(ctx)
