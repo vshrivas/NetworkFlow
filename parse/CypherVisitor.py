@@ -1,5 +1,7 @@
 # Generated from Cypher.g4 by ANTLR 4.7
 from antlr4 import *
+from .SimpleTypes import *
+
 if __name__ is not None and "." in __name__:
     from .CypherParser import CypherParser
 else:
@@ -15,8 +17,16 @@ def dict_from_mapLiteral(visitor, ctx:CypherParser.MapLiteralContext):
 
 class CypherVisitor(ParseTreeVisitor):
     def __init__(self):
+        # Represents the relationships to be created (maybe later, the
+        # relationships to return or something) and their properties/labels
+        self.relationships = []
+
         # Represents the nodes and properties to be created on a CREATE command
-        self.to_create = {}
+        # The keys are the variable names bound to the nodes.
+        # The values are 2-tuples; the first item is a list of relationships in
+        # which this key lies, and the second item is a dictionary representing
+        # the properties this node has (e.g. {"name": "Donnie"})
+        self.nodes_to_create = []
 
     # Visit a parse tree produced by CypherParser#cypher.
     def visitCypher(self, ctx:CypherParser.CypherContext):
@@ -24,16 +34,31 @@ class CypherVisitor(ParseTreeVisitor):
 
 
     def visitCreate(self, ctx:CypherParser.CreateContext):
+        # Each pattern part is associated with a particular node to create.
         for part in ctx.pattern().patternPart():
-            # TODO: Error catching.
+            # Get the variable associated with the node in question.
             node = part.anonymousPatternPart().patternElement().nodePattern()
             node_variable = (node.variable().symbolicName().getText())
+
+            # Extract any properties we must give this new node.
             if node.properties() is not None:
                 properties = dict_from_mapLiteral(self, (node.properties().mapLiteral()))
             else:
                 properties = {}
+
+            # Extract any labels we must give the node.
+            if node.nodeLabels() is not None:
+                labels = [label.labelName().getText()
+                          for label in node.nodeLabels().nodeLabel()]
+            else:
+                labels = []
+
             # Add this node to the list, and move on.
-            self.to_create[node_variable] = properties
+            node_to_add = SimpleNode(node_variable)
+            node_to_add.properties = properties
+            node_to_add.labels = labels
+            self.nodes_to_create.append(node_to_add)
+
         return self.visitChildren(ctx)
 
     # Visit a parse tree produced by CypherParser#expression.

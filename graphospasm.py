@@ -1,4 +1,5 @@
 import parse.Cypher as cyp
+from parse.SimpleTypes import *
 
 import storage.StorageManager as sm
 import storage.LabelFile as lf
@@ -12,18 +13,32 @@ if __name__ == '__main__':
     print("Version -112.")
     print("Enjoy your stay.")
 
+    n = nf.NodeFile()
+    r = rf.RelationshipFile()
+    p = pf.PropertyFile()
+    l = lf.LabelFile()
+    s = sm.StorageManager(n, r, p, l)
+
     while True:
         print(">", end=" ")
         query = input()
         create_dict = cyp.parse(query)
 
-        n = nf.NodeFile()
-        r = rf.RelationshipFile()
-        p = pf.PropertyFile()
-        l = lf.LabelFile()
-        s = sm.StorageManager(n, r, p, l)
+        for relationship in create_dict["relationships"]:
+            # TODO.
+            s.createRelationship(relationship)
 
-        for node_name in create_dict:
+        for simpleNode in create_dict["nodes"]:
+            print(" * Creating node %s" % simpleNode.varName)
             node = s.createNode()
-            for prop_key, prop_val in create_dict[node_name].items():
+
+            # TODO: relationship
+            for label in simpleNode.labels:
+                print(" * Adding label %s to node %s" % (label, simpleNode.varName))
+                node.addLabel(s.createLabel(label))
+            print(" * here it is: %s" % simpleNode.properties)
+            for prop_key, prop_val in simpleNode.properties.items():
+                print(" * Adding property {%s: %s} to node %s" % (prop_key, prop_val, simpleNode.varName))
                 node.addProperty(s.createProperty(prop_key, prop_val))
+
+            node.writeNode()
