@@ -13,6 +13,7 @@ import pickle
 # are allocated in their respective files.
 class StorageManager:
 
+    folder_prefix = "datastore/"
     def __init__(self, nodeFile, relationshipFile, propertyFile, labelFile):
         self.nodeFile = nodeFile
         self.relationshipFile = relationshipFile
@@ -28,7 +29,7 @@ class StorageManager:
         # all lists of free spaces start with space at ID 0 being free
         # list of locations in node file with free space for nodes (specified by nodeIDs)
         # try to load lists from disk, if no lists currently exist, create new ones
-        self.nodeFreeSpaceFileName = "NodeFreeSpaceFile.store"
+        self.nodeFreeSpaceFileName = folder_prefix + "NodeFreeSpaceFile.store"
         try:
             nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'rb')
             self.node_free_space = pickle.load(nodeSpaceFile)
@@ -39,7 +40,7 @@ class StorageManager:
             pickle.dump(self.node_free_space, nodeSpaceFile)
             
 
-        self.relFreeSpaceFileName = "RelationshipFreeSpaceFile.store"
+        self.relFreeSpaceFileName = folder_prefix + "RelationshipFreeSpaceFile.store"
         try:
             relSpaceFile = open(self.relFreeSpaceFileName, 'rb')
             self.rel_free_space = pickle.load(relSpaceFile)
@@ -50,7 +51,7 @@ class StorageManager:
             pickle.dump(self.rel_free_space, relSpaceFile)
 
 
-        self.propFreeSpaceFileName = "PropFreeSpaceFile.store"
+        self.propFreeSpaceFileName = folder_prefix + "PropFreeSpaceFile.store"
         try:
             propSpaceFile = open(self.propFreeSpaceFileName, 'rb')
             self.prop_free_space = pickle.load(propSpaceFile)
@@ -61,7 +62,7 @@ class StorageManager:
             pickle.dump(self.prop_free_space, propSpaceFile)
 
 
-        self.labelFreeSpaceFileName = "LabelFreeSpaceFile.store"
+        self.labelFreeSpaceFileName = folder_prefix + "LabelFreeSpaceFile.store"
         try:
             labelSpaceFile = open(self.labelFreeSpaceFileName, 'rb')
             self.label_free_space = pickle.load(labelSpaceFile)

@@ -6,7 +6,7 @@ class PropertyFile:
         self.fileID = PropertyFile.numFiles
 
         # create property file if it doesn't already exist
-        self.fileName = "PropertyFile{0}.store".format(self.fileID)
+        self.fileName = "datastore/PropertyFile{0}.store".format(self.fileID)
         try:
             propertyFile = open(self.fileName, 'r+b')
         except FileNotFoundError:

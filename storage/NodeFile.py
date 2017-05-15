@@ -12,7 +12,7 @@ class NodeFile(object):
         self.fileID = NodeFile.numFiles
 
         # create node file if it doesn't already exist
-        self.fileName = "NodeFile{0}.store".format(self.fileID)
+        self.fileName = "datastore/NodeFile{0}.store".format(self.fileID)
         try:
             nodeFile = open(self.fileName, 'r+b')
         except FileNotFoundError:
