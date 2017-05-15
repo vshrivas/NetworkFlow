@@ -13,6 +13,29 @@ def dict_from_mapLiteral(visitor, ctx:CypherParser.MapLiteralContext):
         d[propertyName.getText()] = visitor.visitExpression(expression)
     return d
 
+# A helper which creates a SimpleNode, populating its attributes.
+def nodeInfoExtract(visitor, node):
+    node_variable = (node.variable().symbolicName().getText())
+
+    # Extract any properties we must give this new node.
+    if node.properties() is not None:
+        properties = dict_from_mapLiteral(visitor, (node.properties().mapLiteral()))
+    else:
+        properties = {}
+
+    # Extract any labels we must give the node.
+    if node.nodeLabels() is not None:
+        labels = [label.labelName().getText()
+                  for label in node.nodeLabels().nodeLabel()]
+    else:
+        labels = []
+
+    # Give this node back to the parent, who will add it to the list.
+    node_to_add = SimpleNode(node_variable)
+    node_to_add.properties = properties
+    node_to_add.labels = labels
+    return node_to_add
+
 # This class defines a complete generic visitor for a parse tree produced by CypherParser.
 
 class CypherVisitor(ParseTreeVisitor):
@@ -47,12 +70,77 @@ class CypherVisitor(ParseTreeVisitor):
     def visitCreate(self, ctx:CypherParser.CreateContext):
         # Each pattern part is associated with a particular node to create.
         for part in ctx.pattern().patternPart():
-            # Get the context of the node in question.
-            node = part.anonymousPatternPart().patternElement().nodePattern()
+            # There are two possibilities.
 
-            # Add this node to the list, and move on.
-            node_to_add = visitNodePattern(node)
-            self.nodes_to_create.append(node_to_add)
+            # Either this patternPart is a node, which must then be created,
+            # or it represents a relationship that connects two nodes.
+
+
+            # In the relationship case, there are two subcases.
+
+            # Either all of the nodes mentioned in the relationship are brand
+            # new (that is, they are not known variables), in which case they
+            # must be created, or some of the nodes are not new, in which case
+            # they must be looked up in the variable list. (We do not yet
+            # support variables.)
+
+
+            # First, we need to tell whether this part has a relationship!
+            if part.anonymousPatternPart().patternElement().patternElementChain():
+                detail = part.anonymousPatternPart().patternElement().patternElementChain()[0] \
+                             .relationshipPattern().relationshipDetail()
+
+                # Get the label associated with the relationship
+                relationshipLabel = detail.relationshipTypes().relTypeName()[0] \
+                                          .schemaName().symbolicName().getText()
+
+                # Get any properties associated with the relationship
+                if detail.properties() is not None:
+                    rel_properties = dict_from_mapLiteral(self, (detail.properties().mapLiteral()))
+                else:
+                    rel_properties = {}
+
+                # We will use this marker to tell whether we need to construct
+                # relationships and nodes in a special way or not.
+                isRelationship = True
+            else:
+                isRelationship = False
+
+
+            # Need to get the variable associated with the node(s) in question.
+            # If we're creating a relationship, there are two nodes to get.
+            # If not, just one.
+            element = part.anonymousPatternPart().patternElement()
+            if isRelationship:
+                nodes = [
+                        element.nodePattern(), # left-hand node
+                        element.patternElementChain()[0].nodePattern() # right-hand node
+                ]
+            else:
+                nodes = [
+                        element.nodePattern(), # left-hand node is the only node
+                ]
+
+            # We need to extract all the info we can from the node(s) we
+            # have just procured. Call a helper function to do this, and
+            # write down the node(s).
+            nodes_to_create = [nodeInfoExtract(self, node) for node in nodes]
+
+            # If we're making a relationship, we need to create one.
+            if isRelationship:
+                relationship = SimpleRelationship(relationshipLabel,
+                                        nodes_to_create[0], nodes_to_create[1])
+                relationship.properties = rel_properties
+                self.relationships.append(relationship)
+                # We also need to make sure the nodes know the relationships
+                # that they are a part of. This, of course, generates a
+                # reference cycle, but that's ok...
+                for node_to_create in nodes_to_create:
+                    node_to_create.relationships.append(relationship)
+
+            # Done! Just add it (or them) to our create-list and move on...
+            for node in nodes_to_create:
+                self.nodes_to_create.append(node)
 
         return self.visitChildren(ctx)
 
@@ -69,36 +157,7 @@ class CypherVisitor(ParseTreeVisitor):
                 rel = visitRelationshipPattern(elem.relationshipPattern())
                 node = visitNodePattern(elem.NodePattern())
 
-        return self.visitChildren(ctx)      
-
-
-    # Visit a parse tree produced by CypherParser#nodePattern.
-    def visitNodePattern(self, ctx:CypherParser.NodePatternContext):
-        # Get the node variable
-        node_variable = (ctx.variable().symbolicName().getText())
-
-        # Extract any properties this node has.
-        if ctx.properties() is not None:
-            properties = dict_from_mapLiteral(self, (node.properties().mapLiteral()))
-        else:
-            properties = {}
-
-        # Extract any labels this node has.
-        if ctx.nodeLabels() is not None:
-            labels = [label.labelName().getText()
-                      for label in ctx.nodeLabels().nodeLabel()]
-        else:
-            labels = []
-
-        # Make a SimpleNode with all this node's info
-        node = SimpleNode(node_variable)
-        node.properties = properties
-        node.labels = labels
-
-        # Don't forget to visit your kids.
-        self.visitChildren(ctx)  
-
-        return node
+        return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by CypherParser#relationshipPattern.
