@@ -5,14 +5,17 @@ from .Label import Label
 class LabelFile:
     numFiles = 0
 
-    def __init__(self):
+    def __init__(self, createFile=True):
         LabelFile.numFiles += 1
         self.fileID = LabelFile.numFiles
 
-		# create relationship file
+		# create relationship file if it doesn't already exist
         self.fileName = "LabelFile{0}.store".format(self.fileID)
-        relFile = open(self.fileName, 'wb')
-        relFile.close()
+        try:
+            labelFile = open(self.fileName, 'r+b')
+        except FileNotFoundError:
+            labelFile = open(self.fileName, 'wb')
+        labelFile.close()
 
     def getFileName(self):
         return self.fileName

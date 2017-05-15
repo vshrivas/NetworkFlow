@@ -11,9 +11,12 @@ class NodeFile(object):
         NodeFile.numFiles += 1
         self.fileID = NodeFile.numFiles
 
-        # create node file
+        # create node file if it doesn't already exist
         self.fileName = "NodeFile{0}.store".format(self.fileID)
-        nodeFile = open(self.fileName, 'wb')
+        try:
+            nodeFile = open(self.fileName, 'r+b')
+        except FileNotFoundError:
+            nodeFile = open(self.fileName, 'wb')
         nodeFile.close()
 
     def getFileName(self):
