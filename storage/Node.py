@@ -30,6 +30,7 @@ class Node:
 
     def __init__(self, nodeFile, nodeID=None):
         Node.numNodes = nodeFile.getNumNodes()
+        print("**** Num Nodes = {0} *****".format(Node.numNodes))
 
         if nodeID is None:
             nodeID = Node.numNodes
@@ -45,8 +46,10 @@ class Node:
 
         self.nodeID = nodeID
 
+        # if creating a new node
+        if self.nodeID >= Node.numNodes:
         # increment number of nodes
-        Node.numNodes += 1
+            Node.numNodes += 1
 
         self.nodeFile = nodeFile
 

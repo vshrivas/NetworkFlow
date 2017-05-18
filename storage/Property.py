@@ -22,6 +22,7 @@ class Property:
     def __init__(self, key, value, propertyFile, propertyID=None):
         if propertyFile != "":
             Property.numProperties = propertyFile.getNumProperties()
+            print("****** Num properties = {0} ******".format(Property.numProperties))
         # Note: For reading properties from files, we assume keys and values to be ints.
         # TODO: Support reading keys and values of other types
         if propertyID is None:
