@@ -33,7 +33,8 @@ class Property:
 
         self.propertyID = propertyID
 
-        if propertyID != -1:
+        # property isn't the null property and is a new property
+        if self.propertyID != -1 and self.propertyID >= self.numProperties:
             Property.numProperties += 1
 
         self.propertyFile = propertyFile
