@@ -11,20 +11,37 @@ class Label:
     NEXT_LABEL_ID_OFFSET = 103
     MAX_LABEL_SIZE = 100
 
+    labelIDByteLen = 3
     storageSize = 106
     numLabels = 0
 
     def __init__(self, label, labelFile, labelID=None, nextLabelID=-1):
+        Label.numLabels = labelFile.getNumLabels()
+        print("**** Num Labels = {0} *****".format(Label.numLabels))
+
         if labelID is None:
             labelID = Label.numLabels
+
         self.labelID = labelID
-        Label.numLabels += 1
+
+        # increment number of labels when non-null label and new label created
+        if self.labelID != -1 and self.labelID >= Label.numLabels:
+            Label.numLabels += 1
 
         self.label = label
 
         self.labelFile = labelFile
 
-        self.startOffset = self.labelID * Label.storageSize
+        # open label file
+        storeFileName = self.labelFile.getFileName()
+        storeFile = open(storeFileName, 'r+b')
+
+        # write number of labels to first 3 bytes of label file
+        storeFile.write((self.numLabels).to_bytes(Label.labelIDByteLen,
+            byteorder = sys.byteorder, signed=True))
+
+        self.startOffset = self.labelID * Label.storageSize + Label.labelIDByteLen
+
         self.nextLabelID = nextLabelID
 
     def getLabelStr(self):

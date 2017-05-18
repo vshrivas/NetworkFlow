@@ -15,15 +15,23 @@ class LabelFile:
             labelFile = open(self.fileName, 'r+b')
         except FileNotFoundError:
             labelFile = open(self.fileName, 'wb')
+            # write number of labels to first 3 bytes of label file
+            labelFile.write((0).to_bytes(Label.labelIDByteLen,
+                byteorder = sys.byteorder, signed=True))
         labelFile.close()
 
     def getFileName(self):
         return self.fileName
 
+    def getNumLabels(self):
+        labelFile = open(self.fileName, 'r+b')
+        numLabels = int.from_bytes(labelFile.read(Label.labelIDByteLen), byteorder=sys.byteorder, signed=True)
+        return numLabels
+
     # This method reads a given label based on labelID and returns a label object for it
     def readLabel(self, labelID):
         labelStore = open(self.fileName, 'rb')
-        labelStartOffset = labelID * Label.storageSize
+        labelStartOffset = labelID * Label.storageSize + Label.labelIDByteLen
 
         labelStore.seek(labelStartOffset + Label.LABEL_ID_OFFSET)
         # Requires Python >= 3.2 for the function int.from_bytes

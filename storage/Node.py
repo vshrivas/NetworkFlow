@@ -128,6 +128,10 @@ class Node:
         for prop in self.properties:
             print(prop.getID())
 
+        print("labels in node:")
+        for label in self.labels:
+            print(label.getLabelID())
+
         print("writing node...")
 
         # open node file
