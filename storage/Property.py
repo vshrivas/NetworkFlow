@@ -17,9 +17,11 @@ class Property:
 
     storageSize = 208
     numProperties = 0
-    propIDByteSize = 4
+    propIDByteLen = 4
 
     def __init__(self, key, value, propertyFile, propertyID=None):
+        if propertyFile != "":
+            Property.numProperties = propertyFile.getNumProperties()
         # Note: For reading properties from files, we assume keys and values to be ints.
         # TODO: Support reading keys and values of other types
         if propertyID is None:
@@ -35,7 +37,16 @@ class Property:
 
         self.propertyFile = propertyFile
 
-        self.startOffset = self.propertyID * Property.storageSize
+        if self.propertyFile != "":
+            # open property file
+            storeFileName = self.propertyFile.getFileName()
+            storeFile = open(storeFileName, 'r+b')
+
+            # write number of properties to first 4 bytes of property file
+            storeFile.write((Property.numProperties).to_bytes(Property.propIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+
+        self.startOffset = self.propertyID * Property.storageSize + Property.propIDByteLen
 
     def getKey(self):
         return self.key
@@ -60,7 +71,7 @@ class Property:
 
         # write property id
         storeFile.seek(self.startOffset + Property.PROPERTY_ID_OFFSET)
-        storeFile.write(self.propertyID.to_bytes(Property.propIDByteSize, 
+        storeFile.write(self.propertyID.to_bytes(Property.propIDByteLen, 
                 byteorder = sys.byteorder, signed = True))
 
         # write key
@@ -94,7 +105,7 @@ class Property:
         print("next property has index:{0}".format(nextProp.getID()))
 
         print("writing next property index {0} at {1}".format(nextProp.getID(), self.startOffset + Property.NEXT_PROPERTY_ID_OFFSET))
-        storeFile.write(nextProp.getID().to_bytes(Property.propIDByteSize, 
+        storeFile.write(nextProp.getID().to_bytes(Property.propIDByteLen, 
                 byteorder = sys.byteorder, signed = True))
 
         print()

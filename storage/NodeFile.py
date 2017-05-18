@@ -97,19 +97,19 @@ class NodeFile(object):
             print('for node: {0}'.format(nodeID))
             print('first prop id: {0}'. format(firstPropID))
             print(nextPropID)
-            propertyStartOffset = nextPropID * Property.storageSize
+            propertyStartOffset = nextPropID * Property.storageSize + Property.propIDByteLen
 
             # find ID
             propertyStore.seek(propertyStartOffset)
             print("seek to {0} for ID". format(propertyStartOffset))
-            ID = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+            ID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
             #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
             print('id: {0}'.format(ID))
 
             # find key
             propertyStore.seek(propertyStartOffset + Property.KEY_OFFSET)
             print("seek to {0} for key". format(propertyStartOffset + Property.KEY_OFFSET))
-            key = propertyStore.read(4).decode("utf-8")
+            key = propertyStore.read(Property.MAX_KEY_SIZE).decode("utf-8")
             key = key.rstrip(' ')
             #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
             print('key: {0}'.format(key))
@@ -118,7 +118,7 @@ class NodeFile(object):
             propertyStore.seek(propertyStartOffset + Property.VALUE_OFFSET)
             print("seek to {0} for value". format(propertyStartOffset + Property.VALUE_OFFSET))
             #value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
-            value = propertyStore.read(4).decode("utf-8")
+            value = propertyStore.read(Property.MAX_VALUE_SIZE).decode("utf-8")
             value = value.rstrip(' ')
             print('value: {0}'.format(value))
 
@@ -129,7 +129,7 @@ class NodeFile(object):
             # find next property id
             propertyStore.seek(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET)
             print("seek to {0} for next property id". format(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET))
-            nextPropID = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+            nextPropID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
             print("next prop id is {0}".format(nextPropID))
 
 

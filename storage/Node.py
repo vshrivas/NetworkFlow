@@ -164,13 +164,13 @@ class Node:
         storeFile.seek(self.startOffset + Node.PROPERTY_ID_OFFSET)
         if len(self.properties) == 0:
             firstProp = -1
-            storeFile.write((-1).to_bytes(Property.propIDByteSize,
+            storeFile.write((-1).to_bytes(Property.propIDByteLen,
                 byteorder = sys.byteorder, signed=True))
             print("wrote first property ID: -1")
 
         else:
             firstProp = self.properties[0]
-            storeFile.write(firstProp.getID().to_bytes(Property.propIDByteSize,
+            storeFile.write(firstProp.getID().to_bytes(Property.propIDByteLen,
                 byteorder = sys.byteorder, signed=True))
 
             print("wrote first property ID: {0}". format(firstProp.getID()))
