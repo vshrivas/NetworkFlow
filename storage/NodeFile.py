@@ -12,21 +12,29 @@ class NodeFile(object):
         self.fileID = NodeFile.numFiles
 
         # create node file if it doesn't already exist
-        self.fileName = "datastore/NodeFile{0}.store".format(self.fileID)
+        self.fileName = "NodeFile{0}.store".format(self.fileID)
         try:
             nodeFile = open(self.fileName, 'r+b')
         except FileNotFoundError:
             nodeFile = open(self.fileName, 'wb')
+            # write number of nodes to first 3 bytes of node file
+            nodeFile.write((0).to_bytes(Node.nodeIDByteLen,
+                byteorder = sys.byteorder, signed=True))
         nodeFile.close()
 
     def getFileName(self):
         return self.fileName
 
+    def getNumNodes(self):
+        nodeFile = open(self.fileName, 'r+b')
+        numNodes = int.from_bytes(nodeFile.read(Node.nodeIDByteLen), byteorder=sys.byteorder, signed=True)
+        return numNodes
+
     # This method reads a given node based on nodeID and returns a node object for it
     def readNode(self, nodeID, relationshipFile, propertyFile, labelFile):
         node = Node(self, nodeID)
         nodeStore = open(self.fileName, 'rb')
-        nodeStartOffset = nodeID * Node.storageSize
+        nodeStartOffset = nodeID * Node.storageSize + Node.nodeIDByteLen
 
         # TODO: refactor some of reading relationships and properties into those classes
 

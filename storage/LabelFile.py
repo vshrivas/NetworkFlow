@@ -10,7 +10,7 @@ class LabelFile:
         self.fileID = LabelFile.numFiles
 
 		# create relationship file if it doesn't already exist
-        self.fileName = "datastore/LabelFile{0}.store".format(self.fileID)
+        self.fileName = "LabelFile{0}.store".format(self.fileID)
         try:
             labelFile = open(self.fileName, 'r+b')
         except FileNotFoundError:

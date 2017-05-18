@@ -15,6 +15,7 @@ from .Label import Label
 import sys
 
 class Node:
+    # offsets from start of node
     NODE_ID_OFFSET = 0
     IN_USE_FLAG_OFFSET = 3
     REL_ID_OFFSET = 4
@@ -28,6 +29,8 @@ class Node:
     numNodes = 0
 
     def __init__(self, nodeFile, nodeID=None):
+        Node.numNodes = nodeFile.getNumNodes()
+
         if nodeID is None:
             nodeID = Node.numNodes
 
@@ -41,12 +44,21 @@ class Node:
         self.labels = []
 
         self.nodeID = nodeID
+
         # increment number of nodes
         Node.numNodes += 1
 
         self.nodeFile = nodeFile
 
-        self.startOffset = self.nodeID * Node.storageSize
+        # open node file
+        storeFileName = self.nodeFile.getFileName()
+        storeFile = open(storeFileName, 'r+b')
+
+        # write number of nodes to first 3 bytes of node file
+        storeFile.write((self.numNodes).to_bytes(Node.nodeIDByteLen,
+            byteorder = sys.byteorder, signed=True))
+
+        self.startOffset = self.nodeID * Node.storageSize + Node.nodeIDByteLen
 
     # This method adds a node with a relationship to this node's adj list
     def addRelationship(self, rel):

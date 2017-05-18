@@ -6,7 +6,7 @@ class RelationshipFile:
         self.fileID = RelationshipFile.numFiles
 
         # create relationship file if it doesn't already exist
-        self.fileName = "datastore/RelationshipFile{0}.store".format(self.fileID)
+        self.fileName = "RelationshipFile{0}.store".format(self.fileID)
         try:
             relFile = open(self.fileName, 'r+b')
         except FileNotFoundError:
