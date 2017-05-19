@@ -157,12 +157,12 @@ class Node:
         storeFile.seek(self.startOffset + Node.REL_ID_OFFSET)
         if len(self.relationships) == 0:
             firstRel = -1
-            storeFile.write((-1).to_bytes(Relationship.relIDByteSize,
+            storeFile.write((-1).to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
             print("wrote first rel ID: -1")
         else:
             firstRel = self.relationships[0]
-            storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteSize,
+            storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
 
             print("wrote first rel ID: {0}". format(firstRel.getID()))

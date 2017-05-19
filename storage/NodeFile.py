@@ -51,7 +51,7 @@ class NodeFile(object):
         # while there is a next relationship
         while nextRelID != -1:
             print(nextRelID)
-            relationshipStartOffset = nextRelID * Relationship.storageSize
+            relationshipStartOffset = nextRelID * Relationship.storageSize + Relationship.relIDByteLen
 
             # find ID of first node in relationship
             relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_ID_OFFSET)
@@ -70,8 +70,8 @@ class NodeFile(object):
             print('Relationship type: {0}'.format(relType))
 
             # create relationship and add to node
-            rel = Relationship(node1ID, node2ID, relType, relationshipFile)
-            rel.relationshipID = nextRelID
+            rel = Relationship(node1ID, node2ID, relType, relationshipFile, nextRelID)
+            #rel.relationshipID = nextRelID
             node.addRelationship(rel)
 
             # find next rel ID

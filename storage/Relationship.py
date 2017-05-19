@@ -29,9 +29,14 @@ class Relationship:
     storageSize = 126
     numRelationships = 0
 
-    relIDByteSize = 4
+    relIDByteLen = 4
 
     def __init__(self, node1ID, node2ID, relType, relationshipFile, relationshipID=None):
+        if relationshipFile != "":
+            Relationship.numRelationships = relationshipFile.getNumRelationships()
+
+        print("**** Num Relationships = {0} *****".format(Relationship.numRelationships))
+
         if relationshipID is None:
             relationshipID = Relationship.numRelationships
 
@@ -42,12 +47,21 @@ class Relationship:
 
         self.relationshipID = relationshipID
 
-        if relationshipID != -1:
+        if relationshipID != -1 and relationshipID >= Relationship.numRelationships:
             Relationship.numRelationships += 1
 
         self.relationshipFile = relationshipFile
 
-        self.startOffset = self.relationshipID * Relationship.storageSize
+        if relationshipFile != "":
+            # open relationship file
+            storeFileName = self.relationshipFile.getFileName()
+            storeFile = open(storeFileName, 'r+b')
+
+            # write number of relationships to first 4 bytes of relationship file
+            storeFile.write((self.numRelationships).to_bytes(Relationship.relIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+
+        self.startOffset = self.relationshipID * Relationship.storageSize + Relationship.relIDByteLen
 
     def getID(self):
         return self.relationshipID 
@@ -71,7 +85,7 @@ class Relationship:
         storeFile.seek(self.startOffset)
 
         # write relationship ID
-        storeFile.write(self.relationshipID.to_bytes(Relationship.relIDByteSize, 
+        storeFile.write(self.relationshipID.to_bytes(Relationship.relIDByteLen, 
             byteorder = sys.byteorder, signed=True))
         print("wrote relationship id")
 
@@ -92,21 +106,21 @@ class Relationship:
             print("writing relationship for first node")
 
             storeFile.seek(self.startOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
-            storeFile.write(nextRel.getID().to_bytes(Relationship.relIDByteSize, 
+            storeFile.write(nextRel.getID().to_bytes(Relationship.relIDByteLen, 
                 byteorder = sys.byteorder, signed=True))
 
             storeFile.seek(self.startOffset + Relationship.NODE1_PREV_REL_ID_OFFSET)
-            storeFile.write(prevRel.getID().to_bytes(Relationship.relIDByteSize, 
+            storeFile.write(prevRel.getID().to_bytes(Relationship.relIDByteLen, 
                 byteorder = sys.byteorder, signed=True))
 
         else:
             print("writing relationship for second node")
             storeFile.seek(self.startOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
-            storeFile.write(nextRel.getID().to_bytes(Relationship.relIDByteSize, 
+            storeFile.write(nextRel.getID().to_bytes(Relationship.relIDByteLen, 
                 byteorder = sys.byteorder, signed = True))
 
             storeFile.seek(self.startOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
-            storeFile.write(prevRel.getID().to_bytes(Relationship.relIDByteSize, 
+            storeFile.write(prevRel.getID().to_bytes(Relationship.relIDByteLen, 
                 byteorder = sys.byteorder, signed = True))
 
 
