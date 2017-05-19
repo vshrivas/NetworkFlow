@@ -34,6 +34,7 @@ class NodeFile(object):
     def readNode(self, nodeID, relationshipFile, propertyFile, labelFile):
         node = Node(self, nodeID)
         nodeStore = open(self.fileName, 'rb')
+        propertyStore = open(propertyFile.getFileName(), 'rb')
         nodeStartOffset = nodeID * Node.storageSize + Node.nodeIDByteLen
 
         # TODO: refactor some of reading relationships and properties into those classes
@@ -74,6 +75,53 @@ class NodeFile(object):
             #rel.relationshipID = nextRelID
             node.addRelationship(rel)
 
+            # read in relationship properties
+            # read in first property ID
+            relationshipStore.seek(relationshipStartOffset + Relationship.PROPERTY_ID_OFFSET)
+            firstRelPropID = int.from_bytes(relationshipStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
+
+            nextRelPropID = firstRelPropID
+            print ('Reading in properties for rel {0}...'.format(nextRelID))
+            while nextRelPropID != -1:
+                print()
+                print('for rel: {0}'.format(nextRelID))
+                print('first prop id: {0}'. format(firstRelPropID))
+                print(nextRelPropID)
+                propertyStartOffset = nextRelPropID * Property.storageSize + Property.propIDByteLen
+
+                # find ID
+                propertyStore.seek(propertyStartOffset)
+                print("seek to {0} for ID". format(propertyStartOffset))
+                ID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
+                #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+                print('id: {0}'.format(ID))
+
+                # find key
+                propertyStore.seek(propertyStartOffset + Property.KEY_OFFSET)
+                print("seek to {0} for key". format(propertyStartOffset + Property.KEY_OFFSET))
+                key = propertyStore.read(Property.MAX_KEY_SIZE).decode("utf-8")
+                key = key.rstrip(' ')
+                #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+                print('key: {0}'.format(key))
+
+                # find value
+                propertyStore.seek(propertyStartOffset + Property.VALUE_OFFSET)
+                print("seek to {0} for value". format(propertyStartOffset + Property.VALUE_OFFSET))
+                #value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+                value = propertyStore.read(Property.MAX_VALUE_SIZE).decode("utf-8")
+                value = value.rstrip(' ')
+                print('value: {0}'.format(value))
+
+                # create property and add to relationship
+                prop = Property(key, value, propertyFile, nextRelPropID)
+                rel.addProperty(prop)
+
+                # find next property id
+                propertyStore.seek(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET)
+                print("seek to {0} for next property id". format(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET))
+                nextRelPropID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
+                print("next prop id is {0}".format(nextRelPropID))            
+
             # find next rel ID
             if nodeID == node1ID:
                 relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
@@ -89,7 +137,7 @@ class NodeFile(object):
         nodeStore.seek(nodeStartOffset + Node.PROPERTY_ID_OFFSET)
         firstPropID = int.from_bytes(nodeStore.read(4), sys.byteorder, signed=True)
 
-        propertyStore = open(propertyFile.getFileName(), 'rb')
+        #propertyStore = open(propertyFile.getFileName(), 'rb')
         nextPropID = firstPropID
 
         while nextPropID != -1:

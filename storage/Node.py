@@ -67,7 +67,7 @@ class Node:
     def addRelationship(self, rel):
         self.relationships.append(rel)
 
-    # This method adds data to a node
+    # This method adds property data to a node
     def addProperty(self, prop):
         self.properties.append(prop)
 
@@ -233,7 +233,7 @@ class Node:
                 prop.writeProperty(self.properties[propIndex + 1])
 
 
-        # write labels
+        # write labels to label file
         for labelIndex in range(0, len(self.labels)):
             label = self.labels[labelIndex]
             print("writing {0} label ".format(label.getLabelID()))

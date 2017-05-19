@@ -7,11 +7,13 @@
 # Bytes 19-22: Node 2 Next Rel ID
 # Bytes 23-26: Node 2 Prev Rel ID
 # Bytes 27-126: Relationship Type
+# Bytes 127-130: ID of first property for relationship
 
 # Uniqueness:
 # If relationship with node 1 = A and node 2 = B exists, a relationship with 
 # node 1 = B and node 2 = A should not exist
 #from Node import Node 
+from .Property import Property
 import sys
 
 
@@ -24,9 +26,11 @@ class Relationship:
     NODE2_NEXT_REL_ID_OFFSET = 18
     NODE2_PREV_REL_ID_OFFSET = 22
     RELATIONSHIP_TYPE_OFFSET = 26
+    PROPERTY_ID_OFFSET = 126
+
     MAX_TYPE_SIZE = 100
 
-    storageSize = 126
+    storageSize = 130
     numRelationships = 0
 
     relIDByteLen = 4
@@ -44,6 +48,8 @@ class Relationship:
         self.secondNodeID = node2ID
 
         self.type = relType 
+
+        self.properties = []
 
         self.relationshipID = relationshipID
 
@@ -74,6 +80,10 @@ class Relationship:
 
     def getRelType(self):
         return self.type
+
+    # This method adds property data to a relationship
+    def addProperty(self, prop):
+        self.properties.append(prop)
 
     def writeRelationship(self, node, prevRel, nextRel):
         # open relationship file
@@ -136,6 +146,40 @@ class Relationship:
 
         storeFile.write(bytearray(self.type, 'utf8'))
 
+        # write first property ID
+        storeFile.seek(self.startOffset + Relationship.PROPERTY_ID_OFFSET)
+
+        # if no properties write -1 for first ID
+        if len(self.properties) == 0:
+            firstProp = -1
+            storeFile.write((-1).to_bytes(Property.propIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+            print("wrote first property ID: -1")
+        # otherwise write id of first property
+        else:
+            firstProp = self.properties[0]
+            storeFile.write(firstProp.getID().to_bytes(Property.propIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+
+            print("wrote first property ID: {0}". format(firstProp.getID()))
+
+
+        # write properties to property file
+        print("writing properties to property file ...")
+
+        # write properties to property file
+        for propIndex in range(0, len(self.properties)):
+            prop = self.properties[propIndex]
+            print("writing {0} property ".format(prop.getID()))
+
+            # no next property
+            if propIndex == len(self.properties) - 1:
+                print("no next property")
+                nullProperty = Property("", "", "", -1)
+                prop.writeProperty(nullProperty)
+
+            else:
+                prop.writeProperty(self.properties[propIndex + 1])
 
     
 
