@@ -15,6 +15,7 @@ from .Label import Label
 import sys
 
 class Node:
+    # offsets from start of node
     NODE_ID_OFFSET = 0
     IN_USE_FLAG_OFFSET = 3
     REL_ID_OFFSET = 4
@@ -28,6 +29,9 @@ class Node:
     numNodes = 0
 
     def __init__(self, nodeFile, nodeID=None):
+        Node.numNodes = nodeFile.getNumNodes()
+        print("**** Num Nodes = {0} *****".format(Node.numNodes))
+
         if nodeID is None:
             nodeID = Node.numNodes
 
@@ -41,18 +45,29 @@ class Node:
         self.labels = []
 
         self.nodeID = nodeID
+
+        # if creating a new node
+        if self.nodeID >= Node.numNodes:
         # increment number of nodes
-        Node.numNodes += 1
+            Node.numNodes += 1
 
         self.nodeFile = nodeFile
 
-        self.startOffset = self.nodeID * Node.storageSize
+        # open node file
+        storeFileName = self.nodeFile.getFileName()
+        storeFile = open(storeFileName, 'r+b')
+
+        # write number of nodes to first 3 bytes of node file
+        storeFile.write((self.numNodes).to_bytes(Node.nodeIDByteLen,
+            byteorder = sys.byteorder, signed=True))
+
+        self.startOffset = self.nodeID * Node.storageSize + Node.nodeIDByteLen
 
     # This method adds a node with a relationship to this node's adj list
     def addRelationship(self, rel):
         self.relationships.append(rel)
 
-    # This method adds data to a node
+    # This method adds property data to a node
     def addProperty(self, prop):
         self.properties.append(prop)
 
@@ -113,6 +128,10 @@ class Node:
         for prop in self.properties:
             print(prop.getID())
 
+        print("labels in node:")
+        for label in self.labels:
+            print(label.getLabelID())
+
         print("writing node...")
 
         # open node file
@@ -138,12 +157,12 @@ class Node:
         storeFile.seek(self.startOffset + Node.REL_ID_OFFSET)
         if len(self.relationships) == 0:
             firstRel = -1
-            storeFile.write((-1).to_bytes(Relationship.relIDByteSize,
+            storeFile.write((-1).to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
             print("wrote first rel ID: -1")
         else:
             firstRel = self.relationships[0]
-            storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteSize,
+            storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
 
             print("wrote first rel ID: {0}". format(firstRel.getID()))
@@ -152,13 +171,13 @@ class Node:
         storeFile.seek(self.startOffset + Node.PROPERTY_ID_OFFSET)
         if len(self.properties) == 0:
             firstProp = -1
-            storeFile.write((-1).to_bytes(Property.propIDByteSize,
+            storeFile.write((-1).to_bytes(Property.propIDByteLen,
                 byteorder = sys.byteorder, signed=True))
             print("wrote first property ID: -1")
 
         else:
             firstProp = self.properties[0]
-            storeFile.write(firstProp.getID().to_bytes(Property.propIDByteSize,
+            storeFile.write(firstProp.getID().to_bytes(Property.propIDByteLen,
                 byteorder = sys.byteorder, signed=True))
 
             print("wrote first property ID: {0}". format(firstProp.getID()))
@@ -182,16 +201,16 @@ class Node:
 
             # first relationship
             if relIndex == 0:
-                nullRelationship = Relationship(-1, -1, "", -1)
+                nullRelationship = Relationship(-1, -1, "", "",-1)
                 # no next relationship
                 if relIndex == len(self.relationships) - 1:
                     print("only one relationship")
                     rel.writeRelationship(self, nullRelationship, nullRelationship)
                 else:
-                    nullRelationship = Relationship(-1, -1, "", -1)
+                    nullRelationship = Relationship(-1, -1, "", "", -1)
                     rel.writeRelationship(self, nullRelationship, self.relationships[relIndex + 1])
             elif relIndex == len(self.relationships) - 1:
-                nullRelationship = Relationship(-1, -1, "", -1)
+                nullRelationship = Relationship(-1, -1, "", "", -1)
                 rel.writeRelationship(self, self.relationships[relIndex - 1], nullRelationship)
             else:
                 rel.writeRelationship(self, self.relationships[relIndex - 1],
@@ -214,7 +233,7 @@ class Node:
                 prop.writeProperty(self.properties[propIndex + 1])
 
 
-        # write labels
+        # write labels to label file
         for labelIndex in range(0, len(self.labels)):
             label = self.labels[labelIndex]
             print("writing {0} label ".format(label.getLabelID()))
