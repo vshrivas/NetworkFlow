@@ -46,6 +46,8 @@ class Node:
 
         self.nodeID = nodeID
 
+        self.visited = False
+
         # if creating a new node
         if self.nodeID >= Node.numNodes:
         # increment number of nodes

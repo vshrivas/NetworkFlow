@@ -65,6 +65,7 @@ class NodeFile(object):
             # read in type of relationship
             relationshipStore.seek(relationshipStartOffset + Relationship.RELATIONSHIP_TYPE_OFFSET)
             relType = relationshipStore.read(Relationship.MAX_TYPE_SIZE).decode("utf-8")
+            relType = relType.rstrip(' ')
 
             print('Node 1 id: {0}'.format(node1ID))
             print('Node 2 id: {0}'.format(node2ID))
