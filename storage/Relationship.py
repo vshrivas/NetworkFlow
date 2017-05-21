@@ -145,6 +145,7 @@ class Relationship:
                 self.type += ' '
 
         storeFile.write(bytearray(self.type, 'utf8'))
+        self.type = self.type.rstrip(' ')
 
         # write first property ID
         storeFile.seek(self.startOffset + Relationship.PROPERTY_ID_OFFSET)

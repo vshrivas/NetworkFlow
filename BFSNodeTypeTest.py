@@ -10,7 +10,7 @@ from storage.LabelFile import LabelFile
 from storage.StorageManager import StorageManager
 from queryeval.degreeQueries import breadthFirstSearch
 
-# find all friends of friends of doctor who, who own cats
+# initial set up
 nodeFile = NodeFile()
 relationshipFile = RelationshipFile()
 propFile = PropertyFile()
@@ -36,6 +36,7 @@ catLabel = storageManager.createLabel("cat")
 crookshanks.addProperty(propCrookshanksName)
 crookshanks.addLabel(catLabel)
 
+# create relationships
 rel0 = storageManager.createRelationship(hermione, crookshanks, "ownership")
 hermione.addRelationship(rel0)
 crookshanks.addRelationship(rel0)
@@ -52,22 +53,24 @@ rel3 = storageManager.createRelationship(hermione, ron, "friendship")
 hermione.addRelationship(rel3)
 ron.addRelationship(rel3)
 
+# write nodes to disk
 harryPotter.writeNode()
 ron.writeNode()
 hermione.writeNode()
 crookshanks.writeNode()
 
+# find all friends of harry potter who own cats
 resultQueue = breadthFirstSearch(harryPotter, [("friendship", "", 1), ("ownership", "cat", 0)], 
 	nodeFile, relationshipFile, propFile, labelFile)
 
 print("after breadth first search")
 
 while(not resultQueue.empty()):
-	friend = resultQueue.get()
+	result = resultQueue.get()
 	print("got node")
-	print(friend.getID())
-	print(len(friend.properties))
-	for prop in friend.properties:
+	#print(friend.getID())
+	#print(len(friend.properties))
+	for prop in result.properties:
 		print("key: {0}".format(prop.key))
 		print("value: {0}".format(prop.value))
 
