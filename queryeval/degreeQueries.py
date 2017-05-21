@@ -16,6 +16,7 @@ def breadthFirstSearch(rootNode, conditions, nodeFile, relationshipFile, propFil
 		relType = conditionTuple[0]
 		print("relationship type: {0}".format(relType))
 		relEndNodeType = conditionTuple[1]
+		wantedNode = conditionTuple[2]
 		print("relationship end node type: {0}".format(relEndNodeType))
 		# create a new queue to store nodes for this level
 		nextNodeQueue = Queue()
@@ -49,14 +50,25 @@ def breadthFirstSearch(rootNode, conditions, nodeFile, relationshipFile, propFil
 					if otherNodeID not in visitedNodeIDs:
 						# if an end node type is specified 
 						if relEndNodeType != "":
+							print("!!! rel end node type is: {0} !!!".format(relEndNodeType))
 							# check if any of the labels of otherNode match 
 							# relEndNodeType
-							if relEndNodeType in otherNode.getLabels():
-								nextNodeQueue.put(otherNode)
-								print("put node in queue")
+							for lbl in otherNode.getLabels():
+								print("!! lbl: {0} !!".format(lbl.getLabelStr()))
+								print("{0} in {1}: {2}".format(relEndNodeType, otherNode.getLabels(), relEndNodeType in otherNode.getLabels()))
+								if (lbl.getLabelStr() == relEndNodeType):
+									if(wantedNode == 1):
+										nextNodeQueue.put(otherNode)
+									else:
+										nextNodeQueue.put(node)
+									print("put node in queue")
+								
 						# otherNode can be of any type
 						else:
-							nextNodeQueue.put(otherNode)
+							if(wantedNode == 1):
+								nextNodeQueue.put(otherNode)
+							else:
+								nextNodeQueue.put(node)
 							print("put node in queue")
 
 
