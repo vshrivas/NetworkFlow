@@ -29,6 +29,9 @@ prop0 = storageManager.createProperty("1", "2")
 prop1 = storageManager.createProperty("3", "4")
 prop2 = storageManager.createProperty("5", "1")
 prop3 = storageManager.createProperty("years", "9")
+prop4 = storageManager.createProperty("years", 9)
+prop5 = storageManager.createProperty(">18 years", False)
+prop6 = storageManager.createProperty("exact years", 9.5)
 
 rel0.addProperty(prop3)
 
@@ -39,6 +42,9 @@ label3 = storageManager.createLabel("numb")
 
 node0.addProperty(prop2)
 node1.addProperty(prop1)
+node1.addProperty(prop4)
+node1.addProperty(prop5)
+node1.addProperty(prop6)
 
 node0.addLabel(label0)
 node1.addLabel(label1)
@@ -83,9 +89,11 @@ for rel in node2read.relationships:
 		print("value: {0}".format(prop.getValue()))
 print("print node2 properties")
 for prop in node2read.properties:
-	print("id {0}".format(prop.getID()))
-	print("key: {0}".format(prop.getKey()))
-	print("value: {0}".format(prop.getValue()))
+    print("id {0}".format(prop.getID()))
+    print("stored type {0}".format(prop.getType()))
+    print("key: {0}".format(prop.getKey()))
+    print("value: {0}".format(prop.getValue()))
+    print("actual type " + str(type(prop.getValue())))
 print("print node2 labels")
 for label in node2read.labels:
 	print(label.getLabelStr())

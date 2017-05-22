@@ -2,7 +2,7 @@ from .Node import Node
 from .Property import Property
 from .Relationship import Relationship
 from .Label import Label
-import sys
+import sys, struct
 
 class NodeFile(object):
     numFiles = 0
@@ -97,6 +97,13 @@ class NodeFile(object):
                 #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
                 print('id: {0}'.format(ID))
 
+                # find type
+                propertyStore.seek(propertyStartOffset + Property.TYPE_OFFSET)
+                print("seek to {0} for type". format(propertyStartOffset + Property.TYPE_OFFSET))
+                type = int.from_bytes(propertyStore.read(Property.typeByteLen), sys.byteorder, signed=True)
+                #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+                print('type: {0}'.format(type))
+
                 # find key
                 propertyStore.seek(propertyStartOffset + Property.KEY_OFFSET)
                 print("seek to {0} for key". format(propertyStartOffset + Property.KEY_OFFSET))
@@ -109,8 +116,17 @@ class NodeFile(object):
                 propertyStore.seek(propertyStartOffset + Property.VALUE_OFFSET)
                 print("seek to {0} for value". format(propertyStartOffset + Property.VALUE_OFFSET))
                 #value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
-                value = propertyStore.read(Property.MAX_VALUE_SIZE).decode("utf-8")
-                value = value.rstrip(' ')
+                
+                # read value (way value is read depends on its type)
+                if type == Property.TYPE_STRING:
+                    value = propertyStore.read(Property.MAX_VALUE_SIZE).decode("utf-8")
+                    value = value.rstrip(' ')
+                elif type == Property.TYPE_INT:
+                    value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+                elif type == Property.TYPE_FLOAT:
+                    value = struct.unpack('d', propertyStore.read(8))[0]
+                else:
+                    value = bool(int.from_bytes(propertyStore.read(1), sys.byteorder, signed=True))
                 print('value: {0}'.format(value))
 
                 # create property and add to relationship
@@ -155,6 +171,13 @@ class NodeFile(object):
             #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
             print('id: {0}'.format(ID))
 
+            # find type
+            propertyStore.seek(propertyStartOffset + Property.TYPE_OFFSET)
+            print("seek to {0} for type". format(propertyStartOffset + Property.TYPE_OFFSET))
+            type = int.from_bytes(propertyStore.read(Property.typeByteLen), sys.byteorder, signed=True)
+            #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+            print('type: {0}'.format(type))
+
             # find key
             propertyStore.seek(propertyStartOffset + Property.KEY_OFFSET)
             print("seek to {0} for key". format(propertyStartOffset + Property.KEY_OFFSET))
@@ -167,8 +190,18 @@ class NodeFile(object):
             propertyStore.seek(propertyStartOffset + Property.VALUE_OFFSET)
             print("seek to {0} for value". format(propertyStartOffset + Property.VALUE_OFFSET))
             #value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
-            value = propertyStore.read(Property.MAX_VALUE_SIZE).decode("utf-8")
-            value = value.rstrip(' ')
+
+            # read value (way value is read depends on its type)
+            if type == Property.TYPE_STRING:
+                value = propertyStore.read(Property.MAX_VALUE_SIZE).decode("utf-8")
+                value = value.rstrip(' ')
+            elif type == Property.TYPE_INT:
+                value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
+            elif type == Property.TYPE_FLOAT:
+                value = struct.unpack('d', propertyStore.read(8))[0]
+            else:
+                value = bool(int.from_bytes(propertyStore.read(1), sys.byteorder, signed=True))
+           
             print('value: {0}'.format(value))
 
             # create property and add to node
