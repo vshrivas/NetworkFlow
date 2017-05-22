@@ -14,12 +14,32 @@ def parse(query):
     tree_string  = antlr4.tree.Trees.Trees.toStringTree(tree, None, parser)
     visitor = CypherVisitor()
 
-    # # Here lie some helpful print statements. Bring them back as you
-    # # figure out more things to parse:
-    # print("Here's the tree: \n", tree_string, "\n\n")
 
+
+    # Print the tree.
+    print("Here comes the tree...")
+    openParens = 0
+    for char in tree_string:
+        if char == '(':
+            print("\n", end="")
+            openParens += 1
+            print("." * openParens, end="")
+        elif char == ')':
+            openParens -= 1
+        else:
+            print(char, end="")
+    print("\n\n", end="")
+
+
+    # Visit it all!
     visitor.visit(tree)
 
-    # For now, return the nodes and the properties to be created.
-    print("Trying to create this dict:")
-    return visitor.to_create
+    # Package everything up nicely and pass it to the database to make it all.
+    create_return = {
+        "create_relationships": visitor.relationships_to_create,
+        "create_nodes": visitor.nodes_to_create,
+        "match_relationships": visitor.relationships_to_match,
+        "match_nodes": visitor.nodes_to_match
+    }
+
+    return create_return

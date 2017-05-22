@@ -1,5 +1,7 @@
 # Generated from Cypher.g4 by ANTLR 4.7
 from antlr4 import *
+from .SimpleTypes import *
+
 if __name__ is not None and "." in __name__:
     from .CypherParser import CypherParser
 else:
@@ -11,12 +13,99 @@ def dict_from_mapLiteral(visitor, ctx:CypherParser.MapLiteralContext):
         d[propertyName.getText()] = visitor.visitExpression(expression)
     return d
 
+# A helper which creates a SimpleNode, populating its attributes.
+# If the simple flag is false, make a DummyNode instead.
+def nodeInfoExtract(visitor, node, simple):
+    node_variable = (node.variable().symbolicName().getText())
+
+    # Extract any properties we must give this new node.
+    if node.properties() is not None:
+        properties = dict_from_mapLiteral(visitor, (node.properties().mapLiteral()))
+    else:
+        properties = {}
+
+    # Extract any labels we must give the node.
+    if node.nodeLabels() is not None:
+        labels = [label.labelName().getText()
+                  for label in node.nodeLabels().nodeLabel()]
+    else:
+        labels = []
+
+    # Give this node back to the parent, who will add it to the list.
+    if simple:
+        node_to_add = SimpleNode(node_variable)
+    else: # dummy
+        node_to_add = DummyNode(node_variable)
+    node_to_add.properties = properties
+    node_to_add.labels = labels
+    return node_to_add
+
+# A helper which creates a SimpleRelationship, populating its attributes.
+# The node holds a DummyNode that is the left side of the relationship.
+# If the simple flag is false, creates a DummyRelationship instead.
+def patternElementExtract(visitor, patternElement, node, simple):
+    rel = patternElement.relationshipPattern().relationshipDetail()
+    # Get the variable associated with this if it exists
+    variable_exists = False
+    if rel.variable() is not None:
+        variable_exists = True
+        rel_variable = (rel.variable().symbolicName().getText())
+
+    # Get the types of the relationship.
+    types = []
+    for relType in rel.relationshipTypes().relTypeName():
+        types.append(relType.schemaName().symbolicName().getText())
+
+    # Extract any properties we have to give the new relationships.
+    if rel.properties() is not None:
+        rel_properties = dict_from_mapLiteral(visitor, (rel.properties().mapLiteral()))
+    else:
+        rel_properties = {}
+
+    # Get the node as a simple node
+    rel_node = nodeInfoExtract(visitor, patternElement.nodePattern(), True)
+
+    # Now we can create the relationship
+    if simple:
+        rel_to_add = SimpleRelationship(types, node, rel_node)
+    else: # dummy
+        rel_to_add = DummyRelationship(types, node, rel_node)
+    rel_to_add.properties = rel_properties
+    if variable_exists:
+        rel_to_add.variable = variable
+
+    # Now for each of the two nodes, add this relationship.
+    node.relationships.append(rel_to_add)
+    rel_node.relationships.append(rel_to_add)
+
+    return (rel_to_add, rel_node)
+
+
 # This class defines a complete generic visitor for a parse tree produced by CypherParser.
 
 class CypherVisitor(ParseTreeVisitor):
     def __init__(self):
+        # Represents the relationships to be created (maybe later, the
+        # relationships to return or something) and their properties/labels
+        self.relationships_to_create = []
+
         # Represents the nodes and properties to be created on a CREATE command
-        self.to_create = {}
+        # The keys are the variable names bound to the nodes.
+        # The values are 2-tuples; the first item is a list of relationships in
+        # which this key lies, and the second item is a dictionary representing
+        # the properties this node has (e.g. {"name": "Donnie"})
+        self.nodes_to_create = []
+
+        # Represents the nodes and properties to be matched on a MATCH command
+        # They have the same structure as previous.
+        self.nodes_to_match = []
+
+        # Represents the relationship and node to be matched on a MATCH command
+        # These will be the equivalent of the patternElementChain, or each node
+        # that each relationship matches to.  They will be tuples of
+        # (relationship, node)
+        self.relationships_to_match = []
+
 
     # Visit a parse tree produced by CypherParser#cypher.
     def visitCypher(self, ctx:CypherParser.CypherContext):
@@ -24,17 +113,49 @@ class CypherVisitor(ParseTreeVisitor):
 
 
     def visitCreate(self, ctx:CypherParser.CreateContext):
-        for part in ctx.pattern().patternPart():
-            # TODO: Error catching.
-            node = part.anonymousPatternPart().patternElement().nodePattern()
-            node_variable = (node.variable().symbolicName().getText())
-            if node.properties() is not None:
-                properties = dict_from_mapLiteral(self, (node.properties().mapLiteral()))
-            else:
-                properties = {}
-            # Add this node to the list, and move on.
-            self.to_create[node_variable] = properties
+        # Get to the good part. Should only have one patternPart.
+        parts = ctx.pattern().patternPart(0).anonymousPatternPart().patternElement()
+        # parts = ctx.pattern().patternPart().anonymousPatternPart().patternElement()
+        # First get the first node. Always exists.
+        curr_node = nodeInfoExtract(self, parts.nodePattern(), True)
+        # Each part in the element chain is associated with a 
+        # relationship and a node to create.
+        for part in parts.patternElementChain():
+            (rel, rel_node) = patternElementExtract(self, part, curr_node, True)
+            # Now that curr_node has updated to include the relationship, add
+            # it to the list of nodes to create. Also add the relationship.
+            self.nodes_to_create.append(curr_node)
+            self.relationships_to_create.append(rel)
+            # Update curr_node
+            curr_node = rel_node
+        # Make sure the last node is added as well
+        self.nodes_to_create.append(curr_node)
+
         return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CypherParser#match_.
+    def visitMatch_(self, ctx:CypherParser.Match_Context):
+        # Get to the good part. Should only have one patternPart.
+        parts = ctx.pattern().patternPart(0).anonymousPatternPart().patternElement()
+        # parts = ctx.pattern().patternPart().anonymousPatternPart().patternElement()
+        # First get the first node. Always exists.
+        curr_node = nodeInfoExtract(self, parts.nodePattern(), False)
+        # Each part in the element chain is associated with a 
+        # relationship and a node to create.
+        for part in parts.patternElementChain():
+            (rel, rel_node) = patternElementExtract(self, part, curr_node, False)
+            # Now that curr_node has updated to include the relationship, add
+            # it to the list of nodes to create. Also add the relationship.
+            self.nodes_to_match.append(curr_node)
+            self.relationships_to_match.append(rel)
+            # Update curr_node
+            curr_node = rel_node
+        # Make sure the last node is added as well
+        self.nodes_to_match.append(curr_node)
+
+        return self.visitChildren(ctx)
+
 
     # Visit a parse tree produced by CypherParser#expression.
     def visitExpression(self, ctx:CypherParser.ExpressionContext):

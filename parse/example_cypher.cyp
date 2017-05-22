@@ -1,1 +1,1 @@
-CREATE (a:Person {math: 1})
+CREATE (n:Person {name:"bill"})-[:HATES {when:"now"}]->(m)
