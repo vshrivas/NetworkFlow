@@ -36,8 +36,10 @@ def parse(query):
 
     # Package everything up nicely and pass it to the database to make it all.
     create_return = {
-        "relationships": visitor.relationships,
-        "nodes": visitor.nodes_to_create,
+        "create_relationships": visitor.relationships_to_create,
+        "create_nodes": visitor.nodes_to_create,
+        "match_relationships": visitor.relationships_to_match,
+        "match_nodes": visitor.nodes_to_match
     }
 
     return create_return

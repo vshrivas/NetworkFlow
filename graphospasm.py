@@ -41,7 +41,7 @@ if __name__ == '__main__':
         # We'll need to keep track of this mapping to do what the previous
         # paragraph just said.
         simpleNodeToNode = {}
-        for simpleNode in create_dict["nodes"]:
+        for simpleNode in create_dict["create_nodes"]:
             node = s.createNode()
             print(" * Creating node %s; has ID %d" % (simpleNode.varName, node.nodeID))
 
@@ -59,7 +59,7 @@ if __name__ == '__main__':
         # OK, we have semi-filled-in nodes for each node, but we need to make
         # the relationships now...
         nodesToRelationships = {}
-        for relationship in create_dict["relationships"]:
+        for relationship in create_dict["create_relationships"]:
             print(" * Creating relationship %s" % relationship.label)
             print("   * It connects nodes %s and %s" % (relationship.node1.varName,
                                                     relationship.node2.varName))

@@ -14,7 +14,8 @@ def dict_from_mapLiteral(visitor, ctx:CypherParser.MapLiteralContext):
     return d
 
 # A helper which creates a SimpleNode, populating its attributes.
-def nodeInfoExtract(visitor, node):
+# If the simple flag is false, make a DummyNode instead.
+def nodeInfoExtract(visitor, node, simple):
     node_variable = (node.variable().symbolicName().getText())
 
     # Extract any properties we must give this new node.
@@ -31,10 +32,54 @@ def nodeInfoExtract(visitor, node):
         labels = []
 
     # Give this node back to the parent, who will add it to the list.
-    node_to_add = SimpleNode(node_variable)
+    if simple:
+        node_to_add = SimpleNode(node_variable)
+    else: # dummy
+        node_to_add = DummyNode(node_variable)
     node_to_add.properties = properties
     node_to_add.labels = labels
     return node_to_add
+
+# A helper which creates a SimpleRelationship, populating its attributes.
+# The node holds a DummyNode that is the left side of the relationship.
+# If the simple flag is false, creates a DummyRelationship instead.
+def patternElementExtract(visitor, patternElement, node, simple):
+    rel = patternElement.relationshipPattern().relationshipDetail()
+    # Get the variable associated with this if it exists
+    variable_exists = False
+    if rel.variable() is not None:
+        variable_exists = True
+        rel_variable = (rel.variable().symbolicName().getText())
+
+    # Get the types of the relationship.
+    types = []
+    for relType in rel.relationshipTypes().relTypeName():
+        types.append(relType.schemaName().symbolicName().getText())
+
+    # Extract any properties we have to give the new relationships.
+    if rel.properties() is not None:
+        rel_properties = dict_from_mapLiteral(visitor, (rel.properties().mapLiteral()))
+    else:
+        rel_properties = {}
+
+    # Get the node as a simple node
+    rel_node = nodeInfoExtract(visitor, patternElement.nodePattern(), True)
+
+    # Now we can create the relationship
+    if simple:
+        rel_to_add = SimpleRelationship(types, node, rel_node)
+    else: # dummy
+        rel_to_add = DummyRelationship(types, node, rel_node)
+    rel_to_add.properties = rel_properties
+    if variable_exists:
+        rel_to_add.variable = variable
+
+    # Now for each of the two nodes, add this relationship.
+    node.relationships.append(rel_to_add)
+    rel_node.relationships.append(rel_to_add)
+
+    return (rel_to_add, rel_node)
+
 
 # This class defines a complete generic visitor for a parse tree produced by CypherParser.
 
@@ -42,7 +87,7 @@ class CypherVisitor(ParseTreeVisitor):
     def __init__(self):
         # Represents the relationships to be created (maybe later, the
         # relationships to return or something) and their properties/labels
-        self.relationships = []
+        self.relationships_to_create = []
 
         # Represents the nodes and properties to be created on a CREATE command
         # The keys are the variable names bound to the nodes.
@@ -59,7 +104,7 @@ class CypherVisitor(ParseTreeVisitor):
         # These will be the equivalent of the patternElementChain, or each node
         # that each relationship matches to.  They will be tuples of
         # (relationship, node)
-        self.chains_to_match = []
+        self.relationships_to_match = []
 
 
     # Visit a parse tree produced by CypherParser#cypher.
@@ -68,122 +113,48 @@ class CypherVisitor(ParseTreeVisitor):
 
 
     def visitCreate(self, ctx:CypherParser.CreateContext):
-        # Each pattern part is associated with a particular node to create.
-        for part in ctx.pattern().patternPart():
-            # There are two possibilities.
-
-            # Either this patternPart is a node, which must then be created,
-            # or it represents a relationship that connects two nodes.
-
-
-            # In the relationship case, there are two subcases.
-
-            # Either all of the nodes mentioned in the relationship are brand
-            # new (that is, they are not known variables), in which case they
-            # must be created, or some of the nodes are not new, in which case
-            # they must be looked up in the variable list. (We do not yet
-            # support variables.)
-
-
-            # First, we need to tell whether this part has a relationship!
-            if part.anonymousPatternPart().patternElement().patternElementChain():
-                detail = part.anonymousPatternPart().patternElement().patternElementChain()[0] \
-                             .relationshipPattern().relationshipDetail()
-
-                # Get the label associated with the relationship
-                relationshipLabel = detail.relationshipTypes().relTypeName()[0] \
-                                          .schemaName().symbolicName().getText()
-
-                # Get any properties associated with the relationship
-                if detail.properties() is not None:
-                    rel_properties = dict_from_mapLiteral(self, (detail.properties().mapLiteral()))
-                else:
-                    rel_properties = {}
-
-                # We will use this marker to tell whether we need to construct
-                # relationships and nodes in a special way or not.
-                isRelationship = True
-            else:
-                isRelationship = False
-
-
-            # Need to get the variable associated with the node(s) in question.
-            # If we're creating a relationship, there are two nodes to get.
-            # If not, just one.
-            element = part.anonymousPatternPart().patternElement()
-            if isRelationship:
-                nodes = [
-                        element.nodePattern(), # left-hand node
-                        element.patternElementChain()[0].nodePattern() # right-hand node
-                ]
-            else:
-                nodes = [
-                        element.nodePattern(), # left-hand node is the only node
-                ]
-
-            # We need to extract all the info we can from the node(s) we
-            # have just procured. Call a helper function to do this, and
-            # write down the node(s).
-            nodes_to_create = [nodeInfoExtract(self, node) for node in nodes]
-
-            # If we're making a relationship, we need to create one.
-            if isRelationship:
-                relationship = SimpleRelationship(relationshipLabel,
-                                        nodes_to_create[0], nodes_to_create[1])
-                relationship.properties = rel_properties
-                self.relationships.append(relationship)
-                # We also need to make sure the nodes know the relationships
-                # that they are a part of. This, of course, generates a
-                # reference cycle, but that's ok...
-                for node_to_create in nodes_to_create:
-                    node_to_create.relationships.append(relationship)
-
-            # Done! Just add it (or them) to our create-list and move on...
-            for node in nodes_to_create:
-                self.nodes_to_create.append(node)
+        # Get to the good part. Should only have one patternPart.
+        parts = ctx.pattern().patternPart(0).anonymousPatternPart().patternElement()
+        # parts = ctx.pattern().patternPart().anonymousPatternPart().patternElement()
+        # First get the first node. Always exists.
+        curr_node = nodeInfoExtract(self, parts.nodePattern(), True)
+        # Each part in the element chain is associated with a 
+        # relationship and a node to create.
+        for part in parts.patternElementChain():
+            (rel, rel_node) = patternElementExtract(self, part, curr_node, True)
+            # Now that curr_node has updated to include the relationship, add
+            # it to the list of nodes to create. Also add the relationship.
+            self.nodes_to_create.append(curr_node)
+            self.relationships_to_create.append(rel)
+            # Update curr_node
+            curr_node = rel_node
+        # Make sure the last node is added as well
+        self.nodes_to_create.append(curr_node)
 
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by CypherParser#match_.
     def visitMatch_(self, ctx:CypherParser.Match_Context):
-        # The first anon pattern part will always be a node, so get that info.
-        anon = ctx.pattern().patternPart().anonymousPatternPart()
-        for elem in anon.patternElement():
-            if isinstance(elem, CypherParser.NodePatternContext):
-                node = elem.nodePattern()
-                nodes_to_match.append(visitNodePattern(node))
-            else: # elem is patternElementChain
-                rel = visitRelationshipPattern(elem.relationshipPattern())
-                node = visitNodePattern(elem.NodePattern())
+        # Get to the good part. Should only have one patternPart.
+        parts = ctx.pattern().patternPart(0).anonymousPatternPart().patternElement()
+        # parts = ctx.pattern().patternPart().anonymousPatternPart().patternElement()
+        # First get the first node. Always exists.
+        curr_node = nodeInfoExtract(self, parts.nodePattern(), False)
+        # Each part in the element chain is associated with a 
+        # relationship and a node to create.
+        for part in parts.patternElementChain():
+            (rel, rel_node) = patternElementExtract(self, part, curr_node, False)
+            # Now that curr_node has updated to include the relationship, add
+            # it to the list of nodes to create. Also add the relationship.
+            self.nodes_to_match.append(curr_node)
+            self.relationships_to_match.append(rel)
+            # Update curr_node
+            curr_node = rel_node
+        # Make sure the last node is added as well
+        self.nodes_to_match.append(curr_node)
 
         return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by CypherParser#relationshipPattern.
-    def visitRelationshipPattern(self, ctx:CypherParser.RelationshipPatternContext):
-        rel = ctx.relationshipDetail()
-        # Get the relationship variable
-        rel_variable = rel.variable().symbolicName().getText()
-
-        # Get the relationship types
-        types = []
-        for relType in rel.relationshipTypes():
-            types.append(relType.relTypeName().schemaName().symbolicName().getText())
-
-        # Extract any properties
-        if rel.properties() is not None:
-            properties = dict_from_mapLiteral(self, (rel.properties().mapLiteral()))
-        else:
-            properties = {}
-
-        # Make a MatchRelationship with the info
-        relation = MatchRelationship(types)
-        relation.varname = rel_variable
-        relation.properties = properties
-
-        self.visitChildren(ctx)
-        return relation
 
 
     # Visit a parse tree produced by CypherParser#expression.

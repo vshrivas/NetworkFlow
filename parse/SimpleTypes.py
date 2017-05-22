@@ -1,4 +1,4 @@
-class SimpleNode:
+class BasicNode:
     def __init__(self, varName):
         self.varName = varName
 
@@ -6,7 +6,7 @@ class SimpleNode:
         self.labels = []
         self.properties = {}
 
-class SimpleRelationship:
+class BasicRelationship:
     def __init__(self, label, node1, node2):
         self.label = label
         self.node1 = node1
@@ -15,9 +15,14 @@ class SimpleRelationship:
         self.varname = None
         self.properties = {}
 
-class MatchRelationship:
-    def __init__(self, label):
-        self.label = label
+class SimpleNode(BasicNode):
+    pass
 
-        self.varname = None
-        self.properties = 
+class SimpleRelationship(BasicRelationship):
+    pass
+
+class DummyNode(BasicNode):
+    pass
+
+class DummyRelationship(BasicRelationship):
+    pass
