@@ -14,16 +14,14 @@ def advQueryEval(nodes, relationships, nodeFile, relationshipFile,
     """
     `nodes` should be a list of `DummyNode`s, and `relationships` should be
         a list of `DummyRelationship`s, such that the following pattern is to be
-        matched:
+        matched. Paths must always start and end with a node:
 
         (node 1) -[relationship 1]-> (node 2) ... -[relationship n-1]-> (node n)
 
         Hence, len(nodes) must equal len(relationships) + 1.
 
-        The return value is a set of tuples matching this description; that is,
-        each tuple contains a `Node`, then a `Relationship`, then a `Node`, etc.
-        All tuples, for now, must be of the same length, since we don't yet 
-        support arbitrary-length relationship distances.
+        The return value is a list of paths, consisting of nodes and relationships
+        which fulfill this pattern.
     """
 
     # need to make a list of the number of items in each category
@@ -43,7 +41,7 @@ def advQueryEval(nodes, relationships, nodeFile, relationshipFile,
     # for each dummy node in dummy nodes (each category):
         """ need to find nodes with all labels """
         # make variable for avg num connections for items this category
-        # get number of labels
+        # get number of labels in this category
         # make dictionary {nodeID: numLabels}
         # for each label in dummy node labels
             # open label index
@@ -61,7 +59,7 @@ def advQueryEval(nodes, relationships, nodeFile, relationshipFile,
     """ cost = num items * avg num connections will serve as the heuristic for which category to consider first """
     # create list of viable nodes and viable relationships
 
-    # while every node and rel category has not been considered:
+    # while every node and rel category has not been considered: #nodesToConsider and relsToConsider dictionaries are not empty
         # iterate through "nodes/rels to consider" dictionaries to find category with lowest cost
         # minCostCategory = 0
         # for category in nodesToConsider:
@@ -93,31 +91,41 @@ def advQueryEval(nodes, relationships, nodeFile, relationshipFile,
                             # add relationship to list of right viable relationships (category)
                             # add other node to list of viable nodes (category + 1)
                             # foundRight = true
+                    """ this node is only viable if the path exists to the left and right of it"""
                     # if foundLeft and foundRight:
                         # add this node to viable nodes (category)
+                        """ these can only be added if the current node is viable """
+                        """ otherwise list of viable nodes/rels will have some nonviable items"""
+                        # add list of left viable nodes to list of viable nodes
+                        # add list of left viable rels to list of viable rels
+                        # add list of right viable nodes to list of viable nodes
+                        # add list of right viable rels to list of viable rels
+            # if nothing in viable nodes for this category, return immediately since no path can exist
             # remove this node category, and categories of left and right rels from nodesToConsider and relsToConsider
             # to mark these categories as visited
-
     
         # if the category is instanceof relationship:
+            # clear out nodes to consider for categories category and category + 1
+            # since we will be updating that based on these relationships
             # for each relationship in category:
                 # if one node is of category:
                     # if other node is of category + 1:
-                        # add first node to viable nodes (category)
-                        # add second node to viable nodes (category + 1)
+                        # add first node to nodes to consider (category)
+                        # add second node to nodes to consider (category + 1)
                         # add this rel to viable rels (category)
+            # if no viable relationships of this category, return immediately since no path can exist
             # remove this relationship category from relsToConsider to mark it as visited
 
     """ should now have all nodes and rels to make paths out of """
-    # relationships can only connect 2 nodes
+    # relationships can only connect 2 nodes so use them to generate path chains
     # create dictionary with {nodeID: list of chains ending at node}
     # put nodes of category 1 in their own value lists
 
     # for category in rel categories:
         # for each rel in category:
             # check which node of rel is of category
-            # for each branch ending at node of category:
-                # attach rel and node of category + 1 (other node of rel) to branch
+            # for each branch ending at this node:
+                # attach this rel and node of category + 1 (other node of rel) to branch
                 # place branch in category + 1 node value list
 
     """ we expect all branches to end up in value lists of nodes in final category """
@@ -125,12 +133,3 @@ def advQueryEval(nodes, relationships, nodeFile, relationshipFile,
     # extract branches from value lists of nodes in final category
 
     # return branches
-
-
-
-
-
-
-
-
-
