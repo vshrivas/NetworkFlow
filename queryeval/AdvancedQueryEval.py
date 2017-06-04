@@ -23,7 +23,7 @@ def advQueryEval(dummyNodes, dummyRelationships, nodeFile, relationshipFile,
     such that the following pattern is to be matched. 
     Paths must always start and end with a node:
 
-    (node 1) -[relationship 1]-> (node 2) ... -[relationship n-1]-> (node n)
+    (node 1) -[relationship 1]-> (node 2) ... -[relationship n-1]- > (node n)
 
     Hence, len(nodes) must equal len(relationships) + 1.
 
