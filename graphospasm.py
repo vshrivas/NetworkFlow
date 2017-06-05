@@ -8,6 +8,8 @@ import storage.PropertyFile as pf
 import storage.RelationshipFile as rf
 from storage.Node import Node
 
+import queryeval.degreeQueries as qeval
+
 if __name__ == '__main__':
     print("Welcome to graphospasm.")
     print("Version -112.")
@@ -76,4 +78,44 @@ if __name__ == '__main__':
         for node in simpleNodeToNode.values():
             print(" * Writing node with ID %d back to disk" % node.nodeID)
             node.writeNode()
+
+        # Maybe creation needed to occur, maybe not. If it did, it's done.
+        # However, there is still more to do. Perhaps we need to match, and then
+        # return, some patterns in the database. This will require some query
+        # evaluation.
+        if query_dict["match_nodes"]:
+            # Perform a breadth-first-search on the database with the given
+            # patterns to evaluate.
+            # TODO: we only handle one match at a time, i.e. only things that
+            # look like (n) -[]-> (m) -[]-> ...
+            # rather than (n) -[]-> (m), (p) -[]-> (q), ...
+            # Once we fix this, this call to this function will become more
+            # complicated, likely a loop.
+            results = qeval.breadthFirstSearch(query_dict["match_nodes"],
+                query_dict["match_relationships"], n, r, p, l)
+
+            # Unfortunately, these results don't necessarily match with what
+            # we need to print to the screen, which is something dictated
+            # by RETURN statements. RETURN statements can involve variable
+            # names, as well as completely-unrelated expressions (like 1 + 1),
+            # as well as column names to give these things. We need to breathe
+            # meaning into our "results".
+
+            # If there was a MATCH statement, this means that each column will
+            # be computed once per above result. That is, if we were asked to
+            # "RETURN n, m.name, p" after "MATCH"ing those things, then we shall
+            # print out each result represented via those three columns.
+            for result in results:
+                for expr in query_dict["return_exprs"]:
+                    # TODO: how to not repeat all of ANTLR eval code?
+                    pass
+        else:
+            # There was no MATCH statement, but there can still be something to
+            # RETURN!
+            for expr in query_dict["return_exprs"]:
+                # These are (hopefully, unless the user is trying to screw with
+                # us) literals that we can evaluate with no other information.
+
+                # TODO: how to not repeat all of ANTLR eval code?
+                pass
 

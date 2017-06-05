@@ -44,6 +44,7 @@ def nodeInfoExtract(visitor, node, simple):
 # The node holds a DummyNode that is the left side of the relationship.
 # If the simple flag is false, creates a DummyRelationship instead.
 def patternElementExtract(visitor, patternElement, node, simple):
+    # TODO (BUG): Support relationships without labels
     rel = patternElement.relationshipPattern().relationshipDetail()
     # Get the variable associated with this if it exists
     variable_exists = False
@@ -171,6 +172,8 @@ class CypherVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by CypherParser#match_.
     def visitMatch_(self, ctx:CypherParser.Match_Context):
         # Get to the good part. Should only have one patternPart.
+        # TODO: support more than one patternPart; that is, support queries
+        # of the form "MATCH (n) --> (m), (p) --> (q)".
         parts = ctx.pattern().patternPart(0).anonymousPatternPart().patternElement()
 
         # First get the first node. Always exists.
