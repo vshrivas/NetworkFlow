@@ -23,13 +23,13 @@ if __name__ == '__main__':
         print(">", end=" ")
         query = input()
 
-        # Get the "create_dict", which represents what needs to be created
+        # Get the "query_dict", which represents what needs to be created
         # given the query that just occurred.
-        create_dict = cyp.parse(query)
+        query_dict = cyp.parse(query)
 
-        # One invariant on create_dict that we shall use is that if the query
+        # One invariant on query_dict that we shall use is that if the query
         # needed relationships to be created, those relationships reference only
-        # nodes that are also in the create_dict in the "nodes" section.
+        # nodes that are also in the query_dict in the "nodes" section.
         # Maybe this sentiment is better demonstrated than stated.
 
         # An interesting note. Nodes reference the relationships they are a
@@ -37,11 +37,12 @@ if __name__ == '__main__':
         # We must create the nodes in an incomplete form, then create the
         # relationships that refer to them, then fill in the rest of the info
         # associated with the nodes to have them know their relationships.
+        # We endearingly call this method "crabbing". (\/) o,,o (\/)
 
         # We'll need to keep track of this mapping to do what the previous
         # paragraph just said.
         simpleNodeToNode = {}
-        for simpleNode in create_dict["create_nodes"]:
+        for simpleNode in query_dict["create_nodes"]:
             node = s.createNode()
             print(" * Creating node %s; has ID %d" % (simpleNode.varName, node.nodeID))
 
@@ -59,7 +60,7 @@ if __name__ == '__main__':
         # OK, we have semi-filled-in nodes for each node, but we need to make
         # the relationships now...
         nodesToRelationships = {}
-        for relationship in create_dict["create_relationships"]:
+        for relationship in query_dict["create_relationships"]:
             print(" * Creating relationship %s" % relationship.label)
             print("   * It connects nodes %s and %s" % (relationship.node1.varName,
                                                     relationship.node2.varName))

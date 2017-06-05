@@ -14,8 +14,6 @@ def parse(query):
     tree_string  = antlr4.tree.Trees.Trees.toStringTree(tree, None, parser)
     visitor = CypherVisitor()
 
-
-
     # Print the tree.
     print("Here comes the tree...")
     openParens = 0
@@ -30,16 +28,17 @@ def parse(query):
             print(char, end="")
     print("\n\n", end="")
 
-
     # Visit it all!
     visitor.visit(tree)
 
     # Package everything up nicely and pass it to the database to make it all.
-    create_return = {
+    query = {
         "create_relationships": visitor.relationships_to_create,
         "create_nodes": visitor.nodes_to_create,
         "match_relationships": visitor.relationships_to_match,
-        "match_nodes": visitor.nodes_to_match
+        "match_nodes": visitor.nodes_to_match,
+        "var_name_to_basic": visitor.var_name_to_basic,
+        "return_exprs": visitor.to_return
     }
 
-    return create_return
+    return query
