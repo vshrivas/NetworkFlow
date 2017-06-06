@@ -30,6 +30,12 @@ class Label:
 
         self.label = label
 
+        # label is not of max size
+        if(sys.getsizeof(self.label) != self.MAX_LABEL_SIZE):
+            # pad key up to max size
+            while len(self.label.encode('utf-8')) != self.MAX_LABEL_SIZE:
+                self.label += ' '
+
         self.labelFile = labelFile
 
         # open label file

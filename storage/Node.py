@@ -77,6 +77,14 @@ class Node:
             self.labels[len(self.labels) - 1].nextLabelID = nodeLabel.labelID
         self.labels.append(nodeLabel)
 
+        # add nodeID to label index
+        # open label index
+        labelIndex = LabelIndex(nodeLabel)
+
+        # add node to index
+        labelIndex.addNode(self.nodeID)
+        
+
     # This method removes a relationship from a node and writes the node
     def removeRelationship(self, relID):
         toRemove = 0
