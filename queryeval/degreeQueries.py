@@ -124,11 +124,11 @@ def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
                 otherNodeID = currRel.getOtherNodeID(chain[1][0].getID())
                 otherNode = nodeFile.readNode(otherNodeID, relationshipFile,
                                               propFile, labelFile)
-                if set(otherNode.getLabels()) == set(nodeGoal.labels) and
-                   otherNode.getProperties() == nodeGoal.properties:
-                   # It's good!
-                   newChain = ((otherNode, currIdx),) + chain
-                   chainQueue.put(newChain)
+                if set(otherNode.getLabels()) == set(nodeGoal.labels) and \
+                    otherNode.getProperties() == nodeGoal.properties:
+                        # It's good!
+                        newChain = ((otherNode, currIdx),) + chain
+                        chainQueue.put(newChain)
         # OK, we didn't need to extend the chain to the left; how about the
         # right? We don't need to do this if the last element in the chain
         # is the last input node...
