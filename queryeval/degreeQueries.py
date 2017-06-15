@@ -4,6 +4,7 @@ from ..storage.DummyNode import DummyNode
 from ..storage.Node import Node
 from ..storage.DummyRelationship import DummyRelationship
 
+
 def findBestElement(nodes, relationships):
     # For now, this function chooses the dummy node or dummy relationship with
     # the most labels 
@@ -45,6 +46,23 @@ def locateNodes(dummyNode, nodeFile, relationshipFile, propFile, labelFile):
             print(len(node.getRelationships()))
             categoryNodes.append(node)
 
+    for nodeID in categoryNodes[:]:
+        node = nodeFile.readNode(nodeID, relationshipFile, propFile, labelFile)
+        nodeList.append(node)
+        # dummyNode.getProperties() should return a list of key-value pairs (represented
+        # as tuples) corresponding to the properties the dummyNode should have.
+        for prop in dummyNode.getProperties():
+            key = prop[0]
+            value = prop[1]
+            foundProperty = False
+            for property in node.getProperties():
+                if property.key == key and property.value == value:
+                    foundProperty = True
+                    break
+            if foundProperty == False:
+                categoryNodes.remove(nodeID)
+                break
+            
     return categoryNodes
 
 """ This function should find the real relationships which match up with the given dummy
@@ -89,7 +107,8 @@ def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
     if isinstance(start, DummyRelationship):
         realStart = locateRelationships(start)
         [chainQueue.put((rel, start_idx)) for rel in realStart]
-    if isinstance(start, DummyNode):
+
+    elif isinstance(start, DummyNode):
         realStart = locateNodes(start, nodeFile, relationshipFile, propFile, labelFile) # TODO: May need to pass in files, here.
 
         print("real starting nodes:")
@@ -109,6 +128,7 @@ def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
                 print(lbl.getLabelStr())
 
         [chainQueue.put([(node, start_idx)]) for node in realStart]
+
     else:
         # TODO: Perhaps replace this with some sort of error reporting.
         return chainQueue
@@ -157,10 +177,12 @@ def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
                 otherNodeID = currRel.getOtherNodeID(chain[1][0].getID())
                 otherNode = nodeFile.readNode(otherNodeID, relationshipFile,
                                               propFile, labelFile)
+
                 if set(otherNode.getLabels()) == set(nodeGoal.labels) and otherNode.getProperties() == nodeGoal.properties:
                    # It's good!
                    newChain = ((otherNode, currIdx),) + chain
                    chainQueue.put(newChain)
+
         # OK, we didn't need to extend the chain to the left; how about the
         # right? We don't need to do this if the last element in the chain
         # is the last input node...

@@ -23,8 +23,10 @@ storageManager = StorageManager(nodeFile, relationshipFile, propFile, labelFile)
 harryPotter = storageManager.createNode()
 propPotterName = storageManager.createProperty("Name", "Harry Potter")
 hpLabel1 = storageManager.createLabel("Harry Potter")
+hpLabel2 = storageManager.createLabel("Half Blood")
 harryPotter.addProperty(propPotterName)
 harryPotter.addLabel(hpLabel1)
+harryPotter.addLabel(hpLabel2)
 
 ron = storageManager.createNode()
 propRonName = storageManager.createProperty("Name", "Ronald Weasley")
@@ -40,9 +42,22 @@ hermione.addLabel(hermioneLabel)
 
 crookshanks = storageManager.createNode()
 propCrookshanksName = storageManager.createProperty("Name", "Crookshanks")
+propBlue = storageManager.createProperty("Color", "Blue")
 catLabel = storageManager.createLabel("cat")
 crookshanks.addProperty(propCrookshanksName)
+crookshanks.addProperty(propBlue)
 crookshanks.addLabel(catLabel)
+
+hermione2 = storageManager.createNode()
+propHermioneName2 = storageManager.createProperty("Name", "Hermione Granger_clone")
+hermione2.addProperty(propHermioneName2)
+hermione2.addLabel(hermioneLabel)
+
+crookshanks2 = storageManager.createNode()
+propCrookshanksName2 = storageManager.createProperty("Name", "Crookshanks_clone")
+crookshanks2.addProperty(propCrookshanksName2)
+crookshanks2.addProperty(propBlue)
+crookshanks2.addLabel(catLabel)
 
 # create relationships
 rel0 = storageManager.createRelationship(hermione, crookshanks, "ownership")
@@ -67,26 +82,25 @@ ron.writeNode()
 hermione.writeNode()
 crookshanks.writeNode()
 
-# query: find all muggle friends of harry potter who own cats
+# query: find all friends of muggle born people who own blue cats
 
-# [Harry Potter (node 1), friendship (rel 1), Muggle Born (node 2), ownership (rel 2), cat (node 3)]
+# [Blue cats (node 1), ownership (rel 1), Muggle Born (node 2), friendship (rel 2), (node 3)]
+# Last nodes of chains should be nodes with names Harry Potter and Ronald Weasley
 dummyNode1 = DummyNode()
-dummyNode1.addLabel("Harry Potter")
+dummyNode1.addLabel("cat")
+dummyNode1.addProperty(("Color", "Blue"))
 
-dummyRel1 = DummyRelationship("friendship")
+dummyRel1 = DummyRelationship("ownership")
 
 dummyNode2 = DummyNode()
 dummyNode2.addLabel("Muggle Born")
 
-dummyRel2 = DummyRelationship("ownership")
+dummyRel2 = DummyRelationship("friendship")
 
 dummyNode3 = DummyNode()
-dummyNode3.addLabel("cat")
 
 nodes = [dummyNode1, dummyNode2, dummyNode3]
 rels = [dummyRel1, dummyRel2]
-
-print("STARTING BFS!!!")
 
 goodChains = breadthFirstSearch_(nodes, rels, nodeFile, relationshipFile, propFile, labelFile)
 
@@ -96,14 +110,7 @@ for chain in goodChains:
     print("got chain")
     #print(friend.getID())
     #print(len(friend.properties))
-    for tup in chain:
-        element = tup[0]
-        if isinstance(element, Node):
-            print("NODE:")
-            for prop in element.properties:
-                print("key: {0}".format(prop.key))
-                print("value: {0}".format(prop.value))
-
-        else:
-            print("REL:")
-            print(element.getRelType())
+    for element in chain:
+        for prop in element.properties:
+            print("key: {0}".format(prop.key))
+            print("value: {0}".format(prop.value))

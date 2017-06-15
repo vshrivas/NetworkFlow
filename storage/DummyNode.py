@@ -17,3 +17,4 @@ class DummyNode:
 
     def getProperties(self):
         return self.properties
+
