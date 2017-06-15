@@ -4,6 +4,19 @@ from ..storage.DummyNode import DummyNode
 from ..storage.Node import Node
 from ..storage.DummyRelationship import DummyRelationship
 
+def itemPropertiesMatch(dummyItem, realItem):
+    for dummyProp in dummyItem.getProperties():
+        key = prop[0]
+        value = prop[1]
+        foundProperty = False
+        for realProp in node.getProperties():
+            if realProp.key == key and realProp.value == value:
+                foundProperty = True
+                break
+        if foundProperty == False:
+            return False
+
+    return True
 
 def findBestElement(nodes, relationships):
     # For now, this function chooses the dummy node or dummy relationship with
@@ -44,24 +57,8 @@ def locateNodes(dummyNode, nodeFile, relationshipFile, propFile, labelFile):
             node = nodeFile.readNode(nodeID, relationshipFile, propFile, labelFile)
             print()
             print(len(node.getRelationships()))
-            categoryNodes.append(node)
-
-    for nodeID in categoryNodes[:]:
-        node = nodeFile.readNode(nodeID, relationshipFile, propFile, labelFile)
-        nodeList.append(node)
-        # dummyNode.getProperties() should return a list of key-value pairs (represented
-        # as tuples) corresponding to the properties the dummyNode should have.
-        for prop in dummyNode.getProperties():
-            key = prop[0]
-            value = prop[1]
-            foundProperty = False
-            for property in node.getProperties():
-                if property.key == key and property.value == value:
-                    foundProperty = True
-                    break
-            if foundProperty == False:
-                categoryNodes.remove(nodeID)
-                break
+            if itemPropertiesMatch(dummyNode, node):
+                categoryNodes.append(node)
             
     return categoryNodes
 
@@ -162,11 +159,11 @@ def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
                     # We only want relationships that match all specifications.
                     # TODO: fix the properties equality, if incorrect
                     if rel.getRelType() == relationshipGoal.getRelType():
-                        if set(rel.getProperties()) == set(relationshipGoal.getProperties()):
+                        if itemPropertiesMatch(relationshipGoal, rel):
                             goodRels.append(rel)
                 for goodRel in goodRels:
                     # Form a new chain. Tuple addition syntax is weird.
-                    newChain = ((goodRel, currIdx - 1),) + chain
+                    newChain = [(goodRel, currIdx - 1)]+ chain
                     chainQueue.put(newChain)
             else: # Relationship
                 # We'll extend the chain to the left via all the possible
@@ -178,10 +175,11 @@ def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
                 otherNode = nodeFile.readNode(otherNodeID, relationshipFile,
                                               propFile, labelFile)
 
-                if set(otherNode.getLabels()) == set(nodeGoal.labels) and otherNode.getProperties() == nodeGoal.properties:
-                   # It's good!
-                   newChain = ((otherNode, currIdx),) + chain
-                   chainQueue.put(newChain)
+                if set(otherNode.getLabelStrs()).issuperset(set(nodeGoal.getLabels())):
+                   if itemPropertiesMatch(nodeGoal, otherNode):
+                       # It's good!
+                       newChain = [(otherNode, currIdx)] + chain
+                       chainQueue.put(newChain)
 
         # OK, we didn't need to extend the chain to the left; how about the
         # right? We don't need to do this if the last element in the chain
@@ -208,7 +206,7 @@ def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
                     # We only want relationships that match all specifications.
                     if rel.getRelType().strip() == relationshipGoal.getRelType().strip():
                         print("types matched")
-                        if set(rel.getProperties()).issuperset(set(relationshipGoal.getProperties())):
+                        if itemPropertiesMatch(relationshipGoal, rel):
                             print("properties matched")
                             goodRels.append(rel)
 
@@ -237,7 +235,7 @@ def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
                     print (label)
                 if set(otherNode.getLabelStrs()).issuperset(set(nodeGoal.getLabels())):
                     print("node labels match")
-                    if set(otherNode.getProperties()).issuperset(set(nodeGoal.getProperties())):
+                    if itemPropertiesMatch(nodeGoal, otherNode):
                         print("node properties match")
                         # It's good!
                         print("good other node found")
