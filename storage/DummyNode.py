@@ -14,3 +14,6 @@ class DummyNode:
 
     def getLabels(self):
         return self.labels
+
+    def getProperties(self):
+        return self.properties

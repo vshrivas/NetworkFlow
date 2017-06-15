@@ -1,4 +1,7 @@
 from queue import Queue
+from storage.DummyNode import DummyNode
+from storage.DummyRelationship import DummyRelationship
+from storage.LabelIndex import LabelIndex
 
 def findBestElement(nodes, relationships):
     # For now, this function chooses the dummy node or dummy relationship with
@@ -10,7 +13,7 @@ def findBestElement(nodes, relationships):
 
 """ This function should find the real nodes which match up with the given dummy
 node. """
-def locateNodes(dummyNode):
+def locateNodes(dummyNode, nodeFile, relationshipFile, propFile, labelFile):
     # TODO: should this go in a different file?
     """ look at nodes in each label of category """
     numNodeLabels = {} # dictionary tracks number of labels a given node has
@@ -34,6 +37,23 @@ def locateNodes(dummyNode):
         if numNodeLabels[nodeID] == numCategoryLabels:
             categoryNodes.append(nodeID)
 
+    for nodeID in categoryNodes[:]:
+        node = nodeFile.readNode(nodeID, relationshipFile, propFile, labelFile)
+        nodeList.append(node)
+        # dummyNode.getProperties() should return a list of key-value pairs (represented
+        # as tuples) corresponding to the properties the dummyNode should have.
+        for prop in dummyNode.getProperties():
+            key = prop[0]
+            value = prop[1]
+            foundProperty = False
+            for property in node.getProperties():
+                if property.key == key and property.value == value:
+                    foundProperty = True
+                    break
+            if foundProperty == False:
+                categoryNodes.remove(nodeID)
+                break
+            
     return categoryNodes
 
 """ This function should find the real relationships which match up with the given dummy
@@ -75,7 +95,7 @@ def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
         realStart = locateRelationships(start)
         [chainQueue.put((rel, start_idx)) for rel in realStart]
     elif isinstance(start, DummyNode):
-        realStart = locateNodes(start) # TODO: May need to pass in files, here.
+        realStart = locateNodes(start, nodeFile, relationshipFile, propFile, labelFile) 
         [chainQueue.put(((node, start_idx))) for node in realStart]
     else:
         # TODO: Perhaps replace this with some sort of error reporting.
