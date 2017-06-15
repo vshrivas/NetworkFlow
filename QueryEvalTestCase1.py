@@ -10,7 +10,7 @@ from .storage.LabelFile import LabelFile
 from .storage.StorageManager import StorageManager
 from .storage.DummyNode import DummyNode
 from .storage.DummyRelationship import DummyRelationship
-from .queryeval.degreeQueries import breadthFirstSearch
+from .queryeval.degreeQueries import breadthFirstSearch_
 from .queryeval.AdvancedQueryEval import advQueryEval
 
 # initial set up
@@ -23,19 +23,20 @@ storageManager = StorageManager(nodeFile, relationshipFile, propFile, labelFile)
 # create nodes
 harryPotter = storageManager.createNode()
 propPotterName = storageManager.createProperty("Name", "Harry Potter")
-hpLabel = storageManager.createLabel("Harry Potter")
+hpLabel1 = storageManager.createLabel("Harry Potter")
+hpLabel2 = storageManager.createLabel("Half Blood")
 harryPotter.addProperty(propPotterName)
 harryPotter.addLabel(hpLabel)
 
 ron = storageManager.createNode()
 propRonName = storageManager.createProperty("Name", "Ronald Weasley")
-ronLabel = storageManager.createLabel("male")
+ronLabel = storageManager.createLabel("Pure Blood")
 ron.addProperty(propRonName)
 ron.addLabel(ronLabel)
 
 hermione = storageManager.createNode()
 propHermioneName = storageManager.createProperty("Name", "Hermione Granger")
-hermioneLabel = storageManager.createLabel("female")
+hermioneLabel = storageManager.createLabel("Muggle Born")
 hermione.addProperty(propHermioneName)
 hermione.addLabel(hermioneLabel)
 
@@ -68,36 +69,34 @@ ron.writeNode()
 hermione.writeNode()
 crookshanks.writeNode()
 
-# find all friends of harry potter who own cats
-resultQueue = breadthFirstSearch(harryPotter, [("friendship", "", 1), ("ownership", "cat", 0)], 
-    nodeFile, relationshipFile, propFile, labelFile)
+# query: find all muggle friends of harry potter who own cats
 
+# [Harry Potter (node 1), friendship (rel 1), Muggle Born (node 2), ownership (rel 2), cat (node 3)]
 dummyNode1 = DummyNode()
 dummyNode1.addLabel("Harry Potter")
 
 dummyRel1 = DummyRelationship("friendship")
 
 dummyNode2 = DummyNode()
-dummyNode2.addLabel("female")
+dummyNode2.addLabel("Muggle Born")
 
 dummyRel2 = DummyRelationship("ownership")
 
 dummyNode3 = DummyNode()
 dummyNode3.addLabel("cat")
 
-dummyNodes = {1:dummyNode1, 2:dummyNode2, 3:dummyNode3}
-dummyRels = {1:dummyRel1, 2:dummyRel2}
+nodes = [dummyNode1, dummyNode2, dummyNode3]
+rels = [dummyRel1, dummyRel2]
 
-altResultQueue = advQueryEval(dummyNodes, dummyRels, nodeFile, 
-    relationshipFile, propFile, labelFile)
+goodChains = breadthFirstSearch_(nodes, rels, nodeFile, relationshipFile, propFile, labelFile)
 
 print("after breadth first search")
 
-while(not resultQueue.empty()):
-    result = resultQueue.get()
-    print("got node")
+for chain in goodChains:
+    print("got chain")
     #print(friend.getID())
     #print(len(friend.properties))
-    for prop in result.properties:
-        print("key: {0}".format(prop.key))
-        print("value: {0}".format(prop.value))
+    for element in chain:
+        for prop in element.properties:
+            print("key: {0}".format(prop.key))
+            print("value: {0}".format(prop.value))
