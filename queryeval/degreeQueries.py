@@ -1,17 +1,45 @@
 from queue import Queue
 
 def findBestElement(nodes, relationships):
-    # For now, this is a stub function. Later, it'll use heuristics to choose
+    # For now, this function chooses the dummy node or dummy relationship with
+    # the most labels 
+    # Later, it'll use heuristics to choose
     # the "most specific" node to start a query with to minimize time the
     # storage-layer search takes.
     return (nodes[0], 0)
 
-def locateNodes(node):
-    # Not implemented yet :( This should go in a different file, anyway.
-    return False
+""" This function should find the real nodes which match up with the given dummy
+node. """
+def locateNodes(dummyNode):
+    # TODO: should this go in a different file?
+    """ look at nodes in each label of category """
+    numNodeLabels = {} # dictionary tracks number of labels a given node has
+    numCategoryLabels = len(dummyNode.getLabels()) # get number of labels in this category
 
+    for lbl in dummyNode.getLabels():
+        # open label index
+        lblIndex = LabelIndex(lbl)
+        # add each node in index to dictionary, if not already there
+        # increment label count for node
+        lblNodes = lblIndex.getItems()
+        for nodeID in lblNodes:
+            if nodeID not in numNodeLabels:
+                numNodeLabels[nodeID] = 1
+            else:
+                numNodeLabels[nodeID] += 1
+
+    categoryNodes = [] # list of nodes to consider for this category
+    for nodeID in numNodeLabels.keys():
+        # node has all labels of category
+        if numNodeLabels[nodeID] == numCategoryLabels:
+            categoryNodes.append(nodeID)
+
+    return categoryNodes
+
+""" This function should find the real relationships which match up with the given dummy
+relationship. """
 def locateRelationships(relationship):
-    # Same as above.
+    # Not yet implemented, should be very similar to locateNodes
     return False
 
 def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
@@ -81,8 +109,7 @@ def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
                 for rel in rels:
                     # We only want relationships that match all specifications.
                     # TODO: fix the properties equality, if incorrect
-                    if rel.getRelType() == relationshipGoal.label and
-                       rel.getProperties() == relationshipGoal.properties:
+                    if rel.getRelType() == relationshipGoal.label and rel.getProperties() == relationshipGoal.properties:
                        goodRels.append(rel)
                 for goodRel in goodRels:
                     # Form a new chain. Tuple addition syntax is weird.
@@ -112,7 +139,6 @@ def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
         else:
             goodChains.add(chain)
     return goodChains
-
 
 # root node is node to start search from
 # conditions are query constraints to be applied at each level of search
