@@ -80,7 +80,7 @@ class Node:
 
         # add nodeID to label index
         # open label index
-        labelIndex = LabelIndex(nodeLabel)
+        labelIndex = LabelIndex(nodeLabel.getLabelStr())
 
         # add node to index
         labelIndex.addNode(self.nodeID)
