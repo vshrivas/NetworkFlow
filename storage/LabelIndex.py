@@ -17,10 +17,10 @@ class LabelIndex:
     numConnectionsByteLen = 6
     nodeIDByteLen = 3
 
-    def __init__(self, label):
-        self.label = label
+    def __init__(self, labelStr):
+        self.labelStr = labelStr
         # create index file if it doesn't already exist
-        self.fileName = "{0}.labelindex".format(self.label.getLabelStr())
+        self.fileName = "{0}.labelindex".format(self.labelStr)
 
         # open index file
         try:
@@ -29,7 +29,7 @@ class LabelIndex:
         except FileNotFoundError:
             indexFile = open(self.fileName, 'wb')
             # label string
-            indexFile.write(bytearray(self.label.getLabelStr(), "utf8"))
+            indexFile.write(bytearray(self.labelStr, "utf8"))
             # write number of nodes to next 3 bytes of index file
             indexFile.write((0).to_bytes(self.nodeIDByteLen,
                 byteorder = sys.byteorder, signed=True))
