@@ -1,7 +1,6 @@
 class DummyNode:
 
     def __init__(self):
-        self.relationships = []
         self.properties = []
         self.labels = []
 
