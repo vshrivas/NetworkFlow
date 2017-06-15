@@ -91,6 +91,9 @@ class Relationship:
     def addProperty(self, prop):
         self.properties.append(prop)
 
+    def getProperties(self):
+        return self.properties
+
     def writeRelationship(self, node, prevRel, nextRel):
         # open relationship file
         print(self.relationshipFile)

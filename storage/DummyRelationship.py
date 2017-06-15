@@ -6,3 +6,9 @@ class DummyRelationship:
     # This method adds property data to a relationship
     def addProperty(self, prop):
         self.properties.append(prop)
+
+    def getProperties(self):
+        return self.properties
+
+    def getRelType(self):
+        return self.type

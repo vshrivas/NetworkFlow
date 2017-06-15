@@ -24,9 +24,8 @@ storageManager = StorageManager(nodeFile, relationshipFile, propFile, labelFile)
 harryPotter = storageManager.createNode()
 propPotterName = storageManager.createProperty("Name", "Harry Potter")
 hpLabel1 = storageManager.createLabel("Harry Potter")
-hpLabel2 = storageManager.createLabel("Half Blood")
 harryPotter.addProperty(propPotterName)
-harryPotter.addLabel(hpLabel)
+harryPotter.addLabel(hpLabel1)
 
 ron = storageManager.createNode()
 propRonName = storageManager.createProperty("Name", "Ronald Weasley")
@@ -88,6 +87,8 @@ dummyNode3.addLabel("cat")
 nodes = [dummyNode1, dummyNode2, dummyNode3]
 rels = [dummyRel1, dummyRel2]
 
+print("STARTING BFS!!!")
+
 goodChains = breadthFirstSearch_(nodes, rels, nodeFile, relationshipFile, propFile, labelFile)
 
 print("after breadth first search")
@@ -96,7 +97,14 @@ for chain in goodChains:
     print("got chain")
     #print(friend.getID())
     #print(len(friend.properties))
-    for element in chain:
-        for prop in element.properties:
-            print("key: {0}".format(prop.key))
-            print("value: {0}".format(prop.value))
+    for tup in chain:
+        element = tup[0]
+        if isinstance(element, Node):
+            print("NODE:")
+            for prop in element.properties:
+                print("key: {0}".format(prop.key))
+                print("value: {0}".format(prop.value))
+
+        else:
+            print("REL:")
+            print(element.getRelType())

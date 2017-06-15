@@ -78,12 +78,13 @@ class Node:
             self.labels[len(self.labels) - 1].nextLabelID = nodeLabel.labelID
         self.labels.append(nodeLabel)
 
+        # if this is a new node
         # add nodeID to label index
         # open label index
-        labelIndex = LabelIndex(nodeLabel)
-
-        # add node to index
-        labelIndex.addNode(self.nodeID)
+        if self.nodeID == Node.numNodes - 1:
+            labelIndex = LabelIndex(nodeLabel.getLabelStr())
+            # add node to index
+            labelIndex.addNode(self.nodeID)
         
 
     # This method removes a relationship from a node and writes the node
@@ -127,6 +128,12 @@ class Node:
 
     def getLabels(self):
         return self.labels
+
+    def getLabelStrs(self):
+        labelStrs = []
+        for label in self.labels:
+            labelStrs.append(label.getLabelStr().strip())
+        return labelStrs
 
     def getProperties(self):
         return self.properties
