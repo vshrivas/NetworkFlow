@@ -12,6 +12,7 @@
 from .Relationship import Relationship
 from .Property import Property
 from .Label import Label
+from .LabelIndex import LabelIndex
 import sys
 
 class Node:

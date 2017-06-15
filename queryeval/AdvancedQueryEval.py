@@ -1,3 +1,5 @@
+from ..storage import LabelIndex
+
 def getLabelIndex(label):
     pass
 
@@ -49,19 +51,19 @@ def advQueryEval(dummyNodes, dummyRelationships, nodeFile, relationshipFile,
     for category in dummyNodes.keys(): # each dummyNode is a category
         """ real nodes with all labels are the nodes in this category """
         dummyNode = dummyNodes[category]
-        avgNumConnections = 0.0 # avg num connections for items this category
+        avgNumConnections = 0 # avg num connections for items this category
         numCategoryLabels = len(dummyNode.getLabels()) # get number of labels in this category
         numNodeLabels = {} # dictionary tracks number of labels a given node has
         """ look at nodes in each label of category """
         for lbl in dummyNode.getLabels():
              # open label index
-            lblIndex = openLabelIndex(lbl)
+            lblIndex = LabelIndex(nodeLabel)
             # add avg number of connections for this label to var
-            numLabelConnections = getNumConnections(lblIndex) # average number of connections of items in this category
+            numLabelConnections = lblIndex.getNumConnections() # average number of connections of items in this category
             avgNumConnections += numLabelConnections
             # add each node in index to dictionary, if not already there
             # increment label count for node
-            lblNodes = getItems(lblIndex)
+            lblNodes = lblIndex.getItems()
             for nodeID in lblNodes:
                 if nodeID not in numNodeLabels:
                     numNodeLabels[nodeID] = 1
@@ -145,7 +147,7 @@ def advQueryEval(dummyNodes, dummyRelationships, nodeFile, relationshipFile,
                 minCostCategoryRel = category
 
         minNodeCost = len(nodesToConsider[minCostCategoryNode][0]) * nodesToConsider[minCostCategoryNode][1]
-        minRelCost = len(relsToConsider[minCostCategoryRel][0]) * relsToConsider[minCostCategoryRel][1]
+        minRelCost = len(relsToConsider[minCostCategoryRel][0]) * 2
 
         """ Node category has the lowest exploration cost. """
         if minNodeCost < minRelCost:
@@ -188,7 +190,7 @@ def advQueryEval(dummyNodes, dummyRelationships, nodeFile, relationshipFile,
 
                     # if rel category has not been visited and relationship is of rel category:
                     """ Rel category (right rels) has not been visited and rel is of this category """
-                    if category in relsToConsider.keys() and dummyRelationships[category].match(rel):
+                    if (category in relsToConsider.keys()) and (dummyRelationships[category].match(rel)):
                         """ other node in rel is of node category + 1"""
                         if dummyNodes[category + 1].matchNode(otherNode): 
                             rightViableRels.append(rel) # add relationship to list of right viable relationships (category)
@@ -207,16 +209,17 @@ def advQueryEval(dummyNodes, dummyRelationships, nodeFile, relationshipFile,
                         nodesToConsider[category][0] = rightNodesToConsider # update right nodes to consider
                         
             # if nothing in viable nodes for this category, return immediately since no path can exist
-            if len(viableNodes[category]) == 0:
-                return []
+            #if len(viableNodes[category]) == 0:
+                #return []
+
             """ remove this node category, and categories of left and right rels 
             from nodesToConsider and relsToConsider to mark these categories as visited """
-            nodesToConsider.pop(category, None) # pop this category of nodes from nodes to consider
-            relsToConsider.pop(category - 1, None) # pop left rels from rels to consider
-            relsToConsider.pop(category, None) # pop right rels from rels to consider
+            #nodesToConsider.pop(category, None) # pop this category of nodes from nodes to consider
+            #relsToConsider.pop(category - 1, None) # pop left rels from rels to consider
+            #relsToConsider.pop(category, None) # pop right rels from rels to consider
     
-        # if the category is instanceof relationship:
-        """ Relationship category has the lowest exploration cost. """
+            # if the category is instanceof relationship:
+            """ Relationship category has the lowest exploration cost. """
         else:
             # clear out nodes to consider for categories category and category + 1
             # since we will be updating that based on these relationships
@@ -230,7 +233,7 @@ def advQueryEval(dummyNodes, dummyRelationships, nodeFile, relationshipFile,
                 firstNode = getNodeFromID(rel.getFirstNodeID()) # first node in rel
                 secondNode = getNodeFromID(rel.getSecondNodeID()) # second node in rel
 
-                """ if left and right nodes of rel match category requirements """
+                #if left and right nodes of rel match category requirements 
                 if dummyNodes[category].matchNode(firstNode): # first node is of type category 
                     if dummyNodes[category + 1].matchNode(secondNode): # second node is of type category + 1
                         leftNodesToConsider.append(firstNode) # add to left nodes (category) to consider
@@ -246,11 +249,13 @@ def advQueryEval(dummyNodes, dummyRelationships, nodeFile, relationshipFile,
                 nodesToConsider[category][0] = leftNodesToConsider # update left nodes (category) to consider
                 nodesToConsider[category + 1][0] = rightNodesToConsider # update right nodes (category + 1) to consider
 
-            # if no viable relationships of this category, return immediately since no path can exist
+            '''# if no viable relationships of this category, return immediately since no path can exist
             if len(viableRels[category]) == 0:
                 return []
             # remove this relationship category from relsToConsider to mark it as visited
-            relsToConsider.pop(category, None)
+            relsToConsider.pop(category, None) 
+            print("hello")
+            yellow = 5'''
 
     """ Should now have all nodes and rels to make paths out of. """
 
