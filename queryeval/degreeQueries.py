@@ -6,10 +6,10 @@ from ..storage.DummyRelationship import DummyRelationship
 
 def itemPropertiesMatch(dummyItem, realItem):
     for dummyProp in dummyItem.getProperties():
-        key = prop[0]
-        value = prop[1]
+        key = dummyProp[0]
+        value = dummyProp[1]
         foundProperty = False
-        for realProp in node.getProperties():
+        for realProp in realItem.getProperties():
             if realProp.key == key and realProp.value == value:
                 foundProperty = True
                 break
@@ -123,6 +123,10 @@ def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
             print("node labels:")
             for lbl in node.getLabels():
                 print(lbl.getLabelStr())
+            print("node properties:")
+            for prop in node.getProperties():
+                print(prop.key)
+                print(prop.value)
 
         [chainQueue.put([(node, start_idx)]) for node in realStart]
 
