@@ -76,11 +76,25 @@ rel3 = storageManager.createRelationship(hermione, ron, "friendship")
 hermione.addRelationship(rel3)
 ron.addRelationship(rel3)
 
+rel4 = storageManager.createRelationship(hermione2, crookshanks2, "ownership")
+hermione2.addRelationship(rel4)
+crookshanks2.addRelationship(rel4)
+
+rel5 = storageManager.createRelationship(harryPotter, hermione2, "friendship")
+harryPotter.addRelationship(rel5)
+hermione2.addRelationship(rel5)
+
+rel6 = storageManager.createRelationship(hermione2, ron, "friendship")
+hermione2.addRelationship(rel6)
+ron.addRelationship(rel6)
+
 # write nodes to disk
 harryPotter.writeNode()
 ron.writeNode()
 hermione.writeNode()
 crookshanks.writeNode()
+hermione2.writeNode()
+crookshanks2.writeNode()
 
 # query: find all friends of muggle born people who own blue cats
 
@@ -111,6 +125,6 @@ for chain in goodChains:
     #print(friend.getID())
     #print(len(friend.properties))
     for element in chain:
-        for prop in element.properties:
+        for prop in element[0].properties:
             print("key: {0}".format(prop.key))
             print("value: {0}".format(prop.value))
