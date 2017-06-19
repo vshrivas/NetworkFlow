@@ -80,6 +80,9 @@ class Node:
             # increment number of nodes
             Node.numNodes += 1
 
+        # set nodeFile for node
+        self.nodeFile = nodeFile
+
         # open node file
         storeFileName = self.nodeFile.getFileName()
         storeFile = open(storeFileName, 'r+b')
@@ -87,9 +90,6 @@ class Node:
         # write number of nodes to first 3 bytes of node file
         storeFile.write((self.numNodes).to_bytes(Node.nodeIDByteLen,
             byteorder = sys.byteorder, signed=True))
-
-        # set nodeFile for node
-        self.nodeFile = nodeFile
 
         # set starting offset of node in NodeFile
         self.startOffset = self.nodeID * Node.storageSize + Node.nodeIDByteLen
@@ -184,7 +184,7 @@ class Node:
         return self.properties
 
     def writeNode(self):
-         """Writes this node to the node's node file according to the storage 
+        """Writes this node to the node's node file according to the storage 
         format given in the class description and writes this node's relationships, 
         properties, and labels to the node's relationship file, property file, and 
         label file, respectively.

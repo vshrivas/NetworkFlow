@@ -178,7 +178,7 @@ class Relationship:
             print("wrote second node id")
 
         # find which node relationship is being written for and write next and previous 
-        relationship IDs appropriately
+        # relationship IDs appropriately
         if node.getID() == self.firstNodeID:
             if DEBUG:
                 print("writing relationship for first node")
