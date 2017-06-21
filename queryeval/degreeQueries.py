@@ -68,7 +68,7 @@ def locateRelationships(relationship):
     # Not yet implemented, should be very similar to locateNodes
     return False
 
-def breadthFirstSearch_(nodes, relationships, nodeFile, relationshipFile,
+def breadthFirstSearch(nodes, relationships, nodeFile, relationshipFile,
                         propFile, labelFile):
     """Perform a breadth-first-search and return patterns satisfying the input.
 

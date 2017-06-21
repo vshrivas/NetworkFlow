@@ -44,6 +44,7 @@ def nodeInfoExtract(visitor, node, simple):
 # The node holds a DummyNode that is the left side of the relationship.
 # If the simple flag is false, creates a DummyRelationship instead.
 def patternElementExtract(visitor, patternElement, node, simple):
+    # TODO (BUG): Support relationships without labels
     rel = patternElement.relationshipPattern().relationshipDetail()
     # Get the variable associated with this if it exists
     variable_exists = False
@@ -85,16 +86,23 @@ def patternElementExtract(visitor, patternElement, node, simple):
 
 class CypherVisitor(ParseTreeVisitor):
     def __init__(self):
+        ###### CREATE STATEMENT RELEVANT STUFF:
+
         # Represents the relationships to be created (maybe later, the
         # relationships to return or something) and their properties/labels
         self.relationships_to_create = []
 
         # Represents the nodes and properties to be created on a CREATE command
         # The keys are the variable names bound to the nodes.
+        # TODO: the following is out-of-date. We use dummies/simples now.
         # The values are 2-tuples; the first item is a list of relationships in
         # which this key lies, and the second item is a dictionary representing
         # the properties this node has (e.g. {"name": "Donnie"})
         self.nodes_to_create = []
+
+
+
+        ###### MATCH STATEMENT RELEVANT STUFF:
 
         # Represents the nodes and properties to be matched on a MATCH command
         # They have the same structure as previous.
@@ -107,6 +115,27 @@ class CypherVisitor(ParseTreeVisitor):
         self.relationships_to_match = []
 
 
+
+        ###### RETURN STATEMENT RELEVANT STUFF:
+
+        # Keeps track of all seen variable names, and relates them to their
+        # associated BasicNode/BasicRelationship. For example "CREATE (n)
+        # RETURN n" would map {"n": BasicNode()}. This is important for RETURN
+        # statements primarily.
+        self.var_name_to_basic = {}
+
+        # Represents the list of expressions to return. [TODO: figure out the
+        # best way to do this.] For now, each element of this list will be a
+        # 2-tuple: the first item is the printed column name associated with
+        # the expression, and the second is a string that represents the
+        # expression to evaluate. For example, "RETURN n.name AS hello" will
+        # be in this list as ("hello", "n.name"). Another example: "RETURN
+        # n.age + 100 * 2" will be in this list as ("", "n.age + 100 * 2").
+        # Unfortunately, this off-loads evaluation of expressions to somebody
+        # else, even though this antlr parser has a calculator...
+        self.to_return = []
+
+
     # Visit a parse tree produced by CypherParser#cypher.
     def visitCypher(self, ctx:CypherParser.CypherContext):
         return self.visitChildren(ctx)
@@ -115,13 +144,19 @@ class CypherVisitor(ParseTreeVisitor):
     def visitCreate(self, ctx:CypherParser.CreateContext):
         # Get to the good part. Should only have one patternPart.
         parts = ctx.pattern().patternPart(0).anonymousPatternPart().patternElement()
-        # parts = ctx.pattern().patternPart().anonymousPatternPart().patternElement()
+
         # First get the first node. Always exists.
         curr_node = nodeInfoExtract(self, parts.nodePattern(), True)
-        # Each part in the element chain is associated with a 
+        # Aside: update the variable name --> BasicNode association.
+        self.var_name_to_basic[curr_node.varName] = curr_node
+
+        # Each part in the element chain is associated with a
         # relationship and a node to create.
         for part in parts.patternElementChain():
             (rel, rel_node) = patternElementExtract(self, part, curr_node, True)
+            # Aside: update the variable name --> BasicRelationship association.
+            self.var_name_to_basic[rel_node.varName] = rel_node
+
             # Now that curr_node has updated to include the relationship, add
             # it to the list of nodes to create. Also add the relationship.
             self.nodes_to_create.append(curr_node)
@@ -137,14 +172,22 @@ class CypherVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by CypherParser#match_.
     def visitMatch_(self, ctx:CypherParser.Match_Context):
         # Get to the good part. Should only have one patternPart.
+        # TODO: support more than one patternPart; that is, support queries
+        # of the form "MATCH (n) --> (m), (p) --> (q)".
         parts = ctx.pattern().patternPart(0).anonymousPatternPart().patternElement()
-        # parts = ctx.pattern().patternPart().anonymousPatternPart().patternElement()
+
         # First get the first node. Always exists.
         curr_node = nodeInfoExtract(self, parts.nodePattern(), False)
-        # Each part in the element chain is associated with a 
+        # Aside: update the variable name --> BasicNode association.
+        self.var_name_to_basic[curr_node.varName] = curr_node
+
+        # Each part in the element chain is associated with a
         # relationship and a node to create.
         for part in parts.patternElementChain():
             (rel, rel_node) = patternElementExtract(self, part, curr_node, False)
+            # Aside: update the variable name --> BasicRelationship association.
+            self.var_name_to_basic[rel_node.varName] = rel_node
+
             # Now that curr_node has updated to include the relationship, add
             # it to the list of nodes to create. Also add the relationship.
             self.nodes_to_match.append(curr_node)
@@ -153,6 +196,30 @@ class CypherVisitor(ParseTreeVisitor):
             curr_node = rel_node
         # Make sure the last node is added as well
         self.nodes_to_match.append(curr_node)
+
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by CypherParser#return_.
+    def visitReturn_(self, ctx:CypherParser.Return_Context):
+        # Get to the items to return. returnBody should exist, otherwise we
+        # would've thrown a parse error...
+        items = ctx.returnBody().returnItems()
+
+        # TODO: handle "RETURN *"
+        for item in items.returnItem():
+            # Should we name the column something?
+            if item.variable():
+                # Yes: this is an AS statement. (e.g. RETURN n AS name)
+                colName = item.variable().symbolicName()
+            else:
+                # No: the column header will just be the expression itself.
+                colName = ""
+
+            # The first element in this 2-tuple is the printed column name,
+            # and the second is the expression to evaluate.
+            self.to_return.append((colName, item.getText()))
+
 
         return self.visitChildren(ctx)
 
