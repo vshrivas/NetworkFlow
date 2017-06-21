@@ -12,6 +12,7 @@ if __name__ == '__main__':
     print("Welcome to graphospasm.")
     print("Version -112.")
     print("Enjoy your stay.")
+    print("Type 'EXIT' to turn me off.")
 
     n = nf.NodeFile()
     r = rf.RelationshipFile()
@@ -22,6 +23,10 @@ if __name__ == '__main__':
     while True:
         print(">", end=" ")
         query = input()
+
+        # Check if we want to leave. 
+        if query.lower() == "exit":
+            break
 
         # Get the "create_dict", which represents what needs to be created
         # given the query that just occurred.
