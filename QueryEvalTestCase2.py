@@ -8,9 +8,13 @@ from .storage.RelationshipFile import RelationshipFile
 from .storage.Label import Label
 from .storage.LabelFile import LabelFile
 from .storage.StorageManager import StorageManager
-from .storage.DummyNode import DummyNode
-from .storage.DummyRelationship import DummyRelationship
-from .queryeval.degreeQueries import breadthFirstSearch_
+
+#from storage.DummyNode import DummyNode
+#from storage.DummyRelationship import DummyRelationship
+
+from parse.SimpleTypes import DummyNode, DummyRelationship
+
+from .queryeval.degreeQueries import breadthFirstSearch
 
 # initial set up
 nodeFile = NodeFile()
@@ -116,7 +120,7 @@ dummyNode3 = DummyNode()
 nodes = [dummyNode1, dummyNode2, dummyNode3]
 rels = [dummyRel1, dummyRel2]
 
-goodChains = breadthFirstSearch_(nodes, rels, nodeFile, relationshipFile, propFile, labelFile)
+goodChains = breadthFirstSearch(nodes, rels, nodeFile, relationshipFile, propFile, labelFile)
 
 print("after breadth first search")
 

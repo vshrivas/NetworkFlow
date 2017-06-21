@@ -1,21 +1,17 @@
 from queue import Queue
 from storage.LabelIndex import LabelIndex
-from storage.DummyNode import DummyNode
 from storage.Node import Node
-from storage.DummyRelationship import DummyRelationship
+from parse.SimpleTypes import DummyNode, DummyRelationship
 
 def itemPropertiesMatch(dummyItem, realItem):
-    for dummyProp in dummyItem.getProperties():
-        key = dummyProp[0]
-        value = dummyProp[1]
+    for key, value in dummyItem.properties.items():
         foundProperty = False
         for realProp in realItem.getProperties():
             if realProp.key == key and realProp.value == value:
                 foundProperty = True
                 break
-        if foundProperty == False:
+        if not foundProperty:
             return False
-
     return True
 
 def findBestElement(nodes, relationships):
@@ -32,9 +28,9 @@ def locateNodes(dummyNode, nodeFile, relationshipFile, propFile, labelFile):
     # TODO: should this go in a different file?
     """ look at nodes in each label of category """
     numNodeLabels = {} # dictionary tracks number of labels a given node has
-    numCategoryLabels = len(dummyNode.getLabels()) # get number of labels in this category
+    numCategoryLabels = len(dummyNode.labels) # get number of labels in this category
 
-    for lbl in dummyNode.getLabels():
+    for lbl in dummyNode.labels:
         # open label index
         lblIndex = LabelIndex(lbl)
         # add each node in index to dictionary, if not already there
@@ -93,7 +89,7 @@ def breadthFirstSearch(nodes, relationships, nodeFile, relationshipFile,
     (start, start_idx) = findBestElement(nodes, relationships)
 
     print("start element:")
-    for lblStr in start.getLabels():
+    for lblStr in start.labels:
         print(lblStr)
 
     # The first step is to find `start` in the storage layer. Unfortunately,
@@ -106,7 +102,7 @@ def breadthFirstSearch(nodes, relationships, nodeFile, relationshipFile,
         [chainQueue.put((rel, start_idx)) for rel in realStart]
 
     elif isinstance(start, DummyNode):
-        realStart = locateNodes(start, nodeFile, relationshipFile, propFile, labelFile) # TODO: May need to pass in files, here.
+        realStart = locateNodes(start, nodeFile, relationshipFile, propFile, labelFile)
 
         print("real starting nodes:")
         for node in realStart:
@@ -157,7 +153,7 @@ def breadthFirstSearch(nodes, relationships, nodeFile, relationshipFile,
                 # that match with the input specifications.
                 (currNode, currIdx) = chain[0]
                 relationshipGoal = relationships[currIdx - 1] # -[rel (n-1)]-> (node n) ...
-                rels = currNode.getRelationships()
+                rels = currNode.relationships
                 goodRels = []
                 for rel in rels:
                     # We only want relationships that match all specifications.
@@ -167,7 +163,7 @@ def breadthFirstSearch(nodes, relationships, nodeFile, relationshipFile,
                             goodRels.append(rel)
                 for goodRel in goodRels:
                     # Form a new chain. Tuple addition syntax is weird.
-                    newChain = [(goodRel, currIdx - 1)]+ chain
+                    newChain = [(goodRel, currIdx - 1)] + chain
                     chainQueue.put(newChain)
             else: # Relationship
                 # We'll extend the chain to the left via all the possible
@@ -179,7 +175,7 @@ def breadthFirstSearch(nodes, relationships, nodeFile, relationshipFile,
                 otherNode = nodeFile.readNode(otherNodeID, relationshipFile,
                                               propFile, labelFile)
 
-                if set(otherNode.getLabelStrs()).issuperset(set(nodeGoal.getLabels())):
+                if set(otherNode.getLabelStrs()).issuperset(set(nodeGoal.labels)):
                    if itemPropertiesMatch(nodeGoal, otherNode):
                        # It's good!
                        newChain = [(otherNode, currIdx)] + chain
@@ -195,20 +191,20 @@ def breadthFirstSearch(nodes, relationships, nodeFile, relationshipFile,
             if isinstance(chain[-1][0], Node):
                 print("rightmost element is a node:")
                 print("current node labels")
-                for lbl in chain[-1][0].getLabels():
+                for lbl in chain[-1][0].labels:
                     print(lbl.getLabelStr())
                 # extend the chain via all possible relationships
                 # that match with the input specifications.
                 (currNode, currIdx) = chain[-1]
                 relationshipGoal = relationships[currIdx] # -[rel (n-1)]-> (node n) -> (rel n)
 
-                rels = currNode.getRelationships()
+                rels = currNode.relationships
                 print(len(rels))
                 goodRels = []
                 for rel in rels:
                     print("found rel")
                     # We only want relationships that match all specifications.
-                    if rel.getRelType().strip() == relationshipGoal.getRelType().strip():
+                    if rel.getRelType().strip() == relationshipGoal.label.strip():
                         print("types matched")
                         if itemPropertiesMatch(relationshipGoal, rel):
                             print("properties matched")
@@ -235,9 +231,9 @@ def breadthFirstSearch(nodes, relationships, nodeFile, relationshipFile,
                 for label in otherNode.getLabelStrs():
                     print(label)
                 print("node goal labels")
-                for label in nodeGoal.getLabels():
+                for label in nodeGoal.labels:
                     print (label)
-                if set(otherNode.getLabelStrs()).issuperset(set(nodeGoal.getLabels())):
+                if set(otherNode.getLabelStrs()).issuperset(set(nodeGoal.labels)):
                     print("node labels match")
                     if itemPropertiesMatch(nodeGoal, otherNode):
                         print("node properties match")

@@ -26,7 +26,7 @@ if __name__ == '__main__':
         print(">", end=" ")
         query = input()
 
-        # Check if we want to leave. 
+        # Check if we want to leave.
         if query.lower() == "exit":
             break
 
@@ -73,7 +73,9 @@ if __name__ == '__main__':
                                                     relationship.node2.varName))
             node1 = simpleNodeToNode[relationship.node1]
             node2 = simpleNodeToNode[relationship.node2]
-            rel = s.createRelationship(node1, node2)
+            # TODO: We're only able to give one label to each relationship at
+            # the moment :(
+            rel = s.createRelationship(node1, node2, relationship.label[0])
 
             # Cool! We can add this relationship to the nodes.
             node1.addRelationship(rel)
@@ -123,4 +125,3 @@ if __name__ == '__main__':
 
                 # TODO: how to not repeat all of ANTLR eval code?
                 pass
-

@@ -1,16 +1,20 @@
-from .storage.Node import Node
-from .storage.NodeFile import NodeFile
-from .storage.NodePage import NodePage
-from .storage.Property import Property
-from .storage.PropertyFile import PropertyFile
-from .storage.Relationship import Relationship
-from .storage.RelationshipFile import RelationshipFile
-from .storage.Label import Label
-from .storage.LabelFile import LabelFile
-from .storage.StorageManager import StorageManager
-from .storage.DummyNode import DummyNode
-from .storage.DummyRelationship import DummyRelationship
-from .queryeval.degreeQueries import breadthFirstSearch_
+from storage.Node import Node
+from storage.NodeFile import NodeFile
+from storage.NodePage import NodePage
+from storage.Property import Property
+from storage.PropertyFile import PropertyFile
+from storage.Relationship import Relationship
+from storage.RelationshipFile import RelationshipFile
+from storage.Label import Label
+from storage.LabelFile import LabelFile
+from storage.StorageManager import StorageManager
+
+#from storage.DummyNode import DummyNode
+#from storage.DummyRelationship import DummyRelationship
+
+from parse.SimpleTypes import DummyNode, DummyRelationship
+
+from queryeval.degreeQueries import breadthFirstSearch
 
 # initial set up
 nodeFile = NodeFile()
@@ -71,24 +75,24 @@ crookshanks.writeNode()
 
 # [Harry Potter (node 1), friendship (rel 1), Muggle Born (node 2), ownership (rel 2), cat (node 3)]
 dummyNode1 = DummyNode()
-dummyNode1.addLabel("Harry Potter")
+dummyNode1.labels.append("Harry Potter")
 
-dummyRel1 = DummyRelationship("friendship")
 
 dummyNode2 = DummyNode()
-dummyNode2.addLabel("Muggle Born")
-
-dummyRel2 = DummyRelationship("ownership")
+dummyNode2.labels.append("Muggle Born")
 
 dummyNode3 = DummyNode()
-dummyNode3.addLabel("cat")
+dummyNode3.labels.append("cat")
+
+dummyRel1 = DummyRelationship("friendship")
+dummyRel2 = DummyRelationship("ownership")
 
 nodes = [dummyNode1, dummyNode2, dummyNode3]
 rels = [dummyRel1, dummyRel2]
 
 print("STARTING BFS!!!")
 
-goodChains = breadthFirstSearch_(nodes, rels, nodeFile, relationshipFile, propFile, labelFile)
+goodChains = breadthFirstSearch(nodes, rels, nodeFile, relationshipFile, propFile, labelFile)
 
 print("after breadth first search")
 
