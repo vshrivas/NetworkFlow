@@ -3,9 +3,15 @@ import sys
 from .Label import Label
 
 class LabelFile:
+
+    """LabelFile class: representation of label file, which stores info about all
+    labels.
+    """
+
     numFiles = 0
 
     def __init__(self, createFile=True):
+        """Constructor for LabelFile, which creates the backing file if necessary. """
         LabelFile.numFiles += 1
         self.fileID = LabelFile.numFiles
 
@@ -21,25 +27,32 @@ class LabelFile:
         labelFile.close()
 
     def getFileName(self):
+        """Returns name of backing file."""
         return self.fileName
 
     def getNumLabels(self):
+        """Returns number of labels."""
         labelFile = open(self.fileName, 'r+b')
         numLabels = int.from_bytes(labelFile.read(Label.labelIDByteLen), byteorder=sys.byteorder, signed=True)
         return numLabels
 
-    # This method reads a given label based on labelID and returns a label object for it
     def readLabel(self, labelID):
+        """Reads label corresponding to label ID and returns a label object for label."""
         labelStore = open(self.fileName, 'rb')
+        # Starting offset for label 
         labelStartOffset = labelID * Label.storageSize + Label.labelIDByteLen
 
+        # Read label ID
         labelStore.seek(labelStartOffset + Label.LABEL_ID_OFFSET)
         # Requires Python >= 3.2 for the function int.from_bytes
         labelID = int.from_bytes(labelStore.read(3), byteorder=sys.byteorder, signed=True)
 
+        # Read label string
         labelStore.seek(labelStartOffset + Label.LABEL_OFFSET)
+        # Remove padding from label string
         labelString = labelStore.read(Label.MAX_LABEL_SIZE).decode('utf8').rstrip(' ')
 
+        # Read next label ID
         labelStore.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
         nextLabelID = int.from_bytes(labelStore.read(3), byteorder=sys.byteorder, signed=True)
 

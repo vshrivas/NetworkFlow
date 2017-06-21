@@ -4,10 +4,20 @@ from .Relationship import Relationship
 from .Label import Label
 import sys, struct
 
+DEBUG = False
+
 class NodeFile(object):
+
+    """NodeFile class: representation of node file, which stores info about all
+    nodes. A NodeFile object can read nodes from the backing node file and stores 
+    the current number of nodes.
+    """
+
+    # number of node files
     numFiles = 0
 
     def __init__(self):
+        """Constructor for NodeFile, which creates the backing file if necessary. """
         NodeFile.numFiles += 1
         self.fileID = NodeFile.numFiles
 
@@ -23,21 +33,28 @@ class NodeFile(object):
         nodeFile.close()
 
     def getFileName(self):
+        """Return file name of backing file."""
         return self.fileName
 
     def getNumNodes(self):
+        """Return number of nodes."""
         nodeFile = open(self.fileName, 'r+b')
         numNodes = int.from_bytes(nodeFile.read(Node.nodeIDByteLen), byteorder=sys.byteorder, signed=True)
         return numNodes
 
-    # This method reads a given node based on nodeID and returns a node object for it
     def readNode(self, nodeID, relationshipFile, propertyFile, labelFile):
+        """Read the node corresponding to a given node ID and return a node object for it.
+
+        Arguments:
+        nodeID: node ID of node to be returned
+        relationshipFile: RelationshipFile object to read relationships from
+        propertyFile: PropertyFile object to read properties from
+        labelFile: LabelFile object to read labels from
+        """
         node = Node(self, nodeID)
         nodeStore = open(self.fileName, 'rb')
         propertyStore = open(propertyFile.getFileName(), 'rb')
         nodeStartOffset = nodeID * Node.storageSize + Node.nodeIDByteLen
-
-        # TODO: refactor some of reading relationships and properties into those classes
 
         # find all relationships
         # read first rel ID
@@ -47,11 +64,14 @@ class NodeFile(object):
         relationshipStore = open(relationshipFile.getFileName(), 'rb')
         nextRelID = firstRelID
 
-        print("reading relationships")
+        if DEBUG:
+            print("reading relationships")
 
         # while there is a next relationship
         while nextRelID != -1:
-            print(nextRelID)
+            if DEBUG:
+                print(nextRelID)
+            # find starting offset of relationship in relationship file
             relationshipStartOffset = nextRelID * Relationship.storageSize + Relationship.relIDByteLen
 
             # find ID of first node in relationship
@@ -67,9 +87,10 @@ class NodeFile(object):
             relType = relationshipStore.read(Relationship.MAX_TYPE_SIZE).decode("utf-8")
             relType = relType.rstrip(' ')
 
-            print('Node 1 id: {0}'.format(node1ID))
-            print('Node 2 id: {0}'.format(node2ID))
-            print('Relationship type: {0}'.format(relType))
+            if DEBUG:
+                print('Node 1 id: {0}'.format(node1ID))
+                print('Node 2 id: {0}'.format(node2ID))
+                print('Relationship type: {0}'.format(relType))
 
             # create relationship and add to node
             rel = Relationship(node1ID, node2ID, relType, relationshipFile, nextRelID)
@@ -82,20 +103,25 @@ class NodeFile(object):
             firstRelPropID = int.from_bytes(relationshipStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
 
             nextRelPropID = firstRelPropID
-            print ('Reading in properties for rel {0}...'.format(nextRelID))
+            if DEBUG:
+                print ('Reading in properties for rel {0}...'.format(nextRelID))
+            # while there is a next property for the relationship
             while nextRelPropID != -1:
-                print()
-                print('for rel: {0}'.format(nextRelID))
-                print('first prop id: {0}'. format(firstRelPropID))
-                print(nextRelPropID)
+                if DEBUG:
+                    print()
+                    print('for rel: {0}'.format(nextRelID))
+                    print('first prop id: {0}'. format(firstRelPropID))
+                    print(nextRelPropID)
+                # find starting offset of property
                 propertyStartOffset = nextRelPropID * Property.storageSize + Property.propIDByteLen
 
                 # find ID
                 propertyStore.seek(propertyStartOffset)
-                print("seek to {0} for ID". format(propertyStartOffset))
+                if DEBUG:
+                    print("seek to {0} for ID". format(propertyStartOffset))
                 ID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
-                #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
-                print('id: {0}'.format(ID))
+                if DEBUG:
+                    print('id: {0}'.format(ID))
 
                 # find type
                 propertyStore.seek(propertyStartOffset + Property.TYPE_OFFSET)
@@ -106,17 +132,18 @@ class NodeFile(object):
 
                 # find key
                 propertyStore.seek(propertyStartOffset + Property.KEY_OFFSET)
-                print("seek to {0} for key". format(propertyStartOffset + Property.KEY_OFFSET))
+                if DEBUG:
+                    print("seek to {0} for key". format(propertyStartOffset + Property.KEY_OFFSET))
                 key = propertyStore.read(Property.MAX_KEY_SIZE).decode("utf-8")
+                # strip padding from key
                 key = key.rstrip(' ')
-                #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
-                print('key: {0}'.format(key))
+                if DEBUG:
+                    print('key: {0}'.format(key))
 
                 # find value
                 propertyStore.seek(propertyStartOffset + Property.VALUE_OFFSET)
-                print("seek to {0} for value". format(propertyStartOffset + Property.VALUE_OFFSET))
-                #value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
-                
+                if DEBUG:
+                    print("seek to {0} for value". format(propertyStartOffset + Property.VALUE_OFFSET))
                 # read value (way value is read depends on its type)
                 if type == Property.TYPE_STRING:
                     value = propertyStore.read(Property.MAX_VALUE_SIZE).decode("utf-8")
@@ -127,17 +154,20 @@ class NodeFile(object):
                     value = struct.unpack('d', propertyStore.read(8))[0]
                 else:
                     value = bool(int.from_bytes(propertyStore.read(1), sys.byteorder, signed=True))
-                print('value: {0}'.format(value))
+                if DEBUG:
+                    print('value: {0}'.format(value))
 
-                # create property and add to relationship
+                # initialize property object with key and value and add to relationship
                 prop = Property(key, value, propertyFile, nextRelPropID)
                 rel.addProperty(prop)
 
                 # find next property id
                 propertyStore.seek(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET)
-                print("seek to {0} for next property id". format(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET))
+                if DEBUG:
+                    print("seek to {0} for next property id". format(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET))
                 nextRelPropID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
-                print("next prop id is {0}".format(nextRelPropID))            
+                if DEBUG:
+                    print("next prop id is {0}".format(nextRelPropID))            
 
             # find next rel ID
             if nodeID == node1ID:
@@ -148,28 +178,31 @@ class NodeFile(object):
                 relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
                 nextRelID = int.from_bytes(relationshipStore.read(4), sys.byteorder, signed=True)
 
-        print("reading properties")
+        if DEBUG:
+            print("reading properties")
 
         # read first property ID
         nodeStore.seek(nodeStartOffset + Node.PROPERTY_ID_OFFSET)
         firstPropID = int.from_bytes(nodeStore.read(4), sys.byteorder, signed=True)
 
-        #propertyStore = open(propertyFile.getFileName(), 'rb')
         nextPropID = firstPropID
-
+        # while there is a next property
         while nextPropID != -1:
-            print()
-            print('for node: {0}'.format(nodeID))
-            print('first prop id: {0}'. format(firstPropID))
-            print(nextPropID)
+            if DEBUG:
+                print()
+                print('for node: {0}'.format(nodeID))
+                print('first prop id: {0}'. format(firstPropID))
+                print(nextPropID)
+            # find starting offset of property in property file
             propertyStartOffset = nextPropID * Property.storageSize + Property.propIDByteLen
 
             # find ID
             propertyStore.seek(propertyStartOffset)
-            print("seek to {0} for ID". format(propertyStartOffset))
+            if DEBUG:
+                print("seek to {0} for ID". format(propertyStartOffset))
             ID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
-            #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
-            print('id: {0}'.format(ID))
+            if DEBUG:
+                print('id: {0}'.format(ID))
 
             # find type
             propertyStore.seek(propertyStartOffset + Property.TYPE_OFFSET)
@@ -180,17 +213,17 @@ class NodeFile(object):
 
             # find key
             propertyStore.seek(propertyStartOffset + Property.KEY_OFFSET)
-            print("seek to {0} for key". format(propertyStartOffset + Property.KEY_OFFSET))
+            if DEBUG:
+                print("seek to {0} for key". format(propertyStartOffset + Property.KEY_OFFSET))
             key = propertyStore.read(Property.MAX_KEY_SIZE).decode("utf-8")
             key = key.rstrip(' ')
-            #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
-            print('key: {0}'.format(key))
+            if DEBUG:
+                print('key: {0}'.format(key))
 
             # find value
             propertyStore.seek(propertyStartOffset + Property.VALUE_OFFSET)
-            print("seek to {0} for value". format(propertyStartOffset + Property.VALUE_OFFSET))
-            #value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
-
+            if DEBUG:
+                print("seek to {0} for value". format(propertyStartOffset + Property.VALUE_OFFSET))
             # read value (way value is read depends on its type)
             if type == Property.TYPE_STRING:
                 value = propertyStore.read(Property.MAX_VALUE_SIZE).decode("utf-8")
@@ -201,8 +234,8 @@ class NodeFile(object):
                 value = struct.unpack('d', propertyStore.read(8))[0]
             else:
                 value = bool(int.from_bytes(propertyStore.read(1), sys.byteorder, signed=True))
-           
-            print('value: {0}'.format(value))
+            if DEBUG:
+                print('value: {0}'.format(value))
 
             # create property and add to node
             prop = Property(key, value, propertyFile, nextPropID)
@@ -210,10 +243,11 @@ class NodeFile(object):
 
             # find next property id
             propertyStore.seek(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET)
-            print("seek to {0} for next property id". format(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET))
+            if DEBUG:
+                print("seek to {0} for next property id". format(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET))
             nextPropID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
-            print("next prop id is {0}".format(nextPropID))
-
+            if DEBUG:
+                print("next prop id is {0}".format(nextPropID))
 
         # read first label id
         nodeStore.seek(nodeStartOffset + Node.LABEL_ID_OFFSET)
@@ -222,23 +256,29 @@ class NodeFile(object):
 
         labelStore = open(labelFile.getFileName(), 'rb')
 
-        print("reading labels")
+        if DEBUG:
+            print("reading labels")
 
+        # while there is a next label
         while nextLabelID != -1:
-            print('for node: {0}'.format(nodeID))
+            if DEBUG:
+                print('for node: {0}'.format(nodeID))
             # read label and add it to node
             labelStartOffset = nextLabelID * Label.storageSize + Label.labelIDByteLen
-            print('label start offset:{0}'.format(labelStartOffset))
+            if DEBUG:
+                print('label start offset:{0}'.format(labelStartOffset))
 
             labelStore.seek(labelStartOffset)
             label = labelFile.readLabel(nextLabelID)
             node.addLabel(label)
-            print(label.label)
+            if DEBUG:
+                print(label.label)
 
             # find next label id
             labelStore.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
             nextLabelID = int.from_bytes(labelStore.read(3), sys.byteorder, signed=True)
-            print (nextLabelID)
+            if DEBUG:
+                print (nextLabelID)
 
         return node
 
