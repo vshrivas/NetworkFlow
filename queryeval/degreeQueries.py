@@ -1,8 +1,8 @@
 from queue import Queue
-from ..storage.LabelIndex import LabelIndex
-from ..storage.DummyNode import DummyNode
-from ..storage.Node import Node
-from ..storage.DummyRelationship import DummyRelationship
+from storage.LabelIndex import LabelIndex
+from storage.DummyNode import DummyNode
+from storage.Node import Node
+from storage.DummyRelationship import DummyRelationship
 
 def itemPropertiesMatch(dummyItem, realItem):
     for dummyProp in dummyItem.getProperties():
