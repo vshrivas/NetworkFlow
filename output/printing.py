@@ -47,7 +47,7 @@ def printResult(result, nodes, rels, returns, lookingFor):
             propStrings = " {"
             for prop in props:
                 # Need to convert this property to a readable format
-                propStrings += prop.key.strip() + ": " + prop.value.strip() + ", "
+                propStrings += str(prop.key).strip() + ": " + str(prop.value).strip() + ", "
             propStrings += "}"
             if propStrings == " {{}}":
                 propStrings = ""
