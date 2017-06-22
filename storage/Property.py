@@ -162,13 +162,6 @@ class Property:
 
         # write value
         storeFile.seek(self.startOffset + Property.VALUE_OFFSET)
-
-
-        # value is not of max size
-        if(sys.getsizeof(self.value) != self.MAX_VALUE_SIZE):
-            # pad value up to max size
-            while len(self.value.encode('utf-8')) != self.MAX_VALUE_SIZE:
-                self.value += ' '
         
         if DEBUG:
             print("writing value {0} at {1}".format(self.value, self.startOffset + Property.VALUE_OFFSET))
