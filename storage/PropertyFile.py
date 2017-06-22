@@ -1,5 +1,5 @@
 from .Property import Property
-import sys
+import sys, os
 
 class PropertyFile:
 
@@ -17,10 +17,13 @@ class PropertyFile:
 
         # create property file if it doesn't already exist
         self.fileName = "PropertyFile{0}.store".format(self.fileID)
-        try:
-            propertyFile = open(self.fileName, 'r+b')
-        except FileNotFoundError:
-            propertyFile = open(self.fileName, 'wb')
+        self.dir = "datafiles"
+        self.filePath = os.path.join(self.dir, self.fileName)
+
+        if os.path.exists(os.path.join(self.dir, self.fileName)):
+            propertyFile = open(os.path.join(self.dir, self.fileName), 'r+b')
+        else:
+            propertyFile = open(os.path.join(self.dir, self.fileName), 'wb')
             # write number of properties to first 4 bytes of property file
             propertyFile.write((0).to_bytes(Property.propIDByteLen,
                 byteorder = sys.byteorder, signed=True))
@@ -30,8 +33,11 @@ class PropertyFile:
         """Return file name of backing file."""
         return self.fileName
 
+    def getFilePath(self):
+        return self.filePath
+
     def getNumProperties(self):
         """Return number of properties. """
-        propertyFile = open(self.fileName, 'r+b')
+        propertyFile = open(self.filePath, 'r+b')
         numProperties = int.from_bytes(propertyFile.read(Property.propIDByteLen), byteorder=sys.byteorder, signed=True)
         return numProperties

@@ -1,5 +1,5 @@
 from .Relationship import Relationship
-import sys
+import sys, os
 
 class RelationshipFile:
 
@@ -16,10 +16,13 @@ class RelationshipFile:
 
         # create relationship file if it doesn't already exist
         self.fileName = "RelationshipFile{0}.store".format(self.fileID)
-        try:
-            relFile = open(self.fileName, 'r+b')
-        except FileNotFoundError:
-            relFile = open(self.fileName, 'wb')
+        self.dir = "datafiles"
+        self.filePath = os.path.join(self.dir, self.fileName)
+        
+        if os.path.exists(os.path.join(self.dir, self.fileName)):
+            relFile = open(os.path.join(self.dir, self.fileName), 'r+b')
+        else:
+            relFile = open(os.path.join(self.dir, self.fileName), 'wb')
             # write number of relationships to first 4 bytes of relationship file
             relFile.write((0).to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
@@ -29,8 +32,11 @@ class RelationshipFile:
         """Return file name of backing file."""
         return self.fileName
 
+    def getFilePath(self):
+        return self.filePath
+
     def getNumRelationships(self):
         """Return number of relationships. """
-        relFile = open(self.fileName, 'r+b')
+        relFile = open(self.filePath, 'r+b')
         numRelationships = int.from_bytes(relFile.read(Relationship.relIDByteLen), byteorder=sys.byteorder, signed=True)
         return numRelationships

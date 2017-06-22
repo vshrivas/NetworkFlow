@@ -72,8 +72,8 @@ class Label:
         self.labelFile = labelFile
 
         # open label file
-        storeFileName = self.labelFile.getFileName()
-        storeFile = open(storeFileName, 'r+b')
+        storeFilePath = self.labelFile.getFilePath()
+        storeFile = open(storeFilePath, 'r+b')
 
         # write number of labels to first 3 bytes of label file
         storeFile.write((self.numLabels).to_bytes(Label.labelIDByteLen,
@@ -100,8 +100,8 @@ class Label:
     def writeLabel(self, nextLabelID):
         """Write label to disk using specified next label ID."""
         # open label file
-        storeFileName = self.labelFile.getFileName()
-        storeFile = open(storeFileName, 'r+b')
+        storeFilePath = self.labelFile.getFilePath()
+        storeFile = open(storeFilePath, 'r+b')
 
         # seek to location for label and write label ID
         storeFile.seek(self.startOffset)

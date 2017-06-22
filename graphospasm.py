@@ -9,12 +9,17 @@ import storage.RelationshipFile as rf
 from storage.Node import Node
 import queryeval.degreeQueries as qeval
 from output.printing import printResult
+import os
 
 if __name__ == '__main__':
     print("Welcome to graphospasm.")
     print("Version -112.")
     print("Enjoy your stay.")
     print("Type 'EXIT' to turn me off.")
+    
+    dataDirectory = "datafiles"
+    if not os.path.exists(dataDirectory):
+        os.mkdir(dataDirectory)
 
     n = nf.NodeFile()
     r = rf.RelationshipFile()

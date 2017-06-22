@@ -95,8 +95,8 @@ class Property:
         # If propertyFile object passed exists
         if self.propertyFile != "":
             # open property file
-            storeFileName = self.propertyFile.getFileName()
-            storeFile = open(storeFileName, 'r+b')
+            storeFilePath = self.propertyFile.getFilePath()
+            storeFile = open(storeFilePath, 'r+b')
 
             # write number of properties to first 4 bytes of property file
             storeFile.write((Property.numProperties).to_bytes(Property.propIDByteLen,
@@ -130,8 +130,8 @@ class Property:
             print() 
 
         # open property file
-        storeFileName = self.getPropertyFile().getFileName()
-        storeFile = open(storeFileName, 'r+b')
+        storeFilePath = self.getPropertyFile().getFilePath()
+        storeFile = open(storeFilePath, 'r+b')
 
         if DEBUG:
             print("writing property id {0} at {1}".format(self.propertyID, self.startOffset + Property.PROPERTY_ID_OFFSET))

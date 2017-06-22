@@ -84,8 +84,8 @@ class Node:
         self.nodeFile = nodeFile
 
         # open node file
-        storeFileName = self.nodeFile.getFileName()
-        storeFile = open(storeFileName, 'r+b')
+        storeFilePath = self.nodeFile.getFilePath()
+        storeFile = open(storeFilePath, 'r+b')
 
         # write number of nodes to first 3 bytes of node file
         storeFile.write((self.numNodes).to_bytes(Node.nodeIDByteLen,
@@ -201,8 +201,8 @@ class Node:
             print("writing node...")
 
         # open node file
-        storeFileName = self.nodeFile.getFileName()
-        storeFile = open(storeFileName, 'r+b')
+        storeFilePath = self.nodeFile.getFilePath()
+        storeFile = open(storeFilePath, 'r+b')
 
         if DEBUG:
             print("opened store file: {0}". format(storeFileName))

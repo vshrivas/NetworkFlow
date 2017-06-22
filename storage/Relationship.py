@@ -98,8 +98,8 @@ class Relationship:
 
         if relationshipFile != "":
             # open relationship file
-            storeFileName = self.relationshipFile.getFileName()
-            storeFile = open(storeFileName, 'r+b')
+            storeFilePath = self.relationshipFile.getFilePath()
+            storeFile = open(storeFilePath, 'r+b')
 
             # write number of relationships to first 4 bytes of relationship file
             storeFile.write((self.numRelationships).to_bytes(Relationship.relIDByteLen,
@@ -151,8 +151,8 @@ class Relationship:
         # open relationship file
         if DEBUG:
             print(self.relationshipFile)
-        storeFileName = self.relationshipFile.getFileName()
-        storeFile = open(storeFileName, 'r+b')
+        storeFilePath = self.relationshipFile.getFilePath()
+        storeFile = open(storeFilePath, 'r+b')
 
         # seek to location for relationship
         storeFile.seek(self.startOffset)

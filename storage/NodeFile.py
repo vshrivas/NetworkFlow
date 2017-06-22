@@ -2,7 +2,7 @@ from .Node import Node
 from .Property import Property
 from .Relationship import Relationship
 from .Label import Label
-import sys, struct
+import sys, struct, os
 
 DEBUG = False
 
@@ -23,10 +23,15 @@ class NodeFile(object):
 
         # create node file if it doesn't already exist
         self.fileName = "NodeFile{0}.store".format(self.fileID)
-        try:
-            nodeFile = open(self.fileName, 'r+b')
-        except FileNotFoundError:
-            nodeFile = open(self.fileName, 'wb')
+        self.dir = "datafiles"
+        self.filePath = os.path.join(self.dir, self.fileName)
+
+        if os.path.exists(os.path.join(self.dir, self.fileName)):
+            nodeFile = open(os.path.join(self.dir, self.fileName), 'r+b')
+            print("made new node file")
+        else:
+            nodeFile = open(os.path.join(self.dir, self.fileName), 'wb')
+            print("opened node file")
             # write number of nodes to first 3 bytes of node file
             nodeFile.write((0).to_bytes(Node.nodeIDByteLen,
                 byteorder = sys.byteorder, signed=True))
@@ -36,9 +41,12 @@ class NodeFile(object):
         """Return file name of backing file."""
         return self.fileName
 
+    def getFilePath(self):
+        return self.filePath
+
     def getNumNodes(self):
         """Return number of nodes."""
-        nodeFile = open(self.fileName, 'r+b')
+        nodeFile = open(self.filePath, 'r+b')
         numNodes = int.from_bytes(nodeFile.read(Node.nodeIDByteLen), byteorder=sys.byteorder, signed=True)
         return numNodes
 
@@ -52,8 +60,8 @@ class NodeFile(object):
         labelFile: LabelFile object to read labels from
         """
         node = Node(self, nodeID)
-        nodeStore = open(self.fileName, 'rb')
-        propertyStore = open(propertyFile.getFileName(), 'rb')
+        nodeStore = open(self.filePath, 'rb')
+        propertyStore = open(propertyFile.getFilePath(), 'rb')
         nodeStartOffset = nodeID * Node.storageSize + Node.nodeIDByteLen
 
         # find all relationships
@@ -61,7 +69,7 @@ class NodeFile(object):
         nodeStore.seek(nodeStartOffset + Node.REL_ID_OFFSET)
         firstRelID = int.from_bytes(nodeStore.read(4), byteorder=sys.byteorder, signed=True)
 
-        relationshipStore = open(relationshipFile.getFileName(), 'rb')
+        relationshipStore = open(relationshipFile.getFilePath(), 'rb')
         nextRelID = firstRelID
 
         if DEBUG:
@@ -254,7 +262,7 @@ class NodeFile(object):
         firstLabelID = int.from_bytes(nodeStore.read(3), sys.byteorder, signed=True)
         nextLabelID = firstLabelID
 
-        labelStore = open(labelFile.getFileName(), 'rb')
+        labelStore = open(labelFile.getFilePath(), 'rb')
 
         if DEBUG:
             print("reading labels")

@@ -1,4 +1,4 @@
-import sys
+import sys, os
 
 from .Label import Label
 
@@ -17,10 +17,13 @@ class LabelFile:
 
 		# create relationship file if it doesn't already exist
         self.fileName = "LabelFile{0}.store".format(self.fileID)
-        try:
-            labelFile = open(self.fileName, 'r+b')
-        except FileNotFoundError:
-            labelFile = open(self.fileName, 'wb')
+        self.dir = "datafiles"
+        self.filePath = os.path.join(self.dir, self.fileName)
+        
+        if os.path.exists(os.path.join(self.dir, self.fileName)):
+            labelFile = open(os.path.join(self.dir, self.fileName), 'r+b')
+        else:
+            labelFile = open(os.path.join(self.dir, self.fileName), 'wb')
             # write number of labels to first 3 bytes of label file
             labelFile.write((0).to_bytes(Label.labelIDByteLen,
                 byteorder = sys.byteorder, signed=True))
@@ -32,13 +35,16 @@ class LabelFile:
 
     def getNumLabels(self):
         """Returns number of labels."""
-        labelFile = open(self.fileName, 'r+b')
+        labelFile = open(self.filePath, 'r+b')
         numLabels = int.from_bytes(labelFile.read(Label.labelIDByteLen), byteorder=sys.byteorder, signed=True)
         return numLabels
 
+    def getFilePath(self):
+        return self.filePath
+
     def readLabel(self, labelID):
         """Reads label corresponding to label ID and returns a label object for label."""
-        labelStore = open(self.fileName, 'rb')
+        labelStore = open(self.filePath, 'rb')
         # Starting offset for label 
         labelStartOffset = labelID * Label.storageSize + Label.labelIDByteLen
 
