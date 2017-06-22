@@ -5,7 +5,7 @@ Bytes 101-103: number of nodes
 Bytes 104-109: average number of connections (double)
 Bytes 110-...: IDs of nodes in index (3 bytes each)
 """
-import sys
+import sys, os
 
 class LabelIndex:
     # offsets from start of index
@@ -21,15 +21,17 @@ class LabelIndex:
         self.labelStr = labelStr.strip()
         # create index file if it doesn't already exist
         self.fileName = "{0}.labelindex".format(self.labelStr)
+        self.dir = "datafiles"
+        self.filePath = os.path.join(self.dir, self.fileName)
 
         # open index file
-        try:
-            indexFile = open(self.fileName, 'r+b')
+        if os.path.exists(self.filePath):
+            indexFile = open(self.filePath, 'r+b')
             print("opened label index for {0}".format(self.labelStr))
 
-        except FileNotFoundError:
+        else:
             print("created label index for {0}".format(self.labelStr))
-            indexFile = open(self.fileName, 'wb')
+            indexFile = open(self.filePath, 'wb')
             # label string
             indexFile.write(bytearray(self.labelStr, "utf8"))
             # write number of nodes to next 3 bytes of index file
@@ -43,7 +45,7 @@ class LabelIndex:
     def addNode(self, nodeID):
         # increment number of nodes
         print("adding node to index")
-        indexFile = open(self.fileName, 'r+b') # open node index
+        indexFile = open(self.filePath, 'r+b') # open node index
         indexFile.seek(self.NUM_NODES_OFFSET)
         numNodes = int.from_bytes(indexFile.read(self.nodeIDByteLen), sys.byteorder, signed=True)
         print("{0} nodes in index rn".format(numNodes))
@@ -74,14 +76,14 @@ class LabelIndex:
         print("#####writing {0} ID to index#####".format(nodeIDWritten))
 
     def getNumConnections(self):
-        indexFile = open(self.fileName, 'r+b') # open node index
+        indexFile = open(self.filePath, 'r+b') # open node index
         avgNumConnections = int.from_bytes(indexFile.read(self.numConnectionsByteLen), sys.byteorder, signed=True)
         return avgNumConnections
 
     def getItems(self):
         nodeIDs = []
 
-        indexFile = open(self.fileName, 'r+b') # open node index
+        indexFile = open(self.filePath, 'r+b') # open node index
 
         indexFile.seek(self.NUM_NODES_OFFSET)
         numNodes = int.from_bytes(indexFile.read(self.nodeIDByteLen), sys.byteorder, signed=True)
