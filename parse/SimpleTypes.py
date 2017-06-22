@@ -1,7 +1,6 @@
 class BasicNode:
-    def __init__(self, varName=""):
-        self.varName = varName
-
+    def __init__(self):
+        self.varname = None
         self.relationships = []
         self.labels = []
         self.properties = {}

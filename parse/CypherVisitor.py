@@ -16,7 +16,11 @@ def dict_from_mapLiteral(visitor, ctx:CypherParser.MapLiteralContext):
 # A helper which creates a SimpleNode, populating its attributes.
 # If the simple flag is false, make a DummyNode instead.
 def nodeInfoExtract(visitor, node, simple):
-    node_variable = (node.variable().symbolicName().getText())
+    # Get the variable associated with this if it exists
+    variable_exists = False
+    if node.variable() is not None:
+        variable_exists = True
+        node_variable = (node.variable().symbolicName().getText())
 
     # Extract any properties we must give this new node.
     if node.properties() is not None:
@@ -33,11 +37,13 @@ def nodeInfoExtract(visitor, node, simple):
 
     # Give this node back to the parent, who will add it to the list.
     if simple:
-        node_to_add = SimpleNode(node_variable)
+        node_to_add = SimpleNode()
     else: # dummy
-        node_to_add = DummyNode(node_variable)
+        node_to_add = DummyNode()
     node_to_add.properties = properties
     node_to_add.labels = labels
+    if variable_exists:
+        node_to_add.varname = node_variable
     return node_to_add
 
 # A helper which creates a SimpleRelationship, populating its attributes.
@@ -148,14 +154,14 @@ class CypherVisitor(ParseTreeVisitor):
         # First get the first node. Always exists.
         curr_node = nodeInfoExtract(self, parts.nodePattern(), True)
         # Aside: update the variable name --> BasicNode association.
-        self.var_name_to_basic[curr_node.varName] = curr_node
+        self.var_name_to_basic[curr_node.varname] = curr_node
 
         # Each part in the element chain is associated with a
         # relationship and a node to create.
         for part in parts.patternElementChain():
             (rel, rel_node) = patternElementExtract(self, part, curr_node, True)
             # Aside: update the variable name --> BasicRelationship association.
-            self.var_name_to_basic[rel_node.varName] = rel_node
+            self.var_name_to_basic[rel_node.varname] = rel_node
 
             # Now that curr_node has updated to include the relationship, add
             # it to the list of nodes to create. Also add the relationship.
@@ -179,14 +185,14 @@ class CypherVisitor(ParseTreeVisitor):
         # First get the first node. Always exists.
         curr_node = nodeInfoExtract(self, parts.nodePattern(), False)
         # Aside: update the variable name --> BasicNode association.
-        self.var_name_to_basic[curr_node.varName] = curr_node
+        self.var_name_to_basic[curr_node.varname] = curr_node
 
         # Each part in the element chain is associated with a
         # relationship and a node to create.
         for part in parts.patternElementChain():
             (rel, rel_node) = patternElementExtract(self, part, curr_node, False)
             # Aside: update the variable name --> BasicRelationship association.
-            self.var_name_to_basic[rel_node.varName] = rel_node
+            self.var_name_to_basic[rel_node.varname] = rel_node
 
             # Now that curr_node has updated to include the relationship, add
             # it to the list of nodes to create. Also add the relationship.
@@ -211,14 +217,14 @@ class CypherVisitor(ParseTreeVisitor):
             # Should we name the column something?
             if item.variable():
                 # Yes: this is an AS statement. (e.g. RETURN n AS name)
-                colName = item.variable().symbolicName()
+                colName = item.variable().symbolicName().getText()
             else:
                 # No: the column header will just be the expression itself.
                 colName = ""
 
             # The first element in this 2-tuple is the printed column name,
             # and the second is the expression to evaluate.
-            self.to_return.append((colName, item.getText()))
+            self.to_return.append((colName, item.getText().split()[0]))
 
 
         return self.visitChildren(ctx)

@@ -8,7 +8,7 @@ import storage.PropertyFile as pf
 import storage.RelationshipFile as rf
 from storage.Node import Node
 import queryeval.degreeQueries as qeval
-from output.printing import printResult
+from output.printing import printAllResults
 
 import os
 from subprocess import run
@@ -73,13 +73,13 @@ if __name__ == '__main__':
         simpleNodeToNode = {}
         for simpleNode in query_dict["create_nodes"]:
             node = s.createNode()
-            print(" * Creating node %s; has ID %d" % (simpleNode.varName, node.nodeID))
+            print(" * Creating node %s; has ID %d" % (simpleNode.varname, node.nodeID))
 
             for label in simpleNode.labels:
-                print(" * Adding label %s to node %s" % (label, simpleNode.varName))
+                print(" * Adding label %s to node %s" % (label, simpleNode.varname))
                 node.addLabel(s.createLabel(label))
             for prop_key, prop_val in simpleNode.properties.items():
-                print(" * Adding property {%s: %s} to node %s" % (prop_key, prop_val, simpleNode.varName))
+                print(" * Adding property {%s: %s} to node %s" % (prop_key, prop_val, simpleNode.varname))
                 node.addProperty(s.createProperty(prop_key, prop_val))
 
             # This node isn't done yet. We still need to add its relationships!
@@ -91,8 +91,8 @@ if __name__ == '__main__':
         nodesToRelationships = {}
         for relationship in query_dict["create_relationships"]:
             print(" * Creating relationship %s" % relationship.label)
-            print("   * It connects nodes %s and %s" % (relationship.node1.varName,
-                                                    relationship.node2.varName))
+            print("   * It connects nodes %s and %s" % (relationship.node1.varname,
+                                                    relationship.node2.varname))
             node1 = simpleNodeToNode[relationship.node1]
             node2 = simpleNodeToNode[relationship.node2]
             # TODO: We're only able to give one label to each relationship at
@@ -112,6 +112,7 @@ if __name__ == '__main__':
         # However, there is still more to do. Perhaps we need to match, and then
         # return, some patterns in the database. This will require some query
         # evaluation.
+        results = None
         if query_dict["match_nodes"]:
             # Perform a breadth-first-search on the database with the given
             # patterns to evaluate.
@@ -123,30 +124,14 @@ if __name__ == '__main__':
             results = qeval.breadthFirstSearch(query_dict["match_nodes"],
                 query_dict["match_relationships"], n, r, p, l)
 
-            # Unfortunately, these results don't necessarily match with what
+        if query_dict["return_exprs"]:
+            # Unfortunately, those results don't necessarily match with what
             # we need to print to the screen, which is something dictated
             # by RETURN statements. RETURN statements can involve variable
             # names, as well as completely-unrelated expressions (like 1 + 1),
             # as well as column names to give these things. We need to breathe
             # meaning into our "results".
-
-            # If there was a MATCH statement, this means that each column will
-            # be computed once per above result. That is, if we were asked to
-            # "RETURN n, m.name, p" after "MATCH"ing those things, then we shall
-            # print out each result represented via those three columns.
-            for result in results:
-                print(" * Here comes a result: ")
-                printResult(result)
-
-                for expr in query_dict["return_exprs"]:
-                    # TODO: how to not repeat all of ANTLR eval code?
-                    pass
-        else:
-            # There was no MATCH statement, but there can still be something to
-            # RETURN!
-            for expr in query_dict["return_exprs"]:
-                # These are (hopefully, unless the user is trying to screw with
-                # us) literals that we can evaluate with no other information.
-
-                # TODO: how to not repeat all of ANTLR eval code?
-                pass
+            #
+            # This is done in printing.
+            printAllResults(results, query_dict["match_nodes"],
+                query_dict["match_relationships"],  query_dict["return_exprs"])
