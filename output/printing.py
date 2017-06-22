@@ -58,6 +58,7 @@ def printResult(result, nodes, rels, returns, lookingFor):
             if isinstance(asp, r.Relationship):
                 relType = asp.getRelType()
                 toPrint = "-[{}:{}{}]->".format(objID, relType, propStrings)
+        print('|', end='')
         print("{:<29}".format(toPrint), end='|')
     print('')
 
@@ -81,12 +82,17 @@ def printAllResults(results, nodes, rels, returns, matched):
 
     # Now we'll go through the rest of the things we want.
     # Print the first line first:
+    print('|', end='')
     for i in range(len(lookingFor)):
         print('-'*29, end='|')
     print('')
+
+    print('|', end='')
     for i in range(len(lookingFor)):
         print('{:<29}'.format(firstLine[i]), end='|')
     print('')
+
+    print('|', end='')
     for i in range(len(lookingFor)):
         print('-'*29, end='|')
     print('')
@@ -101,6 +107,7 @@ def printAllResults(results, nodes, rels, returns, matched):
     else:
         printResult(None, nodes, rels, returns, lookingFor)
 
+    print('|', end='')
     for i in range(len(lookingFor)):
         print('-'*29, end='|')
     print('')
