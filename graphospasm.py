@@ -7,6 +7,9 @@ import storage.NodeFile as nf
 import storage.PropertyFile as pf
 import storage.RelationshipFile as rf
 from storage.Node import Node
+from storage.Label import Label
+from storage.Relationship import Relationship
+from storage.Property import Property
 import queryeval.degreeQueries as qeval
 from output.printing import printAllResults
 
@@ -44,6 +47,10 @@ if __name__ == '__main__':
             if answer.lower() != 'n':
                 run('rm datafiles/*', shell=True)
                 print('Data cleaned out.')
+                nf.NodeFile.numFiles = 0
+                rf.RelationshipFile.numFiles = 0
+                pf.PropertyFile.numFiles = 0
+                lf.LabelFile.numFiles = 0
                 n = nf.NodeFile()
                 r = rf.RelationshipFile()
                 p = pf.PropertyFile()

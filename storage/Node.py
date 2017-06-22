@@ -112,12 +112,11 @@ class Node:
         # add label to labelID
         self.labels.append(nodeLabel)
 
-        # if this is a new node
-        # add nodeID to label index
+        # add nodeID to label index if node is not already in label index
         # open label index
-        if self.nodeID == Node.numNodes - 1:
-            labelIndex = LabelIndex(nodeLabel.getLabelStr())
-            # add node to index
+        labelIndex = LabelIndex(nodeLabel.getLabelStr())
+        # add node to index
+        if self.nodeID not in labelIndex.getItems():
             labelIndex.addNode(self.nodeID)
         
 
