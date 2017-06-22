@@ -20,10 +20,10 @@ class LabelFile:
         self.dir = "datafiles"
         self.filePath = os.path.join(self.dir, self.fileName)
         
-        if os.path.exists(os.path.join(self.dir, self.fileName)):
-            labelFile = open(os.path.join(self.dir, self.fileName), 'r+b')
+        if os.path.exists(self.filePath):
+            labelFile = open(self.filePath, 'r+b')
         else:
-            labelFile = open(os.path.join(self.dir, self.fileName), 'wb')
+            labelFile = open(self.filePath, 'wb')
             # write number of labels to first 3 bytes of label file
             labelFile.write((0).to_bytes(Label.labelIDByteLen,
                 byteorder = sys.byteorder, signed=True))

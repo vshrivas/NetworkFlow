@@ -19,10 +19,10 @@ class RelationshipFile:
         self.dir = "datafiles"
         self.filePath = os.path.join(self.dir, self.fileName)
         
-        if os.path.exists(os.path.join(self.dir, self.fileName)):
-            relFile = open(os.path.join(self.dir, self.fileName), 'r+b')
+        if os.path.exists(self.filePath):
+            relFile = open(self.filePath, 'r+b')
         else:
-            relFile = open(os.path.join(self.dir, self.fileName), 'wb')
+            relFile = open(self.filePath, 'wb')
             # write number of relationships to first 4 bytes of relationship file
             relFile.write((0).to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))

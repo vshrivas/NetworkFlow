@@ -26,12 +26,10 @@ class NodeFile(object):
         self.dir = "datafiles"
         self.filePath = os.path.join(self.dir, self.fileName)
 
-        if os.path.exists(os.path.join(self.dir, self.fileName)):
-            nodeFile = open(os.path.join(self.dir, self.fileName), 'r+b')
-            print("made new node file")
+        if os.path.exists(self.filePath):
+            nodeFile = open(self.filePath, 'r+b')
         else:
-            nodeFile = open(os.path.join(self.dir, self.fileName), 'wb')
-            print("opened node file")
+            nodeFile = open(self.filePath, 'wb')
             # write number of nodes to first 3 bytes of node file
             nodeFile.write((0).to_bytes(Node.nodeIDByteLen,
                 byteorder = sys.byteorder, signed=True))

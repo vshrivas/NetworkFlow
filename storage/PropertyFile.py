@@ -20,10 +20,10 @@ class PropertyFile:
         self.dir = "datafiles"
         self.filePath = os.path.join(self.dir, self.fileName)
 
-        if os.path.exists(os.path.join(self.dir, self.fileName)):
-            propertyFile = open(os.path.join(self.dir, self.fileName), 'r+b')
+        if os.path.exists(self.filePath):
+            propertyFile = open(self.filePath, 'r+b')
         else:
-            propertyFile = open(os.path.join(self.dir, self.fileName), 'wb')
+            propertyFile = open(self.filePath, 'wb')
             # write number of properties to first 4 bytes of property file
             propertyFile.write((0).to_bytes(Property.propIDByteLen,
                 byteorder = sys.byteorder, signed=True))

@@ -7,7 +7,7 @@ from .PropertyFile import PropertyFile
 from .Relationship import Relationship
 from .RelationshipFile import RelationshipFile
 
-import pickle
+import pickle, os
 
 # Storage manager that manages where nodes, relationships, properties, and labels
 # are allocated in their respective files.
@@ -29,46 +29,55 @@ class StorageManager:
         # all lists of free spaces start with space at ID 0 being free
         # list of locations in node file with free space for nodes (specified by nodeIDs)
         # try to load lists from disk, if no lists currently exist, create new ones
-        self.nodeFreeSpaceFileName = "NodeFreeSpaceFile.store"
-        try:
-            nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'rb')
-            self.node_free_space = pickle.load(nodeSpaceFile)
+        self.dir = "datafiles"
 
-        except FileNotFoundError:
-            nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'wb')
+        self.nodeFreeSpaceFileName = "NodeFreeSpaceFile.store"
+        self.nodeFilePath = os.path.join(self.dir, self.nodeFreeSpaceFileName)
+
+        if os.path.exists(self.nodeFilePath):
+            nodeSpaceFile = open(self.nodeFilePath, 'rb')
+            self.node_free_space = pickle.load(nodeSpaceFile)
+        else:
+            nodeSpaceFile = open(self.nodeFilePath, 'wb')
             self.node_free_space = [0]
             pickle.dump(self.node_free_space, nodeSpaceFile)
             
 
         self.relFreeSpaceFileName = "RelationshipFreeSpaceFile.store"
-        try:
-            relSpaceFile = open(self.relFreeSpaceFileName, 'rb')
+        self.relFilePath = os.path.join(self.dir, self.relFreeSpaceFileName)
+
+        if os.path.exists(self.relFilePath):
+            relSpaceFile = open(self.relFilePath, 'rb')
             self.rel_free_space = pickle.load(relSpaceFile)
 
-        except FileNotFoundError:
-            relSpaceFile = open(self.relFreeSpaceFileName, 'wb')
+        else:
+            relSpaceFile = open(self.relFilePath, 'wb')
             self.rel_free_space = [0]
             pickle.dump(self.rel_free_space, relSpaceFile)
 
 
         self.propFreeSpaceFileName = "PropFreeSpaceFile.store"
-        try:
-            propSpaceFile = open(self.propFreeSpaceFileName, 'rb')
+        self.propFilePath = os.path.join(self.dir, self.propFreeSpaceFileName)
+
+        if os.path.exists(self.propFilePath):
+            propSpaceFile = open(self.propFilePath, 'rb')
             self.prop_free_space = pickle.load(propSpaceFile)
 
-        except FileNotFoundError:
-            propSpaceFile = open(self.propFreeSpaceFileName, 'wb')
+        else:
+            propSpaceFile = open(self.propFilePath, 'wb')
             self.prop_free_space = [0]
             pickle.dump(self.prop_free_space, propSpaceFile)
 
 
         self.labelFreeSpaceFileName = "LabelFreeSpaceFile.store"
-        try:
-            labelSpaceFile = open(self.labelFreeSpaceFileName, 'rb')
+        self.labelFilePath = os.path.join(self.dir, self.labelFreeSpaceFileName)
+
+        if os.path.exists(self.labelFilePath):
+            labelSpaceFile = open(self.labelFilePath, 'rb')
             self.label_free_space = pickle.load(labelSpaceFile)
 
-        except FileNotFoundError:
-            labelSpaceFile = open(self.labelFreeSpaceFileName, 'wb')
+        else:
+            labelSpaceFile = open(self.labelFilePath, 'wb')
             self.label_free_space = [0]
             pickle.dump(self.label_free_space, labelSpaceFile)
 
@@ -87,7 +96,7 @@ class StorageManager:
             self.node_free_space.pop()
 
             # write changes to list
-            nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'wb')
+            nodeSpaceFile = open(self.nodeFilePath, 'wb')
 
             pickle.dump(self.node_free_space, nodeSpaceFile)
             nodeSpaceFile.close()
@@ -112,7 +121,7 @@ class StorageManager:
             self.rel_free_space.pop()
 
             # write changes to list
-            relSpaceFile = open(self.relFreeSpaceFileName, 'wb')
+            relSpaceFile = open(self.relFilePath, 'wb')
             pickle.dump(self.rel_free_space, relSpaceFile)
             relSpaceFile.close()
 
@@ -134,7 +143,7 @@ class StorageManager:
             self.prop_free_space.pop()
 
             # write changes to list
-            propSpaceFile = open(self.propFreeSpaceFileName, 'wb')
+            propSpaceFile = open(self.propFilePath, 'wb')
             pickle.dump(self.prop_free_space, propSpaceFile)
             propSpaceFile.close()
 
@@ -156,7 +165,7 @@ class StorageManager:
             self.label_free_space.pop()
 
             # write changes to list
-            labelSpaceFile = open(self.labelFreeSpaceFileName, 'wb')
+            labelSpaceFile = open(self.labelFilePath, 'wb')
             pickle.dump(self.label_free_space, labelSpaceFile)
             labelSpaceFile.close()
 
@@ -187,7 +196,7 @@ class StorageManager:
             self.rel_free_space.append(rel.getID())
 
         # write changes to list
-        relSpaceFile = open(self.relFreeSpaceFileName, 'wb')
+        relSpaceFile = open(self.relFilePath, 'wb')
         pickle.dump(self.rel_free_space, relSpaceFile)
         relSpaceFile.close()
 
@@ -195,7 +204,7 @@ class StorageManager:
             self.prop_free_space.append(prop.getID())
 
         # write changes to list
-        propSpaceFile = open(self.propFreeSpaceFileName, 'wb')
+        propSpaceFile = open(self.propFilePath, 'wb')
         pickle.dump(self.prop_free_space, propSpaceFile)
         propSpaceFile.close()
 
@@ -203,7 +212,7 @@ class StorageManager:
             self.label_free_space.append(label.getLabelID())
 
         # write changes to list
-        labelSpaceFile = open(self.labelFreeSpaceFileName, 'wb')
+        labelSpaceFile = open(self.labelFilePath, 'wb')
         pickle.dump(self.label_free_space, labelSpaceFile)
         labelSpaceFile.close()
 
