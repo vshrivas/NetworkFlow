@@ -7,8 +7,8 @@ import storage.NodeFile as nf
 import storage.PropertyFile as pf
 import storage.RelationshipFile as rf
 from storage.Node import Node
-
 import queryeval.degreeQueries as qeval
+from output.printing import printResult
 
 if __name__ == '__main__':
     print("Welcome to graphospasm.")
@@ -113,6 +113,9 @@ if __name__ == '__main__':
             # "RETURN n, m.name, p" after "MATCH"ing those things, then we shall
             # print out each result represented via those three columns.
             for result in results:
+                print(" * Here comes a result: ")
+                printResult(result)
+
                 for expr in query_dict["return_exprs"]:
                     # TODO: how to not repeat all of ANTLR eval code?
                     pass

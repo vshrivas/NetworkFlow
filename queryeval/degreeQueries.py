@@ -204,7 +204,9 @@ def breadthFirstSearch(nodes, relationships, nodeFile, relationshipFile,
                 for rel in rels:
                     print("found rel")
                     # We only want relationships that match all specifications.
-                    if rel.getRelType().strip() == relationshipGoal.label.strip():
+                    # NOTE: the [0] is here because relationships only support
+                    # one label at the moment :(
+                    if rel.getRelType() == relationshipGoal.label[0]:
                         print("types matched")
                         if itemPropertiesMatch(relationshipGoal, rel):
                             print("properties matched")
