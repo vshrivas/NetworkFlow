@@ -84,8 +84,8 @@ dummyNode2.labels.append("Muggle Born")
 dummyNode3 = DummyNode()
 dummyNode3.labels.append("cat")
 
-dummyRel1 = DummyRelationship("friendship")
-dummyRel2 = DummyRelationship("ownership")
+dummyRel1 = DummyRelationship(["friendship"])
+dummyRel2 = DummyRelationship(["ownership"])
 
 nodes = [dummyNode1, dummyNode2, dummyNode3]
 rels = [dummyRel1, dummyRel2]

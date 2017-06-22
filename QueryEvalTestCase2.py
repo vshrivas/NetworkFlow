@@ -1,20 +1,20 @@
-from .storage.Node import Node
-from .storage.NodeFile import NodeFile
-from .storage.NodePage import NodePage
-from .storage.Property import Property
-from .storage.PropertyFile import PropertyFile
-from .storage.Relationship import Relationship
-from .storage.RelationshipFile import RelationshipFile
-from .storage.Label import Label
-from .storage.LabelFile import LabelFile
-from .storage.StorageManager import StorageManager
+from storage.Node import Node
+from storage.NodeFile import NodeFile
+from storage.NodePage import NodePage
+from storage.Property import Property
+from storage.PropertyFile import PropertyFile
+from storage.Relationship import Relationship
+from storage.RelationshipFile import RelationshipFile
+from storage.Label import Label
+from storage.LabelFile import LabelFile
+from storage.StorageManager import StorageManager
 
 #from storage.DummyNode import DummyNode
 #from storage.DummyRelationship import DummyRelationship
 
 from parse.SimpleTypes import DummyNode, DummyRelationship
 
-from .queryeval.degreeQueries import breadthFirstSearch
+from queryeval.degreeQueries import breadthFirstSearch
 
 # initial set up
 nodeFile = NodeFile()
@@ -105,20 +105,22 @@ crookshanks2.writeNode()
 # [Blue cats (node 1), ownership (rel 1), Muggle Born (node 2), friendship (rel 2), (node 3)]
 # Last nodes of chains should be nodes with names Harry Potter and Ronald Weasley
 dummyNode1 = DummyNode()
-dummyNode1.addLabel("cat")
-dummyNode1.addProperty(("Color", "Blue"))
+dummyNode1.labels.append("cat")
+dummyNode1.properties["Color"] = "Blue"
 
-dummyRel1 = DummyRelationship("ownership")
+dummyRel1 = DummyRelationship(["ownership"])
 
 dummyNode2 = DummyNode()
-dummyNode2.addLabel("Muggle Born")
+dummyNode2.labels.append("Muggle Born")
 
-dummyRel2 = DummyRelationship("friendship")
+dummyRel2 = DummyRelationship(["friendship"])
 
 dummyNode3 = DummyNode()
 
 nodes = [dummyNode1, dummyNode2, dummyNode3]
 rels = [dummyRel1, dummyRel2]
+
+print("STARTING BFS!!!")
 
 goodChains = breadthFirstSearch(nodes, rels, nodeFile, relationshipFile, propFile, labelFile)
 
@@ -128,7 +130,15 @@ for chain in goodChains:
     print("got chain")
     #print(friend.getID())
     #print(len(friend.properties))
-    for element in chain:
-        for prop in element[0].properties:
-            print("key: {0}".format(prop.key))
-            print("value: {0}".format(prop.value))
+    for tup in chain:
+        element = tup[0]
+        if isinstance(element, Node):
+            print("NODE:")
+            for prop in element.properties:
+                print("key: {0}".format(prop.key))
+                print("value: {0}".format(prop.value))
+
+        else:
+            print("REL:")
+            print(element.getRelType())
+
