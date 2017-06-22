@@ -120,6 +120,7 @@ if __name__ == '__main__':
         # return, some patterns in the database. This will require some query
         # evaluation.
         results = None
+        tried_to_match = False
         if query_dict["match_nodes"]:
             # Perform a breadth-first-search on the database with the given
             # patterns to evaluate.
@@ -130,6 +131,7 @@ if __name__ == '__main__':
             # complicated, likely a loop.
             results = qeval.breadthFirstSearch(query_dict["match_nodes"],
                 query_dict["match_relationships"], n, r, p, l)
+            tried_to_match = True
 
         if query_dict["return_exprs"]:
             # Unfortunately, those results don't necessarily match with what
@@ -141,4 +143,5 @@ if __name__ == '__main__':
             #
             # This is done in printing.
             printAllResults(results, query_dict["match_nodes"],
-                query_dict["match_relationships"],  query_dict["return_exprs"])
+                query_dict["match_relationships"],  query_dict["return_exprs"],
+                tried_to_match)
