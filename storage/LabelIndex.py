@@ -7,6 +7,7 @@ Bytes 110-...: IDs of nodes in index (3 bytes each)
 """
 import sys, os
 
+# label indexes have node IDs of nodes which have the given label
 class LabelIndex:
     # offsets from start of index
     LABEL_STRING_OFFSET = 0
@@ -42,6 +43,7 @@ class LabelIndex:
                 byteorder = sys.byteorder, signed=True))
         indexFile.close()
 
+    # this function adds a node id to the given index
     def addNode(self, nodeID):
         # increment number of nodes
         print("adding node to index")
@@ -73,13 +75,15 @@ class LabelIndex:
             byteorder = sys.byteorder, signed=True))
         indexFile.seek(self.NODE_IDS_OFFSET + self.nodeIDByteLen * numNodes)
         nodeIDWritten = int.from_bytes(indexFile.read(self.nodeIDByteLen), sys.byteorder, signed=True)
-        print("#####writing {0} ID to index#####".format(nodeIDWritten))
+        print("writing {0} ID to index".format(nodeIDWritten))
 
+    # this function finds the number of average connections (relationships) the node has
     def getNumConnections(self):
         indexFile = open(self.filePath, 'r+b') # open node index
         avgNumConnections = int.from_bytes(indexFile.read(self.numConnectionsByteLen), sys.byteorder, signed=True)
         return avgNumConnections
 
+    # this function gets a list of the ids of all nodes in this index
     def getItems(self):
         nodeIDs = []
 
@@ -90,6 +94,7 @@ class LabelIndex:
 
         print("{0} items in index".format(numNodes))
 
+        # get ids
         for i in range(0, numNodes):
             startIndex = self.NODE_IDS_OFFSET + i * self.nodeIDByteLen
             indexFile.seek(startIndex)
