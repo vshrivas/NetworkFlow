@@ -1,14 +1,14 @@
-from Node import Node
-from NodeFile import NodeFile
+from storage.Node import Node
+from storage.NodeFile import NodeFile
 
-from Property import Property
-from PropertyFile import PropertyFile
+from storage.Property import Property
+from storage.PropertyFile import PropertyFile
 
-from Label import Label
-from LabelFile import LabelFile
+from storage.Label import Label
+from storage.LabelFile import LabelFile
 
-from Relationship import Relationship
-from RelationshipFile import RelationshipFile
+from storage.Relationship import Relationship
+from storage.RelationshipFile import RelationshipFile
 
 
 def testCase():

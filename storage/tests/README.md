@@ -1,0 +1,1 @@
+Invoke tests by running "python3 -m storage.tests.testCaseName.py" from the graphospasm directory. Substitute in the name of the test case for testCaseName.py.

@@ -1,6 +1,5 @@
 from storage.Node import Node
 from storage.NodeFile import NodeFile
-from storage.NodePage import NodePage
 from storage.Property import Property
 from storage.PropertyFile import PropertyFile
 from storage.Relationship import Relationship
@@ -12,6 +11,7 @@ from storage.StorageManager import StorageManager
 from parse.SimpleTypes import DummyNode, DummyRelationship
 
 from queryeval.degreeQueries import breadthFirstSearch
+
 
 # initial set up
 nodeFile = NodeFile()
