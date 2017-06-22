@@ -61,7 +61,7 @@ def printResult(result, nodes, rels, returns, lookingFor):
         print("{:<29}".format(toPrint), end='|')
     print('')
 
-def printAllResults(results, nodes, rels, returns):
+def printAllResults(results, nodes, rels, returns, matched):
     # Don't forget the first line needs to be the column names.
     lookingFor = []
     firstLine = []
@@ -93,9 +93,11 @@ def printAllResults(results, nodes, rels, returns):
 
     # If there are results, then there was a match statement and we should
     # print them.
-    if results:
+    if matched and results:
         for result in results:
             printResult(result, nodes, rels, returns, lookingFor)
+    elif matched:
+        pass
     else:
         printResult(None, nodes, rels, returns, lookingFor)
 
