@@ -9,9 +9,6 @@ from storage.Label import Label
 from storage.LabelFile import LabelFile
 from storage.StorageManager import StorageManager
 
-#from storage.DummyNode import DummyNode
-#from storage.DummyRelationship import DummyRelationship
-
 from parse.SimpleTypes import DummyNode, DummyRelationship
 
 from queryeval.degreeQueries import breadthFirstSearch
@@ -98,8 +95,6 @@ print("after breadth first search")
 
 for chain in goodChains:
     print("got chain")
-    #print(friend.getID())
-    #print(len(friend.properties))
     for tup in chain:
         element = tup[0]
         if isinstance(element, Node):
