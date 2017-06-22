@@ -9,7 +9,9 @@ import storage.RelationshipFile as rf
 from storage.Node import Node
 import queryeval.degreeQueries as qeval
 from output.printing import printResult
+
 import os
+from subprocess import run
 
 if __name__ == '__main__':
     print("Welcome to graphospasm.")
@@ -32,8 +34,23 @@ if __name__ == '__main__':
         query = input()
 
         # Check if we want to leave.
-        if query.lower() == "exit":
+        if query.lower() == 'exit':
             break
+
+        # Check if we want to clean out the database.
+        if query.lower() == 'clean':
+            print('Are you sure you want to delete all data? (Y/n)')
+            answer = input('> ')
+            if answer.lower() != 'n':
+                run('rm datafiles/*', shell=True)
+                print('Data cleaned out.')
+                n = nf.NodeFile()
+                r = rf.RelationshipFile()
+                p = pf.PropertyFile()
+                l = lf.LabelFile()
+                s = sm.StorageManager(n, r, p, l)
+            continue
+
 
         # Get the "query_dict", which represents what needs to be created
         # given the query that just occurred.

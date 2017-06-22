@@ -73,7 +73,7 @@ def patternElementExtract(visitor, patternElement, node, simple):
         rel_to_add = DummyRelationship(types, node, rel_node)
     rel_to_add.properties = rel_properties
     if variable_exists:
-        rel_to_add.variable = variable
+        rel_to_add.variable = rel_variable
 
     # Now for each of the two nodes, add this relationship.
     node.relationships.append(rel_to_add)

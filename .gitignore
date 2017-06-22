@@ -1,5 +1,6 @@
 # Ignore stored information
 *.store
+*.labelindex
 
 # Mac OS X folder custom attributes
 *.DS_Store
