@@ -13,19 +13,25 @@ def printResult(result, nodes, rels, returns, lookingFor):
     # To make this, we need to alter the dictionaries of nodes, rels and results.
     # Reverse the keys/values and change the new keys to just the variable name.
     # If there is no variable name, means it's not getting returned or printed,
-    # so we don't need itl; don't add it to our new dict.
+    # so we don't need it; don't add it to our new dict.
     varsDict = {}
-    for (aspect, i) in result:
-        if isinstance(aspect, n.Node):
-            node = nodes[i]
-            if node.varname is not None:
-                varsDict[node.varname] = aspect
-        if isinstance(aspect, r.Relationship):
-            rel = rels[i]
-            if rel.varname is not None:
-                varsDict[rel.varname] = aspect
+    if result:
+        for (aspect, i) in result:
+            if isinstance(aspect, n.Node):
+                node = nodes[i]
+                if node.varname is not None:
+                    varsDict[node.varname] = aspect
+            if isinstance(aspect, r.Relationship):
+                rel = rels[i]
+                if rel.varname is not None:
+                    varsDict[rel.varname] = aspect
 
     # Now we print the things we want to print
+    # Loop over the specific things we want from the return statement,
+    # and print either of three cases:
+    #   - we want a property of a aspect, in which case find the property
+    #   - a constant expression from the return statement
+    #   - a complete aspect (node or relationship)
     for i in range(len(lookingFor)):
         var = lookingFor[i][0]
         if len(lookingFor[i]) > 1:
@@ -85,8 +91,13 @@ def printAllResults(results, nodes, rels, returns):
         print('-'*29, end='|')
     print('')
 
-    for result in results:
-        printResult(result, nodes, rels, returns, lookingFor)
+    # If there are results, then there was a match statement and we should
+    # print them.
+    if results:
+        for result in results:
+            printResult(result, nodes, rels, returns, lookingFor)
+    else:
+        printResult(None, nodes, rels, returns, lookingFor)
 
     for i in range(len(lookingFor)):
         print('-'*29, end='|')
