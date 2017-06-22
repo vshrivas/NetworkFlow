@@ -20,11 +20,6 @@ class StorageManager:
         self.propertyFile = propertyFile
         self.labelFile = labelFile
 
-        # ?????????????????????????????????????????
-        # StorageManager.numFiles += 1
-        # self.fileID = StorageManager.numFiles
-        # ?????????????????????????????????????????
-
         # create storage files to keep track of free space
         # all lists of free spaces start with space at ID 0 being free
         # list of locations in node file with free space for nodes (specified by nodeIDs)
@@ -219,22 +214,6 @@ class StorageManager:
         # add node id to node free space list
         self.node_free_space.append(nodeID)
 
-    '''# opening files in write mode so that previous lists are cleared before new ones are written
-    def openNodeSpaceFile(self):
-        nodeSpaceFile = open(self.nodeFreeSpaceFileName, 'wb')
-        return nodeSpaceFile
-
-    def openRelSpaceFile(self):
-        relSpaceFile = open(self.relFreeSpaceFileName, 'wb')
-        return relSpaceFile
-
-    def openPropSpaceFile(self):
-        propSpaceFile = open(self.propFreeSpaceFileName, 'wb')
-        return propSpaceFile
-
-    def openLabelSpaceFile(self):
-        labelSpaceFile = open(self.labelFreeSpaceFileName, 'wb')
-        return labelSpaceFile'''
 
 
 
