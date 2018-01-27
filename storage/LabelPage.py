@@ -1,0 +1,1 @@
+class LabelPage(DataPage):

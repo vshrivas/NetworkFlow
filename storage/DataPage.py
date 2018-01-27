@@ -1,0 +1,1 @@
+class DataPage(Object):

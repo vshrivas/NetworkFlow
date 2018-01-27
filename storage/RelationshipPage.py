@@ -1,0 +1,1 @@
+class RelationshipPage(DataPage):
