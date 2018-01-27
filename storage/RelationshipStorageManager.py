@@ -1,0 +1,1 @@
+class RelationshipStorageManager(StorageManager):
