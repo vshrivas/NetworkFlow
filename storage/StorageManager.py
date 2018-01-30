@@ -9,9 +9,11 @@ from .RelationshipFile import RelationshipFile
 
 import pickle, os
 
-# Storage manager that manages where nodes, relationships, properties, and labels
-# are allocated in their respective files.
-class StorageManager:
+# Uses the file manager to find files 
+
+# storage manager should have a file to store metadatalike number of files
+# of each type
+class StorageManager(object):
 
     #folder_prefix = "datastore/"
     def __init__(self, nodeFile, relationshipFile, propertyFile, labelFile):
@@ -213,6 +215,177 @@ class StorageManager:
 
         # add node id to node free space list
         self.node_free_space.append(nodeID)
+
+
+    def writeNode(self):
+        """Writes this node to the node's node file according to the storage 
+        format given in the class description and writes this node's relationships, 
+        properties, and labels to the node's relationship file, property file, and 
+        label file, respectively.
+        """
+        if DEBUG:
+            print("properties in node")
+            for prop in self.properties:
+                print(prop.getID())
+
+            print("labels in node:")
+            for label in self.labels:
+                print(label.getLabelID())
+
+            print("writing node...")
+
+        # open node file
+        storeFilePath = self.nodeFile.getFilePath()
+        storeFile = open(storeFilePath, 'r+b')
+
+        if DEBUG:
+            print("opened store file: {0}". format(storeFileName))
+
+        # write node id
+        storeFile.seek(self.startOffset + Node.NODE_ID_OFFSET)
+        storeFile.write((self.nodeID).to_bytes(Node.nodeIDByteLen,
+            byteorder = sys.byteorder, signed=True))
+
+        if DEBUG:
+            print("wrote node ID: {0}". format(self.nodeID))
+
+        # write in-use flag
+        storeFile.seek(self.startOffset + Node.IN_USE_FLAG_OFFSET)
+        storeFile.write((1).to_bytes(1, byteorder = sys.byteorder, signed=True))
+
+        if DEBUG:
+            print("wrote in-use flag: {0}". format(1))
+
+        # write first relationship ID
+        storeFile.seek(self.startOffset + Node.REL_ID_OFFSET)
+        # if there are no relationships, write -1 as first relationship ID
+        if len(self.relationships) == 0:
+            firstRel = -1
+            storeFile.write((-1).to_bytes(Relationship.relIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+            if DEBUG:
+                print("wrote first rel ID: -1")
+        # otherwise, write first relationship ID
+        else:
+            firstRel = self.relationships[0]
+            storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+            if DEBUG:
+                print("wrote first rel ID: {0}". format(firstRel.getID()))
+
+        # write first property ID
+        storeFile.seek(self.startOffset + Node.PROPERTY_ID_OFFSET)
+        # if there are no properties, write -1 as first property ID
+        if len(self.properties) == 0:
+            firstProp = -1
+            storeFile.write((-1).to_bytes(Property.propIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+            if DEBUG:
+                print("wrote first property ID: -1")
+        # otherwise, write first property ID
+        else:
+            firstProp = self.properties[0]
+            storeFile.write(firstProp.getID().to_bytes(Property.propIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+            if DEBUG:
+                print("wrote first property ID: {0}". format(firstProp.getID()))
+
+        # write first label ID
+        storeFile.seek(self.startOffset + Node.LABEL_ID_OFFSET)
+        # if there are no labels, write -1 as first label ID
+        if len(self.labels) == 0:
+            storeFile.write((-1).to_bytes(Label.LABEL_OFFSET,
+                byteorder = sys.byteorder, signed=True))
+        # otherwise, write first label ID
+        else:
+            firstLabel = self.labels[0]
+            storeFile.write(firstLabel.getLabelID().to_bytes(Label.LABEL_OFFSET,
+                byteorder = sys.byteorder, signed=True))
+
+        if DEBUG:
+            print("writing relationships to relationship file ...")
+
+        # write relationships to relationship file
+        for relIndex in range(0, len(self.relationships)):
+            if DEBUG:
+                print("writing {0} relationship ".format(relIndex))
+            rel = self.relationships[relIndex]
+
+            # write first relationship
+            if relIndex == 0:
+                # A placeholder relationship in case there is no previous or next relationship
+                nullRelationship = Relationship(-1, -1, "", "",-1)
+                # no next relationship
+                if relIndex == len(self.relationships) - 1:
+                    if DEBUG:
+                        print("only one relationship")
+                    rel.writeRelationship(self, nullRelationship, nullRelationship)
+                # there is a next relationship
+                else:
+                    nullRelationship = Relationship(-1, -1, "", "", -1)
+                    rel.writeRelationship(self, nullRelationship, self.relationships[relIndex + 1])
+            # write last relationship
+            elif relIndex == len(self.relationships) - 1:
+                # A placeholder relationship in case there is no previous or next relationship
+                nullRelationship = Relationship(-1, -1, "", "", -1)
+                rel.writeRelationship(self, self.relationships[relIndex - 1], nullRelationship)
+            # write relationship that's not first or last relationship
+            else:
+                rel.writeRelationship(self, self.relationships[relIndex - 1],
+                    self.relationships[relIndex + 1])
+        if DEBUG:
+            print("writing properties to property file ...")
+
+        # write properties to property file
+        for propIndex in range(0, len(self.properties)):
+            prop = self.properties[propIndex]
+            if DEBUG:
+                print("writing {0} property ".format(prop.getID()))
+
+            # write last property
+            if propIndex == len(self.properties) - 1:
+                if DEBUG:
+                    print("no next property")
+                # A placeholder property since there is no next property
+                nullProperty = Property("", "", "", -1)
+                prop.writeProperty(nullProperty)
+            # write property that's not last property
+            else:
+                prop.writeProperty(self.properties[propIndex + 1])
+
+        # write labels to label file
+        for labelIndex in range(0, len(self.labels)):
+            label = self.labels[labelIndex]
+            if DEBUG:
+                print("writing {0} label ".format(label.getLabelID()))
+
+            # case of last label
+            if labelIndex == len(self.labels) - 1:
+                if DEBUG:
+                    print("no next label")
+                # set next label's id to -1
+                nextLabelID = -1
+            # case of any other label
+            else:
+                nextLabelID = (self.labels[labelIndex + 1]).getLabelID()
+            # write label
+            label.writeLabel(nextLabelID)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
