@@ -23,6 +23,13 @@ class NodeStorageManager(StorageManager):
 		nodeProperties = PropertyStoreManager.getPropChain(firstPropID)
 		nodeLabels = LabelStoreManager.getLabelChain(firstLabelID)
 
+		node = Node(pageID, nodeID)
+		node.addRelationships(nodeRelationships)
+		node.addProperties(nodeProperties)
+		node.addLabels(nodeLabels)
+
+		return node
+
 	createNode():
 
 	writeNode(pageID, nodeID):

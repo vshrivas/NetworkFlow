@@ -99,9 +99,17 @@ class Node:
         """Adds a relationship to this node's relationship list."""
         self.relationships.append(rel)
 
+    def addRelationships(self, rels):
+        for rel in rels:
+            addRelationship(rel)
+
     def addProperty(self, prop):
         """Add a property, which stores a key-value pair, to this node."""
         self.properties.append(prop)
+
+    def addProperties(self, props):
+        for props in props:
+            addProperty(prop)
 
     def addLabel(self, nodeLabel):
         """Add a label to this node and add node to appropriate labelIndex (index 
@@ -118,8 +126,11 @@ class Node:
         # add node to index
         if self.nodeID not in labelIndex.getItems():
             labelIndex.addNode(self.nodeID)
-        
 
+    def addLabels(self, lbls):
+        for lbl in lbls:
+            addLabel(self, lbl)
+        
     def removeRelationship(self, relID):
         """Remove a relationship from this node and write the node"""
         toRemove = 0
