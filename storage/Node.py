@@ -47,7 +47,10 @@ class Node:
     # number of nodes ever created (used for auto-incrementing the node ID)
     numNodes = 0
 
-    def __init__(self, nodeFile, nodePage, nodeID=None):
+    # node ID is a list of 2 elements 
+    # nodeID[0] = pageID
+    # nodeID[1] = nodeIndex
+    def __init__(self, nodeFile, nodePage, nodeID):
         """Constructor for Node, which sets the node ID and the file the node is stored in.
 
         Arguments:
@@ -60,8 +63,8 @@ class Node:
             print("**** Num Nodes = {0} *****".format(Node.numNodes))
 
         # if nodeID is None, use auto-incrementing for nodeID
-        if nodeID is None:
-            nodeID = Node.numNodes
+        #if nodeID is None:
+            #nodeID = Node.numNodes
 
 		# relationships is the list of relationships this node is in
         self.relationships = []
@@ -92,7 +95,8 @@ class Node:
             byteorder = sys.byteorder, signed=True))
 
         # set starting offset of node in NodeFile
-        self.startOffset = self.nodeID * Node.storageSize + Node.nodeIDByteLen
+        nodeIndex = self.nodeID[1]
+        self.startOffset = nodeIndex * Node.storageSize + Node.nodeIDByteLen
 
     
     def addRelationship(self, rel):
