@@ -135,6 +135,11 @@ class Relationship:
         """Add property to relationship."""
         self.properties.append(prop)
 
+    def addProperties(props):
+        for prop in props:
+           addProperty(prop)
+
+
     def getProperties(self):
         """Return properties of relationship."""
         return self.properties
