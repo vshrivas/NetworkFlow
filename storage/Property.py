@@ -47,6 +47,9 @@ class Property:
     propIDByteLen = 4
     typeByteLen = 1
 
+    # property ID is a list of 2 elements 
+    # propertyID[0] = pageID
+    # propertyID[1] = propIndex
     def __init__(self, key, value, propertyFile, propertyID=None):
         """Constructor for Property, which sets the key, the value, the property ID, 
         and the file the property is stored in.
@@ -86,7 +89,7 @@ class Property:
         self.propertyID = propertyID
 
         # property isn't the null property and is a new property
-        if self.propertyID != -1 and self.propertyID >= self.numProperties:
+        if self.getpropertyIndex() != -1 and self.getPropertyIndex() >= self.numProperties:
             Property.numProperties += 1
 
         # set property file
@@ -103,7 +106,14 @@ class Property:
                 byteorder = sys.byteorder, signed=True))
 
         # starting offset for property in property file
-        self.startOffset = self.propertyID * Property.storageSize + Property.propIDByteLen
+        self.startOffset = self.getPropertyIndex() * Property.storageSize + Property.propIDByteLen
+
+    def getPropertyIndex(self):
+        return propertyID[1]
+
+    # returns the property pageID
+    def getPropertyPage(self):
+        return propertyID[0]
 
     def getKey(self):
         """Return key of property."""
@@ -123,78 +133,3 @@ class Property:
 
     def getType(self):
         return self.type
-
-    def writeProperty(self, nextProp):
-        """Write property to disk using specified next property."""
-        if DEBUG:
-            print() 
-
-        # open property file
-        storeFilePath = self.getPropertyFile().getFilePath()
-        storeFile = open(storeFilePath, 'r+b')
-
-        if DEBUG:
-            print("writing property id {0} at {1}".format(self.propertyID, self.startOffset + Property.PROPERTY_ID_OFFSET))
-
-        # write property id
-        storeFile.seek(self.startOffset + Property.PROPERTY_ID_OFFSET)
-        storeFile.write(self.propertyID.to_bytes(Property.propIDByteLen, 
-                byteorder = sys.byteorder, signed = True))
-
-        # write property value type
-        storeFile.seek(self.startOffset + Property.TYPE_OFFSET)
-        storeFile.write(self.type.to_bytes(Property.typeByteLen, 
-                byteorder = sys.byteorder, signed = True))
-
-        # write key
-        storeFile.seek(self.startOffset + Property.KEY_OFFSET)
-
-        # key is not of max size
-        if(sys.getsizeof(self.key) != self.MAX_KEY_SIZE):
-            # pad key up to max size
-            while len(self.key.encode('utf-8')) != self.MAX_KEY_SIZE:
-                self.key += ' '
-
-        if DEBUG:
-            print("writing key {0} at {1}".format(self.key, self.startOffset + Property.KEY_OFFSET))
-
-        storeFile.write(bytearray(self.key, 'utf8'))
-
-        # write value
-        storeFile.seek(self.startOffset + Property.VALUE_OFFSET)
-        
-        if DEBUG:
-            print("writing value {0} at {1}".format(self.value, self.startOffset + Property.VALUE_OFFSET))
-
-        # Write property values of different types (strings, ints, floats, and booleans)
-        if self.type == Property.TYPE_STRING:
-            # value is not of max size
-            if(sys.getsizeof(self.value) != self.MAX_VALUE_SIZE):
-                # pad value up to max size
-                while len(self.value.encode('utf-8')) != self.MAX_VALUE_SIZE:
-                    self.value += ' '
-            storeFile.write(bytearray(self.value, 'utf8'))
-        elif self.type == Property.TYPE_INT:
-            storeFile.write(self.value.to_bytes(4, byteorder=sys.byteorder, signed = True))
-        elif self.type == Property.TYPE_FLOAT:
-            storeFile.write(bytearray(struct.pack("d", self.value)))
-        else:
-            if self.value:
-                storeFile.write((1).to_bytes(1, byteorder=sys.byteorder, signed = True))
-            else:
-                storeFile.write((0).to_bytes(1, byteorder=sys.byteorder, signed = True))
-
-        # write next property id
-        storeFile.seek(self.startOffset + Property.NEXT_PROPERTY_ID_OFFSET)
-        if DEBUG:
-            print("next property has index:{0}".format(nextProp.getID()))
-
-            print("writing next property index {0} at {1}".format(nextProp.getID(), self.startOffset + Property.NEXT_PROPERTY_ID_OFFSET))
-        storeFile.write(nextProp.getID().to_bytes(Property.propIDByteLen, 
-                byteorder = sys.byteorder, signed = True))
-
-        if DEBUG:
-            print()
-
-
-
