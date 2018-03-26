@@ -54,7 +54,6 @@ class RelationshipPage(DataPage):
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_PREV_REL_ID_OFFSET)
         node1PrevRelID = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
 
-
         # find ID of next rel for node2 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
         node2NextRelID = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
@@ -75,8 +74,11 @@ class RelationshipPage(DataPage):
 
         # create relationship and add to node
         rel = Relationship(relID, node1ID, node2ID, relType, node1NextRelID, node1PrevRelID,
-        		node2NextRelID, node2PrevRelID, relationshipStore)
+        		node2NextRelID, node2PrevRelID, datafile)
 
         return rel
+
+    def readRelationship(self, relationshipIndex):
+    	return relationshipData[relationshipIndex]
 
 	def writeRelationship():

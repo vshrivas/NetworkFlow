@@ -60,7 +60,7 @@ class NodePage(DataPage):
 		nodeProperties = PropertyStoreManager.getPropChain(firstPropID)
 		nodeLabels = LabelStoreManager.getLabelChain(firstLabelID)
 
-		node = Node(pageID, nodeIndex)
+		node = Node(datafile, pageID, nodeIndex)
 		node.addRelationships(nodeRelationships)
 		node.addProperties(nodeProperties)
 		node.addLabels(nodeLabels)

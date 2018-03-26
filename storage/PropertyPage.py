@@ -1,6 +1,6 @@
 class PropertyPage(DataPage):
 	def __init__(self, pageIndex, datafile):
-		# 1 indicates that this is a property page
+		# 2 indicates that this is a property page
 		pageID = [2, pageIndex]
 		super().__init__(pageID, datafile)
 
@@ -10,7 +10,7 @@ class PropertyPage(DataPage):
 
 	# reads in all of the property objects stored in this page
 	# stores them in self.propertyData
-	def readPageData():
+	def readPageData(self):
 		# open property file
 		filePath = ((DataFile) self.file).getFilePath()
 		propertyFile = open(filePath, 'rb')
@@ -81,9 +81,12 @@ class PropertyPage(DataPage):
         propertyStore.seek(propertyStartOffset + NEXT_PROPERTY_ID_OFFSET)
         nextPropID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
         # initialize property object with key and value and add to relationship
-        prop = Property(key, value, propertyFile, propID, nextPropID)
+        prop = Property(key, value, datafile, propID, nextPropID)
 
         return prop
+
+    def readProperty(self, propertyIndex):
+    	return propertyData[propertyIndex]
 
 	def writeProperty(currProp, nextProp):
         """Write property to disk using specified next property."""

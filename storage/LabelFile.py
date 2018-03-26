@@ -41,26 +41,3 @@ class LabelFile:
 
     def getFilePath(self):
         return self.filePath
-
-    def readLabel(self, labelID):
-        """Reads label corresponding to label ID and returns a label object for label."""
-        labelStore = open(self.filePath, 'rb')
-        # Starting offset for label 
-        labelStartOffset = labelID * Label.storageSize + Label.labelIDByteLen
-
-        # Read label ID
-        labelStore.seek(labelStartOffset + Label.LABEL_ID_OFFSET)
-        # Requires Python >= 3.2 for the function int.from_bytes
-        labelID = int.from_bytes(labelStore.read(3), byteorder=sys.byteorder, signed=True)
-
-        # Read label string
-        labelStore.seek(labelStartOffset + Label.LABEL_OFFSET)
-        # Remove padding from label string
-        labelString = labelStore.read(Label.MAX_LABEL_SIZE).decode('utf8').rstrip(' ')
-
-        # Read next label ID
-        labelStore.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
-        nextLabelID = int.from_bytes(labelStore.read(3), byteorder=sys.byteorder, signed=True)
-
-        label = Label(labelString, self, labelID, nextLabelID)
-        return label
