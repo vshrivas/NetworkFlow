@@ -33,36 +33,16 @@ class RelationshipStorageManager(StorageManager):
 	def openPageFile(pageID):
 		pass
 
-	def getRelationship(relId):
+	def readRelationship(relId):
 		pageID = relID[0]
         relIndex = relID[1]
 
-        # find starting offset of relationship in relationship file
-        relationshipStartOffset = relIndex * Relationship.storageSize + Relationship.relIDByteLen
+        pageIndex = pageID[1]
 
-        # open file relationship is stored in 
-        relationshipStore = openPageFile(pageID)
-
-		# find ID of first node in relationship
-        relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_ID_OFFSET)
-        node1ID = int.from_bytes(relationshipStore.read(3), sys.byteorder, signed=True)
-
-        # find ID of second node in relationship
-        relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_ID_OFFSET)
-        node2ID = int.from_bytes(relationshipStore.read(3), sys.byteorder, signed=True)
-
-        # read in type of relationship
-        relationshipStore.seek(relationshipStartOffset + Relationship.RELATIONSHIP_TYPE_OFFSET)
-        relType = relationshipStore.read(Relationship.MAX_TYPE_SIZE).decode("utf-8")
-        relType = relType.rstrip(' ')
-
-        if DEBUG:
-            print('Node 1 id: {0}'.format(node1ID))
-            print('Node 2 id: {0}'.format(node2ID))
-            print('Relationship type: {0}'.format(relType))
-
-        # create relationship and add to node
-        rel = Relationship(node1ID, node2ID, relType, relationshipFile, relID)
+        # use buffer manager to retrieve page from memory
+		# will load page into memory if wasn't there
+        relationshipPage = BufferManager.getRelationshipPage(pageIndex, self)
+        return relationshipPage.readRelationship(nodeIndex)
 
 	def getRelationshipChain(firstRelID):
 		nextRelID = firstRelID

@@ -7,7 +7,8 @@ class NodeStorageManager(StorageManager):
 		# read number of node files 
 		# create file objects for each of the node files, and make a list of these
 
-	readNode(pageID):
+	# returns node, given nodeID
+	readNode(nodeID):
 		pageID = nodeID[0] 			# pageID[0] = 0, pageID[1] = pageIndex
 		nodeIndex = nodeID[1]
 
@@ -15,8 +16,8 @@ class NodeStorageManager(StorageManager):
 
 		# use buffer manager to retrieve page from memory
 		# will load page into memory if wasn't there
-        nodePage = BufferManager.getNodePage(pageID, self)
-        return nodePage.readNode(nodeID[1])
+        nodePage = BufferManager.getNodePage(pageIndex, self)
+        return nodePage.readNode(nodeIndex)
 
 	# takes in a node object 
 	def writeNode(node):

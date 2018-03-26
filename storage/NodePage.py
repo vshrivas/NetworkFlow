@@ -34,9 +34,10 @@ class NodePage(DataPage):
 	def readNode(self, nodeIndex):
 		return nodeData[nodeIndex]
 
-	# takes in nodeID
-	# returns IDs of first relationship, property, and label for the node
+	# reads in node from page in file, using nodeIndex 
 	# used when loading page data into memory
+	# takes in nodeIndex
+	# returns node
 	def readNodeData(self, nodeIndex):
 		filePath = ((NodeFile) self.file).getFilePath()
 		nodeFile = open(filePath, 'rb')

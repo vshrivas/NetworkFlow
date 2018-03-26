@@ -53,7 +53,9 @@ class Relationship:
 
     relIDByteLen = 4
 
-    def __init__(self, node1ID, node2ID, relType, relationshipFile, relationshipID=None):
+    def __init__(self, relationshipID, node1ID, node2ID, node1NextRelID, node2PrevRelID,
+            node2NextRelID, node2PrevRelID,
+            relType, relationshipFile):
         """Constructor for Relationship, which sets the first node ID and second node ID 
         of the relationship, the relationship type, the file the relationship is stored in, 
         and the relationship ID.
@@ -66,6 +68,10 @@ class Relationship:
         relationshipID: the ID of the Relationship to be initialized; default relationshipID of None 
         means the Relationship will be assigned an auto-incrementing relationship ID
         """
+
+        # set relationship ID
+        self.relationshipID = relationshipID
+
         # If relationshipFile object passed exists, get number of relationships 
         if relationshipFile != "":
             Relationship.numRelationships = relationshipFile.getNumRelationships()
@@ -81,13 +87,16 @@ class Relationship:
         self.firstNodeID = node1ID
         self.secondNodeID = node2ID
 
+        self.node1NextRelID = node1NextRelID 
+        self.node1PrevRelID = node1PrevRelID
+
+        self.node2NextRelID = node2NextRelID
+        self.node2PrevRelID = node2PrevRelID
+
         # set relationship type
         self.type = relType 
 
         self.properties = []
-
-        # set relationship ID
-        self.relationshipID = relationshipID
 
         # increment number of relationships when new relationship created
         if relationshipID != -1 and relationshipID >= Relationship.numRelationships:

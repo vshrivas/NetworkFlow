@@ -50,7 +50,7 @@ class Property:
     # property ID is a list of 2 elements 
     # propertyID[0] = pageID
     # propertyID[1] = propIndex
-    def __init__(self, key, value, propertyFile, propertyID=None):
+    def __init__(self, key, value, propertyFile, propertyID, nextPropertyID):
         """Constructor for Property, which sets the key, the value, the property ID, 
         and the file the property is stored in.
 
@@ -87,6 +87,8 @@ class Property:
         
         # set property ID
         self.propertyID = propertyID
+
+        self.nextPropertyID = nextPropertyID
 
         # property isn't the null property and is a new property
         if self.getpropertyIndex() != -1 and self.getPropertyIndex() >= self.numProperties:

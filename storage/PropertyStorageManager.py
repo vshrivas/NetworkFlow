@@ -1,4 +1,15 @@
 class PropertyStorageManager(StorageManager):
+	def readProperty(propertyID):
+		pageID = propertyID[0]
+        propertyIndex = propertyID[1]
+
+        pageIndex = pageID[1]
+
+        # use buffer manager to retrieve page from memory
+		# will load page into memory if wasn't there
+        propertyPage = BufferManager.getPropertyPage(pageIndex, self)
+        return propertyPage.readNode(nodeIndex)
+
 	def writeProperties(properties):
 		# write properties to property file
         for propIndex in range(0, len(properties)):

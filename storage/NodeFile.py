@@ -51,9 +51,7 @@ class NodeFile(object):
         return numNodes
 
     def readNode(pageID, nodeID):
-        # create data page corresponding to pageID
-        nodePage = BufferManager.getNodePage(pageID, self)
-        return nodePage.readNode(nodeID[1])
+        
 
     def writeNode(node):
         pageID = node.nodeID[0]          # pageID[0] = 0, pageID[1] = pageIndex

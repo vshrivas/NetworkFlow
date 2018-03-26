@@ -1,21 +1,46 @@
 class PropertyPage(DataPage):
-	ENTRY_SIZE = Node.storageSize
-
 	def __init__(self, pageIndex, datafile):
-		self.pageStart = pageIndex * DataPage.MAX_PAGE_SIZE
+		# 1 indicates that this is a property page
+		pageID = [2, pageIndex]
+		super().__init__(pageID, datafile)
 
-	def readProperty(self, propertyIndex):
+		self.propertyData = []  # list of property objects the page contains
+		# read in all page data
+		readPageData()
+
+	# reads in all of the property objects stored in this page
+	# stores them in self.propertyData
+	def readPageData():
+		# open property file
+		filePath = ((DataFile) self.file).getFilePath()
+		propertyFile = open(filePath, 'rb')
+
+		# read in number of entries
+		propertyFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
+		self.numEntries = int.from_bytes(propertyFile.read(DataPage.NUM_ENTRIES_SIZE), sys.byteorder, signed=True)
+
+		# read in owner of page
+		propertyFile.seek(self.pageStart + OWNER_ID_OFFSET)
+		self.ownerID = int.from_bytes(propertyFile.read(DataPage.OWNER_ID_SIZE), sys.byteorder, signed=True)
+
+		# read in all data items
+		for propertyIndex in range(0, self.numEntries):
+			property = readPropertyData(propertyIndex)
+			propertyData.append(property)
+
+	def readPropertyData(self, propertyIndex):
 		filePath = ((PropertyFile) self.file).getFilePath()
 		propertyStore = open(filePath, 'rb')
 
-		propertyStartOffset = propertyIndex * Property.storageSize + Property.propIDByteLen
+		propertyStartOffset = self.pageStart + DATA_OFFSET  + propertyIndex * Property.storageSize
 		# find ID
         propertyStore.seek(propertyStartOffset)
 
         if DEBUG:
             print("seek to {0} for ID". format(propertyStartOffset))
 
-        ID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
+        propID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
+
         if DEBUG:
             print('id: {0}'.format(ID))
 
@@ -53,9 +78,12 @@ class PropertyPage(DataPage):
         if DEBUG:
             print('value: {0}'.format(value))
 
+        propertyStore.seek(propertyStartOffset + NEXT_PROPERTY_ID_OFFSET)
+        nextPropID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
         # initialize property object with key and value and add to relationship
-        prop = Property(key, value, propertyFile, nextPropID)
+        prop = Property(key, value, propertyFile, propID, nextPropID)
 
+        return prop
 
 	def writeProperty(currProp, nextProp):
         """Write property to disk using specified next property."""
