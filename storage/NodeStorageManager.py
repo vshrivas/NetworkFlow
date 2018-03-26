@@ -13,17 +13,10 @@ class NodeStorageManager(StorageManager):
 
 		pageIndex = pageID[1]		# which page node is in, page IDs are unique across all files
 
-		# file number of node file page is in
-		fileNo = pageIndex / DataFile.MAX_FILE_PAGES 
-		nodeFile = nodeFiles[fileNo]
-
-		# returns a list of first relationship, first property, and first label associated with node
-		nodeID = [pageID, nodeIndex]
-		nodeAttributes = nodeFile.readNode(pageID, nodeIndex)
-
-		firstRelID = nodeAttributes[0]
-		firstPropID = nodeAttributes[1]
-		firstLabelID = nodeAttributes[2]
+		# use buffer manager to retrieve page from memory
+		# will load page into memory if wasn't there
+        nodePage = BufferManager.getNodePage(pageID, self)
+        return nodePage.readNode(nodeID[1])
 
 	# takes in a node object 
 	def writeNode(node):

@@ -1,12 +1,16 @@
 class NodePage(DataPage):
 	ENTRY_SIZE = Node.storageSize
-	nodeData = []
 
+	# constructor for NodePage
+	# takes in 
+	# pageIndex: index of page (unique across nodeFiles)
+	# datafile: nodeFile containing page
 	def __init__(self, pageIndex, datafile):
 		# 0 indicates that this is a node page
 		pageID = [0, pageIndex]
 		super().__init__(pageID, datafile)
 
+		self.nodeData = []  # list of node objects the page contains
 		# read in all page data
 		readPageData()
 

@@ -14,7 +14,9 @@ class LockManager(Object):
 
 		# while nextThread isn't none (chain ends)
 		# or chain circles back to userThread
-		# there is no other end possibility, since if we circled 
-		while(nextThread != None or nextThread != userThread) > 0) {
-
+		# there is no other end possibility, since if we circled back to some other thread, deadlock
+		# would have existed in the system 
+		while(nextThread != None or nextThread != userThread) {
+			# nextThread is the thread we 
+			nextThread = nextThread.waiting
 		}
