@@ -88,73 +88,72 @@ class PropertyPage(DataPage):
     def readProperty(self, propertyIndex):
     	return propertyData[propertyIndex]
 
-	def writeProperty(currProp, nextProp):
-        """Write property to disk using specified next property."""
+    def writePageData(self):
+        filePath = ((PropertyFile) self.datafile).getFilePath()
+        relFile = open(filePath, 'rb')
+
+        for rel in propertyData:
+            writeRelationshipData(rel, relFile)
+
+	def writePropertyData(self, prop, storeFile):
+        propertyStartOffset = self.pageStart + DATA_OFFSET  + propertyIndex * Property.storageSize
+
         if DEBUG:
-            print() 
-
-        # open property file
-        storeFilePath = ((PropertyFile)self.file).getFilePath()
-        storeFile = open(storeFilePath, 'r+b')
-
-        if DEBUG:
-            print("writing property id {0} at {1}".format(currProp.propertyID, currProp.startOffset + Property.PROPERTY_ID_OFFSET))
-
         # write property id
-        storeFile.seek(self.pageStart + currProp.startOffset + Property.PROPERTY_ID_OFFSET)
-        storeFile.write(currProp.propertyID.to_bytes(Property.propIDByteLen, 
+        storeFile.seek(propertyStartOffset + Property.PROPERTY_ID_OFFSET)
+        storeFile.write(prop.getID().to_bytes(Property.propIDByteLen, 
                 byteorder = sys.byteorder, signed = True))
 
         # write property value type
-        storeFile.seek(self.pageStart + currProp.startOffset + Property.TYPE_OFFSET)
-        storeFile.write(currProp.type.to_bytes(Property.typeByteLen, 
+        storeFile.seek(propertyStartOffset + Property.TYPE_OFFSET)
+        storeFile.write(prop.type.to_bytes(Property.typeByteLen, 
                 byteorder = sys.byteorder, signed = True))
 
         # write key
-        storeFile.seek(self.pageStart + currProp.startOffset + Property.KEY_OFFSET)
+        storeFile.seek(propertyStartOffset + Property.KEY_OFFSET)
 
         # key is not of max size
-        if(sys.getsizeof(currProp.key) != currProp.MAX_KEY_SIZE):
+        if(sys.getsizeof(prop.key) != prop.MAX_KEY_SIZE):
             # pad key up to max size
-            while len(currProp.key.encode('utf-8')) != currProp.MAX_KEY_SIZE:
-                currProp.key += ' '
+            while len(prop.key.encode('utf-8')) != prop.MAX_KEY_SIZE:
+                prop.key += ' '
 
         if DEBUG:
-            print("writing key {0} at {1}".format(currProp.key, self.pageStart + currProp.startOffset + Property.KEY_OFFSET))
+            print("writing key {0} at {1}".format(prop.key, propertyStartOffset + Property.KEY_OFFSET))
 
-        storeFile.write(bytearray(currProp.key, 'utf8'))
+        storeFile.write(bytearray(prop.key, 'utf8'))
 
         # write value
-        storeFile.seek(self.pageStart + currProp.startOffset + Property.VALUE_OFFSET)
+        storeFile.seek(propertyStartOffset + Property.VALUE_OFFSET)
         
         if DEBUG:
-            print("writing value {0} at {1}".format(currProp.value, currProp.startOffset + Property.VALUE_OFFSET))
+            print("writing value {0} at {1}".format(prop.value, propertyStartOffset + Property.VALUE_OFFSET))
 
         # Write property values of different types (strings, ints, floats, and booleans)
-        if currProp.type == Property.TYPE_STRING:
+        if prop.type == Property.TYPE_STRING:
             # value is not of max size
-            if(sys.getsizeof(currProp.value) != currProp.MAX_VALUE_SIZE):
+            if(sys.getsizeof(prop.value) != prop.MAX_VALUE_SIZE):
                 # pad value up to max size
-                while len(currProp.value.encode('utf-8')) != currProp.MAX_VALUE_SIZE:
-                    currProp.value += ' '
-            storeFile.write(bytearray(currProp.value, 'utf8'))
-        elif currProp.type == Property.TYPE_INT:
-            storeFile.write(currProp.value.to_bytes(4, byteorder=sys.byteorder, signed = True))
-        elif currProp.type == Property.TYPE_FLOAT:
-            storeFile.write(bytearray(struct.pack("d", currProp.value)))
+                while len(prop.value.encode('utf-8')) != prop.MAX_VALUE_SIZE:
+                    prop.value += ' '
+            storeFile.write(bytearray(prop.value, 'utf8'))
+        elif prop.type == Property.TYPE_INT:
+            storeFile.write(prop.value.to_bytes(4, byteorder=sys.byteorder, signed = True))
+        elif prop.type == Property.TYPE_FLOAT:
+            storeFile.write(bytearray(struct.pack("d", prop.value)))
         else:
-            if currProp.value:
+            if prop.value:
                 storeFile.write((1).to_bytes(1, byteorder=sys.byteorder, signed = True))
             else:
                 storeFile.write((0).to_bytes(1, byteorder=sys.byteorder, signed = True))
 
         # write next property id
-        storeFile.seek(self.pageStart + currProp.startOffset + Property.NEXT_PROPERTY_ID_OFFSET)
+        storeFile.seek(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET)
         if DEBUG:
-            print("next property has index:{0}".format(nextProp.getID()))
+            print("next property has index:{0}".format(prop.nextPropertyID))
 
-            print("writing next property index {0} at {1}".format(nextProp.getID(), currProp.startOffset + Property.NEXT_PROPERTY_ID_OFFSET))
-        storeFile.write(nextProp.getID().to_bytes(Property.propIDByteLen, 
+            print("writing next property index {0} at {1}".format(prop.nextPropertyID, propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET))
+        storeFile.write(prop.nextPropertyID.to_bytes(Property.propIDByteLen, 
                 byteorder = sys.byteorder, signed = True))
 
         if DEBUG:

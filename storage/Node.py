@@ -118,18 +118,12 @@ class Node:
              else:
                 prevRel.node2NextRelID = rel.getID()
 
-             # relationship was changed so write it to page
-             RelationshipStorageManager.writeRelationship(prevRel)
-
         # set this relationship's prev relID
         if node.getID() == rel.firstNodeID:
             rel.node1PrevRelId = prevRelID
 
         else:
             rel.node2PrevRelID = prevRelID
-            
-        # relationship was changed so write it to page
-        RelationshipStorageManager.writeRelationship(rel)
 
         """Adds a relationship to this node's relationship list."""
         self.relationships.append(rel)
@@ -140,6 +134,9 @@ class Node:
             addRelationship(rel)
 
     def addProperty(self, prop):
+        if len(self.properties) > 0:
+            self.properties[len(self.properties) - 1].nextPropertyID = prop.getID()
+
         """Add a property, which stores a key-value pair, to this node."""
         self.properties.append(prop)
 

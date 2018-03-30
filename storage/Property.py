@@ -68,10 +68,7 @@ class Property:
                 print("****** Num properties = {0} ******".format(Property.numProperties))
         # Note: For reading properties from files, we assume keys and values to be ints.
         # TODO: Support reading keys and values of other types
-        # if propertyID is None, use auto-incrementing for property ID
-        if propertyID is None:
-            propertyID = Property.numProperties
-            
+        # if propertyID is None, use auto-incrementing for property ID            
         # set key and value
         self.key = key
         self.value = value

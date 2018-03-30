@@ -143,6 +143,9 @@ class Relationship:
         return self.type
 
     def addProperty(self, prop):
+        if len(self.properties) > 0:
+            self.properties[len(self.properties) - 1].nextPropertyID = prop.getID()
+
         """Add property to relationship."""
         self.properties.append(prop)
 
