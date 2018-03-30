@@ -28,8 +28,7 @@ class Label:
 
     labelIDByteLen = 3
     storageSize = 106
-    # number of labels ever created (used for auto-incrementing the label ID)
-    numLabels = 0
+
 
     def __init__(self, label, labelFile, labelID=None, nextLabelID=-1):
         """Constructor for Labels. Initializes a Label using the given label string and  
@@ -44,20 +43,8 @@ class Label:
         means the Label will be assigned an auto-incrementing label ID
         nextLabelID: the ID of the next label; default -1 for no next label
         """
-
-        Label.numLabels = labelFile.getNumLabels()
-        if DEBUG:
-            print("**** Num Labels = {0} *****".format(Label.numLabels))
-        
-        # if labelID is None, use auto-incrementing for label ID
-        if labelID is None:
-            labelID = Label.numLabels
-
+    
         self.labelID = labelID
-
-        # increment number of labels when new label created
-        if self.labelID != -1 and self.labelID >= Label.numLabels:
-            Label.numLabels += 1
 
         # set label string
         self.label = label
@@ -96,34 +83,6 @@ class Label:
     def setNextLabelID(self, nextLabelID):
         """Set next label ID of label."""
         self.nextLabelID = nextLabelID
-
-    def writeLabel(self, nextLabelID):
-        """Write label to disk using specified next label ID."""
-        # open label file
-        storeFilePath = self.labelFile.getFilePath()
-        storeFile = open(storeFilePath, 'r+b')
-
-        # seek to location for label and write label ID
-        storeFile.seek(self.startOffset)
-        storeFile.write(self.labelID.to_bytes(3, 
-            byteorder = sys.byteorder, signed=True))
-
-        # write label
-        storeFile.seek(self.startOffset + Label.LABEL_OFFSET)
-        # label is not of max size
-        if(sys.getsizeof(self.label) != self.MAX_LABEL_SIZE):
-            # pad label string up to max size
-            while len(self.label.encode('utf-8')) != self.MAX_LABEL_SIZE:
-                self.label += ' '
-        storeFile.write(bytearray(self.label, "utf8"))
-
-        # write next label's ID
-        storeFile.seek(self.startOffset + Label.NEXT_LABEL_ID_OFFSET)
-
-        if DEBUG:
-            print("writing next label id: {0}".format(nextLabelID))
-        storeFile.write(nextLabelID.to_bytes(3, 
-            byteorder = sys.byteorder, signed=True))
 
 
         

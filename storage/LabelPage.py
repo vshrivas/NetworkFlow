@@ -55,3 +55,40 @@ class LabelPage(DataPage):
 
     def readLabel(self, labelIndex):
     	return labelData[labelIndex]
+
+    def writePageData(self):
+    	filePath = ((LabelFile) self.datafile).getFilePath()
+		labelFile = open(filePath, 'rb')
+
+    	for label in labelData:
+    		writeLabelData(label, labelFile)
+
+    def writeLabelData(label, storeFile):
+    	# Starting offset for label 
+        labelStartOffset = self.pageStart + DATA_OFFSET + labelID * Label.storageSize
+
+        # seek to location for label and write label ID
+        storeFile.seek(labelStartOffset + Label.LABEL_ID_OFFSET)
+        storeFile.write(self.labelID.to_bytes(Label.labelIDByteLen, byteorder = sys.byteorder, signed=True))
+
+        # write label
+        storeFile.seek(labelStartOffset + Label.LABEL_OFFSET)
+        # label is not of max size
+        if(sys.getsizeof(label.label) != Label.MAX_LABEL_SIZE):
+            # pad label string up to max size
+            while len(label.label.encode('utf-8')) != Label.MAX_LABEL_SIZE:
+                label.label += ' '
+        storeFile.write(bytearray(label.label, "utf8"))
+
+        # write next label's ID
+        storeFile.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
+
+        if DEBUG:
+            print("writing next label id: {0}".format(nextLabelID))
+        storeFile.write(nextLabelID.to_bytes(Label.labelIDByteLen, byteorder = sys.byteorder, signed=True))
+
+    def writeLabel(label):
+    	labelID = label.getID()
+
+        labelIndex = labelID[1]
+        labelData[labelIndex] = label

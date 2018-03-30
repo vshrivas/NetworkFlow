@@ -89,16 +89,19 @@ class RelationshipPage(DataPage):
     	return relationshipData[relationshipIndex]
 
     def writeRelationship(self, rel):
-    	relID = rel.getNodeID()
+    	relID = rel.getID()
 
         relIndex = relID[1]
         relationshipData[relIndex] = rel
 
     def writePageData(self):
-    	for rel in relationshipData:
-    		writeRelationshipData(rel)
+    	filePath = ((RelationshipFile) self.datafile).getFilePath()
+		relFile = open(filePath, 'rb')
 
-    def writeRelationshipData(self, rel):
+    	for rel in relationshipData:
+    		writeRelationshipData(rel, relFile)
+
+    def writeRelationshipData(self, rel, relationshipStore):
     	# offset from start of file to start of node
 		relationshipStartOffset = self.pageStart + DATA_OFFSET + relationshipIndex * Relationship.storageSize
 
@@ -155,7 +158,7 @@ class RelationshipPage(DataPage):
             byteorder = sys.byteorder, signed=True))
 
 
-	def OLDwriteRelationshipData(self, node, prevRel, nextRel):
+	'''def OLDwriteRelationshipData(self, node, prevRel, nextRel):
         """Write relationship to relationship file for specified node and relationship's 
         properties to property file.
 
@@ -271,4 +274,4 @@ class RelationshipPage(DataPage):
                 prop.writeProperty(nullProperty)
             # case of next property
             else:
-                prop.writeProperty(self.properties[propIndex + 1])
+                prop.writeProperty(self.properties[propIndex + 1])'''
