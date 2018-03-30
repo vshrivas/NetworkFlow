@@ -55,7 +55,7 @@ class Relationship:
 
     def __init__(self, relationshipID, node1ID, node2ID, node1NextRelID, node2PrevRelID,
             node2NextRelID, node2PrevRelID,
-            relType, relationshipFile):
+            relType, propertyID, relationshipFile):
         """Constructor for Relationship, which sets the first node ID and second node ID 
         of the relationship, the relationship type, the file the relationship is stored in, 
         and the relationship ID.
@@ -95,6 +95,8 @@ class Relationship:
 
         # set relationship type
         self.type = relType 
+
+        self.propertyID = propertyID
 
         self.properties = []
 
@@ -152,124 +154,6 @@ class Relationship:
     def getProperties(self):
         """Return properties of relationship."""
         return self.properties
-
-    def writeRelationship(self, node, prevRel, nextRel):
-        """Write relationship to relationship file for specified node and relationship's 
-        properties to property file.
-
-        Arguments:
-        node: node relationship being written for
-        prevRel: previous relationship for specified node
-        nextRel: next relationship for specified node
-        """
-        # open relationship file
-        if DEBUG:
-            print(self.relationshipFile)
-        storeFilePath = self.relationshipFile.getFilePath()
-        storeFile = open(storeFilePath, 'r+b')
-
-        # seek to location for relationship
-        storeFile.seek(self.startOffset)
-
-        # write relationship ID
-        storeFile.write(self.relationshipID.to_bytes(Relationship.relIDByteLen, 
-            byteorder = sys.byteorder, signed=True))
-        if DEBUG:
-            print("wrote relationship id")
-
-        # write node 1 id
-        storeFile.seek(self.startOffset + Relationship.NODE1_ID_OFFSET)
-        storeFile.write(self.firstNodeID.to_bytes(3, 
-            byteorder = sys.byteorder, signed=True))
-        if DEBUG:
-            print("wrote first node id")
-
-        # write node 2 id
-        storeFile.seek(self.startOffset + Relationship.NODE2_ID_OFFSET)
-        storeFile.write(self.secondNodeID.to_bytes(3, 
-            byteorder = sys.byteorder, signed=True))
-        if DEBUG:
-            print("wrote second node id")
-
-        # find which node relationship is being written for and write next and previous 
-        # relationship IDs appropriately
-        if node.getID() == self.firstNodeID:
-            if DEBUG:
-                print("writing relationship for first node")
-
-            storeFile.seek(self.startOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
-            storeFile.write(nextRel.getID().to_bytes(Relationship.relIDByteLen, 
-                byteorder = sys.byteorder, signed=True))
-
-            storeFile.seek(self.startOffset + Relationship.NODE1_PREV_REL_ID_OFFSET)
-            storeFile.write(prevRel.getID().to_bytes(Relationship.relIDByteLen, 
-                byteorder = sys.byteorder, signed=True))
-
-        else:
-            if DEBUG:
-                print("writing relationship for second node")
-            storeFile.seek(self.startOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
-            storeFile.write(nextRel.getID().to_bytes(Relationship.relIDByteLen, 
-                byteorder = sys.byteorder, signed = True))
-
-            storeFile.seek(self.startOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
-            storeFile.write(prevRel.getID().to_bytes(Relationship.relIDByteLen, 
-                byteorder = sys.byteorder, signed = True))
-
-        # write relationship type
-        if DEBUG:
-            print("writing relationship type")
-        storeFile.seek(self.startOffset + Relationship.RELATIONSHIP_TYPE_OFFSET)
-
-        # type is not of max size
-        if(sys.getsizeof(self.type) != self.MAX_TYPE_SIZE):
-            # pad relationship type string up to max size
-            while len(self.type.encode('utf-8')) != self.MAX_TYPE_SIZE:
-                self.type += ' '
-
-        storeFile.write(bytearray(self.type, 'utf8'))
-        # strip out additional whitespace used for padding from type
-        self.type = self.type.rstrip(' ')
-
-        # write first property ID
-        storeFile.seek(self.startOffset + Relationship.PROPERTY_ID_OFFSET)
-
-        # if no properties write -1 for first ID
-        if len(self.properties) == 0:
-            firstProp = -1
-            storeFile.write((-1).to_bytes(Property.propIDByteLen,
-                byteorder = sys.byteorder, signed=True))
-            if DEBUG:
-                print("wrote first property ID: -1")
-        # otherwise write id of first property
-        else:
-            firstProp = self.properties[0]
-            storeFile.write(firstProp.getID().to_bytes(Property.propIDByteLen,
-                byteorder = sys.byteorder, signed=True))
-            if DEBUG:
-                print("wrote first property ID: {0}". format(firstProp.getID()))
-
-
-        # write properties to property file
-        if DEBUG:
-            print("writing properties to property file ...")
-
-        # write properties to property file
-        for propIndex in range(0, len(self.properties)):
-            prop = self.properties[propIndex]
-            if DEBUG:
-                print("writing {0} property ".format(prop.getID()))
-
-            # case of no next property
-            if propIndex == len(self.properties) - 1:
-                if DEBUG:
-                    print("no next property")
-                # A placeholder property since there is no next property
-                nullProperty = Property("", "", "", -1)
-                prop.writeProperty(nullProperty)
-            # case of next property
-            else:
-                prop.writeProperty(self.properties[propIndex + 1])
 
     
 

@@ -8,7 +8,7 @@ class NodeStorageManager(StorageManager):
 		# create file objects for each of the node files, and make a list of these
 
 	# returns node, given nodeID
-	readNode(nodeID):
+	def readNode(nodeID):
 		pageID = nodeID[0] 			# pageID[0] = 0, pageID[1] = pageIndex
 		nodeIndex = nodeID[1]
 
@@ -37,31 +37,32 @@ class NodeStorageManager(StorageManager):
 
             print("writing node...")
 
-        nodeID = node.nodeID
+        nodeID = node.getNodeID()
         pageID = nodeID[0] 			# pageID[0] = 0, pageID[1] = pageIndex
-		nodeIndex = nodeID[1]
 
 		pageIndex = pageID[1]		# which page node is in, page IDs are unique across all files
-		# file number of node file page is in
-		fileNo = pageIndex / DataFile.MAX_FILE_PAGES 
-		nodeFile = nodeFiles[fileNo - 1]
 
-        nodeFile.writeNode(node)
+		nodePage = BufferManager.getNodePage(pageIndex, self)
+
+		nodePage.writeNode(node)
 
         if DEBUG:
             print("writing relationships to relationship file ...")
 
-        RelationshipStoreManager.writeRelationships(node.relationships)
+        for rel in node.relationships:
+        	RelationshipStoreManager.writeRelationship(rel)
         
         if DEBUG:
             print("writing properties to property file ...")
 
-        PropertyStoreManager.writeProperties(node.properties)
+        for prop in node.properties:
+        	PropertyStoreManager.writeProperty(prop)
 
         if DEBUG:
             print("writing labels to property file ...")
 
-        LabelStoreManager.writeLabels(node.labels)
+        for label in node.labels:
+        	LabelStoreManager.writeLabel(label)
 
 	def createNode():
 		# find if last file's last page has space

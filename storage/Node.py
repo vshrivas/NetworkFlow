@@ -100,8 +100,40 @@ class Node:
 
     
     def addRelationship(self, rel):
+        prevRel = None
+        prevRelID = -1
+
+        # node had relationships before
+        if (len(self.relationships) > 0):
+             # find last relationship
+             prevRel = self.relationships[len(self.relationships) - 1]
+             prevRelID = prevRel.getID()
+
+             # set previous relationship's next relID 
+             # the node is the first node in the relationship
+             if node.getID() == prevRel.firstNodeID:
+                prevRel.node1NextRelID = rel.getID()
+
+             # node is the second node in the relationship
+             else:
+                prevRel.node2NextRelID = rel.getID()
+
+             # relationship was changed so write it to page
+             RelationshipStorageManager.writeRelationship(prevRel)
+
+        # set this relationship's prev relID
+        if node.getID() == rel.firstNodeID:
+            rel.node1PrevRelId = prevRelID
+
+        else:
+            rel.node2PrevRelID = prevRelID
+            
+        # relationship was changed so write it to page
+        RelationshipStorageManager.writeRelationship(rel)
+
         """Adds a relationship to this node's relationship list."""
         self.relationships.append(rel)
+
 
     def addRelationships(self, rels):
         for rel in rels:
