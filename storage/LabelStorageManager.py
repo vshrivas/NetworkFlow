@@ -10,7 +10,31 @@ class LabelStorageManager(StorageManager):
         labelPage = BufferManager.getLabelPage(pageIndex, self)
         return labelPage.readLabel(labelIndex)
 
-	def writeLabels(self, labels):
+    def writeLabel(label):
+        labelID = label.getID()
+        pageID = labelID[0]           # pageID[0] = 0, pageID[1] = pageIndex
+
+        pageIndex = pageID[1]        # which page node is in, page IDs are unique across all files
+
+        labelPage = BufferManager.getLabelPage(pageIndex, self)
+
+        labelPage.writeLabel(label)
+
+    def getLabelChain(firstLabelID):
+        nextLabelID = firstLabelID
+        
+        chainedLabels = []
+        
+        # while there is a next property for the relationship
+        while nextLabelID != -1:
+            label = readLabel(nextLabelID)
+            chainedLabels.append(label)
+
+            nextLabelID = label.nextLabelID
+
+        return chainedLabels
+
+	'''def writeLabels(self, labels):
         # write labels to label file
         for labelIndex in range(0, len(labels)):
             label = labels[labelIndex]
@@ -27,4 +51,4 @@ class LabelStorageManager(StorageManager):
             else:
                 nextLabelID = (labels[labelIndex + 1]).getLabelID()
             # write label
-            label.writeLabel(nextLabelID) 
+            label.writeLabel(nextLabelID)'''

@@ -90,10 +90,20 @@ class PropertyPage(DataPage):
 
     def writePageData(self):
         filePath = ((PropertyFile) self.datafile).getFilePath()
-        relFile = open(filePath, 'rb')
+        propFile = open(filePath, 'rb')
 
-        for rel in propertyData:
-            writeRelationshipData(rel, relFile)
+        # write number of entries
+        propFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
+        propFile.write((self.numEntries).to_bytes(Property.nodeIDByteLen,
+            byteorder = sys.byteorder, signed=True))
+
+        # write owner ID
+        propFile.seek(self.pageStart + OWNER_ID_OFFSET)
+        propFile.write((self.ownerID).to_bytes(Property.nodeIDByteLen,
+            byteorder = sys.byteorder, signed=True))
+
+        for prop in propertyData:
+            writePropertyData(prop, propertyFile)
 
 	def writePropertyData(self, prop, storeFile):
         propertyStartOffset = self.pageStart + DATA_OFFSET  + propertyIndex * Property.storageSize

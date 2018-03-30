@@ -78,11 +78,6 @@ class Node:
         # Assign nodeID
         self.nodeID = nodeID
 
-        # if creating a new node
-        if self.nodeID >= Node.numNodes:
-            # increment number of nodes
-            Node.numNodes += 1
-
         # set nodeFile for node
         self.nodeFile = nodeFile
 
@@ -96,7 +91,7 @@ class Node:
 
         # set starting offset of node in NodeFile
         nodeIndex = self.nodeID[1]
-        self.startOffset = nodeIndex * Node.storageSize + Node.nodeIDByteLen
+        #self.startOffset = nodeIndex * Node.storageSize + Node.nodeIDByteLen
 
     
     def addRelationship(self, rel):
@@ -111,7 +106,7 @@ class Node:
 
              # set previous relationship's next relID 
              # the node is the first node in the relationship
-             if node.getID() == prevRel.firstNodeID:
+             if node.getID()[1] == prevRel.firstNodeID[1]:
                 prevRel.node1NextRelID = rel.getID()
 
              # node is the second node in the relationship
@@ -119,7 +114,7 @@ class Node:
                 prevRel.node2NextRelID = rel.getID()
 
         # set this relationship's prev relID
-        if node.getID() == rel.firstNodeID:
+        if node.getID()[1] == rel.firstNodeID[1]:
             rel.node1PrevRelId = prevRelID
 
         else:

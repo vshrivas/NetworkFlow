@@ -1,11 +1,34 @@
+from .Node import Node
+from .NodePage import NodePage
+from .Property import Property
+from .Relationship import Relationship
+from .Label import Label
+import sys, struct, os
+
 # has metadata keeping track of number of node files
 class NodeStorageManager(StorageManager):
-	nodeFiles = []
-	metaDataPath = "datastore"
+	numNodeFiles = 0
+	directory = "nodestore"
+
 	def __init__(self):
 		# open node storage meta data file
 		# read number of node files 
-		# create file objects for each of the node files, and make a list of these
+		self.fileName = "metadata"
+		self.filePath = os.path.join(NodeStorageManager.directory, self.fileName)
+
+		if os.path.exists(self.filePath):
+            metadataFile = open(self.filePath, 'r+b')
+            numNodeFiles = int.from_bytes(metadataFile.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
+
+        else:
+            metadataFile = open(self.filePath, 'wb')
+            # write number of node files to first 3 bytes of node storage metadata file
+            metadataFile.write((0).to_bytes(Node.nodeIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+
+        if numNodeFiles == 0:
+        	NodeFile(0)
+
 
 	# returns node, given nodeID
 	def readNode(nodeID):
@@ -65,11 +88,11 @@ class NodeStorageManager(StorageManager):
         	LabelStoreManager.writeLabel(label)
 
 	def createNode():
-		# find if last file's last page has space
-		lastFile = nodeFiles[len(nodeFiles) - 1]
-		nodePage = lastFile.hasSpace()
+		nodePage = BufferManager.getNodePage(0, self)
 
-		# last node file is full
-		if nodePage == None:
-			# make new file
-			newFile = NodeFile(len(nodeFiles))
+		nodeFile = NodeFile(0)
+		node = Node(nodeFile, nodePage, nodePage.numEntries)
+
+		nodePage.numEntries += 1
+
+		writeNode(node)

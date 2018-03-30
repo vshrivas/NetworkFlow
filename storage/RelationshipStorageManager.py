@@ -1,10 +1,27 @@
 class RelationshipStorageManager(StorageManager):
 	nodeFiles = []
-	metaDataPath = "datastore"
+	directory = "relstore"
+
+	numRelFiles = 0
+
 	def __init__(self):
-		# open node storage meta data file
-		# read number of node files 
-		# create file objects for each of the node files, and make a list of these
+		# open relationship storage meta data file
+		# read number of relationship files 
+		self.fileName = "metadata"
+		self.filePath = os.path.join(RelationshipStorageManager.directory, self.fileName)
+
+		if os.path.exists(self.filePath):
+            metadataFile = open(self.filePath, 'r+b')
+            numRelFiles = int.from_bytes(metadataFile.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+
+        else:
+            metadataFile = open(self.filePath, 'wb')
+            # write number of rel files to first 3 bytes of rel storage metadata file
+            metadataFile.write((0).to_bytes(Relationship.relIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+
+        if numRelFiles == 0:
+        	RelationshipFile(0)
 
 	def readRelationship(relId):
 		pageID = relID[0]
@@ -15,19 +32,31 @@ class RelationshipStorageManager(StorageManager):
         # use buffer manager to retrieve page from memory
 		# will load page into memory if wasn't there
         relationshipPage = BufferManager.getRelationshipPage(pageIndex, self)
-        return relationshipPage.readRelationship(nodeIndex)
+        rel = relationshipPage.readRelationship(nodeIndex)
+
+        properties = getPropertyChain(rel.propertyID)
+
+        rel.properties = properties
+
+        return rel
 
     def writeRelationship(rel):
-    	reID = rel.getRelID()
+    	relID = rel.getRelID()
         pageID = relID[0] 			# pageID[0] = 0, pageID[1] = pageIndex
 
-		pageIndex = relID[1]		# which page node is in, page IDs are unique across all files
+		pageIndex = pageID[1]		# which page node is in, page IDs are unique across all files
 
 		relPage = BufferManager.getRelationshipPage(pageIndex, self)
 
 		relPage.writeRelationship(rel)
 
-	def getRelationshipChain(firstRelID):
+		if DEBUG:
+            print("writing properties to property pages ...")
+
+        for prop in node.properties:
+        	PropertyStoreManager.writeProperty(prop)
+
+	def getRelationshipChain(firstRelID, nodeIndex):
 		nextRelID = firstRelID
 
         if DEBUG:
@@ -38,30 +67,17 @@ class RelationshipStorageManager(StorageManager):
             if DEBUG:
                 print(nextRelID)
 
-            rel = getRelationship(nextRelID)
+            rel = readRelationship(nextRelID)
 
             #rel.relationshipID = nextRelID
-            node.addRelationship(rel)
-
-            # read in relationship properties
-            # read in first property ID
-            relationshipStore.seek(relationshipStartOffset + Relationship.PROPERTY_ID_OFFSET)
-            firstRelPropID = int.from_bytes(relationshipStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
-
-            nextRelPropID = firstRelPropID
-            if DEBUG:
-                print ('Reading in properties for rel {0}...'.format(nextRelID))
-
-			rel.addProperties(PropertyStorageManager.getPropertyChain())           
+            node.addRelationship(rel)         
 
             # find next rel ID
-            if nodeID == node1ID:
-                relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
-                nextRelID = int.from_bytes(relationshipStore.read(4), sys.byteorder, signed=True)
+            if nodeIndex == node1ID[1]:
+                nextRelID = rel.node1NextRelID
 
             else:
-                relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
-                nextRelID = int.from_bytes(relationshipStore.read(4), sys.byteorder, signed=True)
+                nextRelID = rel.node2NextRelID
 
 
     # triggers writes for every page of these relationships

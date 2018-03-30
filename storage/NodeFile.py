@@ -15,26 +15,32 @@ class NodeFile(object):
 
     # number of node files
     #numFiles = 0
-    METADATA_OFFSET = 0
+    NUMPAGES_OFFSET = 0
     PAGES_OFFSET = 100
 
-    def __init__(self):
+    directory = "nodestore"
+
+    def __init__(self, fileID):
         """Constructor for NodeFile, which creates the backing file if necessary. """
-        NodeFile.numFiles += 1
-        self.fileID = NodeFile.numFiles
+        self.fileID = fileID
 
         # create node file if it doesn't already exist
         self.fileName = "NodeFile{0}.store".format(self.fileID)
-        self.dir = "datafiles"
-        self.filePath = os.path.join(self.dir, self.fileName)
+        self.filePath = os.path.join(self.directory, self.fileName)
 
+        self.numPages = 0
         if os.path.exists(self.filePath):
             nodeFile = open(self.filePath, 'r+b')
+            self.numPages = int.from_bytes(nodeFile.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
         else:
             nodeFile = open(self.filePath, 'wb')
-            # write number of nodes to first 3 bytes of node file
+            # write number of pages to first 3 bytes of node file
             nodeFile.write((0).to_bytes(Node.nodeIDByteLen,
                 byteorder = sys.byteorder, signed=True))
+
+        if self.numPages == 0:
+            NodePage(0, self, True)
+
         nodeFile.close()
 
     def getFileName(self):

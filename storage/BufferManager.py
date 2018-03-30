@@ -10,7 +10,7 @@ class BufferManager(object):
 
     # takes in pageID 
     # returns page if found, None if not found
-    def getPage(pageID):
+    def getNodePage(pageIndex):
         # uses dictionary to find page corresponding to pageID
         # returns the page object associated with it
         for key in cachedPages:

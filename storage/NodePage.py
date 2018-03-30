@@ -1,3 +1,9 @@
+from .Node import Node
+from .Property import Property
+from .Relationship import Relationship
+from .Label import Label
+import sys, struct, os
+
 class NodePage(DataPage):
 	ENTRY_SIZE = Node.storageSize
 
@@ -5,14 +11,18 @@ class NodePage(DataPage):
 	# takes in 
 	# pageIndex: index of page (unique across nodeFiles)
 	# datafile: nodeFile containing page
-	def __init__(self, pageIndex, datafile):
+	def __init__(self, pageIndex, datafile, create):
 		# 0 indicates that this is a node page
 		pageID = [0, pageIndex]
 		super().__init__(pageID, datafile)
 
 		self.nodeData = []  # list of node objects the page contains
-		# read in all page data
-		readPageData()
+
+        if create == False:
+		  # read in all page data
+		  readPageData()
+        else:
+          writePageData()
 
 	def readPageData():
 		filePath = ((DataFile) self.file).getFilePath()
@@ -56,7 +66,7 @@ class NodePage(DataPage):
 
         nodeAttributes = [firstRelID, firstPropID, firstLabelID]
 
-        nodeRelationships = RelationshipStoreManager.getRelChain(firstRelID)
+        nodeRelationships = RelationshipStoreManager.getRelationshipChain(firstRelID, nodeIndex)
 		nodeProperties = PropertyStoreManager.getPropChain(firstPropID)
 		nodeLabels = LabelStoreManager.getLabelChain(firstLabelID)
 
@@ -80,6 +90,16 @@ class NodePage(DataPage):
 	def writePageData(self):
 		filePath = ((NodeFile) self.datafile).getFilePath()
 		nodeFile = open(filePath, 'rb')
+
+        # write number of entries
+        nodeFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
+        nodeFile.write((self.numEntries).to_bytes(Node.nodeIDByteLen,
+            byteorder = sys.byteorder, signed=True))
+
+        # write owner ID
+        nodeFile.seek(self.pageStart + OWNER_ID_OFFSET)
+        nodeFile.write((self.ownerID).to_bytes(Node.nodeIDByteLen,
+            byteorder = sys.byteorder, signed=True))
 
 		for node in nodeData:
 			writeNodeData(node.getIndex(), nodeFile)

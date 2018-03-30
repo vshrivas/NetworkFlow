@@ -98,6 +98,16 @@ class RelationshipPage(DataPage):
     	filePath = ((RelationshipFile) self.datafile).getFilePath()
 		relFile = open(filePath, 'rb')
 
+		# write number of entries
+        relFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
+        relFile.write((self.numEntries).to_bytes(Relationship.relIDByteLen,
+            byteorder = sys.byteorder, signed=True))
+
+        # write owner ID
+        relFile.seek(self.pageStart + OWNER_ID_OFFSET)
+        relFile.write((self.ownerID).to_bytes(Relationship.relIDByteLen,
+            byteorder = sys.byteorder, signed=True))
+
     	for rel in relationshipData:
     		writeRelationshipData(rel, relFile)
 

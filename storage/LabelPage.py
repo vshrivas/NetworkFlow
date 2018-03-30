@@ -60,6 +60,16 @@ class LabelPage(DataPage):
     	filePath = ((LabelFile) self.datafile).getFilePath()
 		labelFile = open(filePath, 'rb')
 
+		# write number of entries
+        labelFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
+        labelFile.write((self.numEntries).to_bytes(Label.nodeIDByteLen,
+            byteorder = sys.byteorder, signed=True))
+
+        # write owner ID
+        labelFile.seek(self.pageStart + OWNER_ID_OFFSET)
+        labelFile.write((self.ownerID).to_bytes(Label.nodeIDByteLen,
+            byteorder = sys.byteorder, signed=True))
+
     	for label in labelData:
     		writeLabelData(label, labelFile)
 
