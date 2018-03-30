@@ -15,7 +15,8 @@ import pickle, os
 # of each type
 class StorageManager(object):
 
-    #folder_prefix = "datastore/"
+    '''def __init__():'''
+    '''#folder_prefix = "datastore/"
     def __init__(self, nodeFile, relationshipFile, propertyFile, labelFile):
         self.nodeFile = nodeFile
         self.relationshipFile = relationshipFile
@@ -369,7 +370,7 @@ class StorageManager(object):
             else:
                 nextLabelID = (self.labels[labelIndex + 1]).getLabelID()
             # write label
-            label.writeLabel(nextLabelID)
+            label.writeLabel(nextLabelID)'''
 
 
 

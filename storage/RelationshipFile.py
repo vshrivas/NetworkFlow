@@ -1,4 +1,4 @@
-from .Relationship import Relationship
+from Relationship import Relationship
 import sys, os
 
 class RelationshipFile:

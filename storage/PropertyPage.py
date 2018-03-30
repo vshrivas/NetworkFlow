@@ -1,3 +1,5 @@
+from .Property import Property
+
 class PropertyPage(DataPage):
 	def __init__(self, pageIndex, datafile):
 		# 2 indicates that this is a property page

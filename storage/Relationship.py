@@ -1,4 +1,4 @@
-from .Property import Property
+from Property import Property
 import sys
 
 DEBUG = False
@@ -53,7 +53,7 @@ class Relationship:
 
     relIDByteLen = 4
 
-    def __init__(self, relationshipID, node1ID, node2ID, node1NextRelID, node2PrevRelID,
+    def __init__(self, relationshipID, node1ID, node2ID, node1NextRelID, node1PrevRelID,
             node2NextRelID, node2PrevRelID,
             relType, propertyID, relationshipFile):
         """Constructor for Relationship, which sets the first node ID and second node ID 

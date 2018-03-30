@@ -29,8 +29,8 @@ class DataPage(object):
 			# 3 Label
 		self.pageID = pageID
 		self.pageStart = self.getPageIndex() * self.MAX_PAGE_SIZE
-		self.pageLock = Lock()
-		self.dirty = true
+		#self.pageLock = Lock()
+		self.dirty = True
 		self.file = datafile
 		self.pageSize = 0
 		self.numEntries = 0
@@ -54,5 +54,5 @@ class DataPage(object):
 		self.pageLock.acquire()
 		self.ownerID = ownerID
 
-	# writes page to disk
-	def syncPage():
+	def getPageIndex(self):
+		return self.pageID[1]

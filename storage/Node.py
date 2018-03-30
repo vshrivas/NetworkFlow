@@ -1,7 +1,7 @@
-from .Relationship import Relationship
-from .Property import Property
-from .Label import Label
-from .LabelIndex import LabelIndex
+from Relationship import Relationship
+from Property import Property
+from Label import Label
+from LabelIndex import LabelIndex
 import sys
 
 DEBUG = False

@@ -1,16 +1,16 @@
-class PropertyStorageManager(StorageManager):
-	def readProperty(propertyID):
-		pageID = propertyID[0]
+class PropertyStorageManager():
+    def readProperty(propertyID):
+        pageID = propertyID[0]
         propertyIndex = propertyID[1]
 
         pageIndex = pageID[1]
 
         # use buffer manager to retrieve page from memory
-		# will load page into memory if wasn't there
+        # will load page into memory if wasn't there
         propertyPage = BufferManager.getPropertyPage(pageIndex, self)
         return propertyPage.readNode(nodeIndex)
 
-	def writeProperty(property):
+    def writeProperty(property):
         propID = property.getID()
         pageID = propID[0]           # pageID[0] = 0, pageID[1] = pageIndex
 
@@ -51,8 +51,8 @@ class PropertyStorageManager(StorageManager):
             else:
                 self.writeProperty(prop, properties[propIndex + 1])'''
 
-	'''def getProperty(propID, propertyStore, propertyStartOffset):
-		# find ID
+    '''def getProperty(propID, propertyStore, propertyStartOffset):
+        # find ID
         propertyStore.seek(propertyStartOffset)
 
         if DEBUG:

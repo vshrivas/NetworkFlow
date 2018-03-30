@@ -1,133 +1,154 @@
-from .Node import Node
-from .Property import Property
-from .Relationship import Relationship
-from .Label import Label
+from Node import Node
+from Property import Property
+from Relationship import Relationship
+from Label import Label
+from DataPage import DataPage
+from RelationshipStorageManager import RelationshipStorageManager
+from PropertyStorageManager import PropertyStorageManager
+from LabelStorageManager import LabelStorageManager
 import sys, struct, os
 
 class NodePage(DataPage):
-	ENTRY_SIZE = Node.storageSize
+    ENTRY_SIZE = Node.storageSize
 
-	# constructor for NodePage
-	# takes in 
-	# pageIndex: index of page (unique across nodeFiles)
-	# datafile: nodeFile containing page
-	def __init__(self, pageIndex, datafile, create):
-		# 0 indicates that this is a node page
-		pageID = [0, pageIndex]
-		super().__init__(pageID, datafile)
+    # constructor for NodePage
+    # takes in 
+    # pageIndex: index of page (unique across nodeFiles)
+    # datafile: nodeFile containing page
+    def __init__(self, pageIndex, datafile, create):
+        # 0 indicates that this is a node page
+        pageID = [0, pageIndex]
+        super().__init__(pageID, datafile)
 
-		self.nodeData = []  # list of node objects the page contains
+        self.nodeData = []  # list of node objects the page contains
 
         if create == False:
-		  # read in all page data
-		  readPageData()
+          # read in all page data
+            self.readPageData()
         else:
-          writePageData()
+            self.writePageData()
 
-	def readPageData():
-		filePath = ((DataFile) self.file).getFilePath()
-		nodeFile = open(filePath, 'rb')
+    def readPageData(self):
+        filePath = (self.file).getFilePath()
+        nodeFile = open(filePath, 'rb')
 
-		# read in number of entries
-		nodeFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
-		self.numEntries = int.from_bytes(nodeFile.read(DataPage.NUM_ENTRIES_SIZE), sys.byteorder, signed=True)
+        # read in number of entries
+        nodeFile.seek(self.pageStart + self.NUM_ENTRIES_OFFSET)
+        self.numEntries = int.from_bytes(nodeFile.read(DataPage.NUM_ENTRIES_SIZE), sys.byteorder, signed=True)
+        print('num entries:')
+        print(self.numEntries)
 
-		# read in owner of page
-		nodeFile.seek(self.pageStart + OWNER_ID_OFFSET)
-		self.ownerID = int.from_bytes(nodeFile.read(DataPage.OWNER_ID_SIZE), sys.byteorder, signed=True)
+        # read in owner of page
+        nodeFile.seek(self.pageStart + self.OWNER_ID_OFFSET)
+        self.ownerID = int.from_bytes(nodeFile.read(DataPage.OWNER_ID_SIZE), sys.byteorder, signed=True)
 
-		# read in all data items
-		for nodeIndex in range(0, self.numEntries):
-			node = readNodeData(nodeIndex)
-			nodeData.append(node)
+        # read in all data items
+        for nodeIndex in range(0, self.numEntries):
+            node = self.readNodeData(nodeIndex)
+            self.nodeData.append(node)
 
-	def readNode(self, nodeIndex):
-		return nodeData[nodeIndex]
+    def readNode(self, nodeIndex):
+        print(len(self.nodeData))
+        return self.nodeData[nodeIndex]
 
-	# reads in node from page in file, using nodeIndex 
-	# used when loading page data into memory
-	# takes in nodeIndex
-	# returns node
-	def readNodeData(self, nodeIndex):
-		filePath = ((NodeFile) self.file).getFilePath()
-		nodeFile = open(filePath, 'rb')
+    # reads in node from page in file, using nodeIndex 
+    # used when loading page data into memory
+    # takes in nodeIndex
+    # returns node
+    def readNodeData(self, nodeIndex):
+        filePath = (self.file).getFilePath()
+        nodeFile = open(filePath, 'rb')
 
-		nodeStartOffset = self.pageStart + DATA_OFFSET + nodeIndex * Node.storageSize
-		
-		# read first rel ID, first property ID, first label ID
+        nodeStartOffset = self.pageStart + self.DATA_OFFSET + nodeIndex * Node.storageSize
+        
+        # read first rel ID, first property ID, first label ID
         nodeFile.seek(nodeStartOffset + Node.REL_ID_OFFSET)
         firstRelID = int.from_bytes(nodeFile.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
 
         nodeFile.seek(nodeStartOffset + Node.PROPERTY_ID_OFFSET)
         firstPropID = int.from_bytes(nodeFile.read(Property.propIDByteLen), sys.byteorder, signed=True)
 
-		nodeFile.seek(nodeStartOffset + Node.LABEL_ID_OFFSET)
-		firstLabelID = int.from_bytes(nodeFile.read(Label.labelIDByteLen), sys.byteorder, signed=True)
+        nodeFile.seek(nodeStartOffset + Node.LABEL_ID_OFFSET)
+        firstLabelID = int.from_bytes(nodeFile.read(Label.labelIDByteLen), sys.byteorder, signed=True)
 
         nodeAttributes = [firstRelID, firstPropID, firstLabelID]
 
-        nodeRelationships = RelationshipStoreManager.getRelationshipChain(firstRelID, nodeIndex)
-		nodeProperties = PropertyStoreManager.getPropChain(firstPropID)
-		nodeLabels = LabelStoreManager.getLabelChain(firstLabelID)
+        '''nodeRelationships = RelationshipStorageManager.getRelationshipChain(firstRelID, nodeIndex)
+        nodeProperties = PropertyStorageManager.getPropChain(firstPropID)
+        nodeLabels = LabelStorageManager.getLabelChain(firstLabelID)'''
 
-		node = Node(datafile, pageID, nodeIndex)
-		node.addRelationships(nodeRelationships)
-		node.addProperties(nodeProperties)
-		node.addLabels(nodeLabels)
+        node = Node(self.file, self, [self.pageID, nodeIndex])
+        #node.addRelationships(nodeRelationships)
+        #node.addProperties(nodeProperties)
+        #node.addLabels(nodeLabels)
 
-		return node
+        return node
 
     # called by node storage manager
     # sets the node as the new node in node data
     # then calls writeNode to sync page data to disk
-    def writeNode(node):
-        nodeID = node.getNodeID()
+    def writeNode(self, node, create):
+        nodeID = node.getID()
 
         nodeIndex = nodeID[1]
-        nodeData[nodeIndex] = node
 
-	# syncs all page data to disk
-	def writePageData(self):
-		filePath = ((NodeFile) self.datafile).getFilePath()
-		nodeFile = open(filePath, 'rb')
+        if create:
+            self.nodeData.append(node)
+        else:
+            self.nodeData[nodeIndex] = node
+
+        self.writePageData()
+
+    # syncs all page data to disk
+    def writePageData(self):
+        filePath = (self.file).getFilePath()
+        nodeFile = open(filePath, 'wb')
+
+        print('writing page data...')
 
         # write number of entries
-        nodeFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
+        nodeFile.seek(self.pageStart + DataPage.NUM_ENTRIES_OFFSET)
+
+        print('writing num entries as {0}'.format(self.numEntries))
         nodeFile.write((self.numEntries).to_bytes(Node.nodeIDByteLen,
             byteorder = sys.byteorder, signed=True))
 
         # write owner ID
-        nodeFile.seek(self.pageStart + OWNER_ID_OFFSET)
+        nodeFile.seek(self.pageStart + DataPage.OWNER_ID_OFFSET)
+
+        print('writing owner ID as {0}'.format(self.ownerID))
         nodeFile.write((self.ownerID).to_bytes(Node.nodeIDByteLen,
             byteorder = sys.byteorder, signed=True))
 
-		for node in nodeData:
-			writeNodeData(node.getIndex(), nodeFile)
+        print('writing all nodes...')
+        for node in self.nodeData:
+            print('writing node {0}'.format(node.getID()[1]))
+            self.writeNodeData(node.getID()[1], nodeFile)
 
 
-	# syncs node data to disk
+    # syncs node data to disk
     def writeNodeData(self, nodeIndex, storeFile):
-    	node = nodeData[nodeIndex]
+        node = self.nodeData[nodeIndex]
 
-        if DEBUG:
-            print("opened store file: {0}". format(storeFileName))
+        #if DEBUG:
+            #print("opened store file: {0}". format(storeFileName))
 
-        nodeStartOffset = self.pageStart + DATA_OFFSET + nodeIndex * Node.storageSize
+        nodeStartOffset = self.pageStart + DataPage.DATA_OFFSET + nodeIndex * Node.storageSize
 
         # write node id
         storeFile.seek(nodeStartOffset + Node.NODE_ID_OFFSET)
-        storeFile.write((node.nodeID).to_bytes(Node.nodeIDByteLen,
+        storeFile.write((node.nodeID[1]).to_bytes(Node.nodeIDByteLen,
             byteorder = sys.byteorder, signed=True))
 
-        if DEBUG:
-            print("wrote node ID: {0}". format(node.nodeID))
+        #if DEBUG:
+            #print("wrote node ID: {0}". format(node.nodeID))
 
         # write in-use flag
         storeFile.seek(nodeStartOffset + Node.IN_USE_FLAG_OFFSET)
         storeFile.write((1).to_bytes(1, byteorder = sys.byteorder, signed=True))
 
-        if DEBUG:
-            print("wrote in-use flag: {0}". format(1))
+        #if DEBUG:
+            #print("wrote in-use flag: {0}". format(1))
 
         # write first relationship ID
         storeFile.seek(nodeStartOffset + Node.REL_ID_OFFSET)
@@ -136,15 +157,15 @@ class NodePage(DataPage):
             firstRel = -1
             storeFile.write((-1).to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
-            if DEBUG:
-                print("wrote first rel ID: -1")
+            #if DEBUG:
+                #print("wrote first rel ID: -1")
         # otherwise, write first relationship ID
         else:
             firstRel = node.relationships[0]
             storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
-            if DEBUG:
-                print("wrote first rel ID: {0}". format(firstRel.getID()))
+            #if DEBUG:
+                #print("wrote first rel ID: {0}". format(firstRel.getID()))
 
         # write first property ID
         storeFile.seek(nodeStartOffset + Node.PROPERTY_ID_OFFSET)
@@ -153,15 +174,15 @@ class NodePage(DataPage):
             firstProp = -1
             storeFile.write((-1).to_bytes(Property.propIDByteLen,
                 byteorder = sys.byteorder, signed=True))
-            if DEBUG:
-                print("wrote first property ID: -1")
+            #if DEBUG:
+                #print("wrote first property ID: -1")
         # otherwise, write first property ID
         else:
             firstProp = node.properties[0]
             storeFile.write(firstProp.getID().to_bytes(Property.propIDByteLen,
                 byteorder = sys.byteorder, signed=True))
-            if DEBUG:
-                print("wrote first property ID: {0}". format(firstProp.getID()))
+            #if DEBUG:
+                #print("wrote first property ID: {0}". format(firstProp.getID()))
 
         # write first label ID
         storeFile.seek(nodeStartOffset + Node.LABEL_ID_OFFSET)
@@ -175,6 +196,6 @@ class NodePage(DataPage):
             storeFile.write(firstLabel.getLabelID().to_bytes(Label.LABEL_OFFSET,
                 byteorder = sys.byteorder, signed=True))
 
-    def createNode():
-    	# create a new node object
-    	newNode = Node()
+    def createNode(self):
+        # create a new node object
+        newNode = Node()

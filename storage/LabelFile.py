@@ -1,6 +1,6 @@
 import sys, os
 
-from .Label import Label
+from Label import Label
 
 class LabelFile:
 
