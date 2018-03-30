@@ -56,7 +56,9 @@ class NodeStorageManager():
         fileID = pageIndex / NodeFile.MAX_PAGES
         # use buffer manager to retrieve page from memory
         # will load page into memory if wasn't there
-        nodePage = BufferManager.getNodePage(pageIndex, NodeFile(fileID))
+
+        print('getting node page for reading')
+        nodePage = BufferManager.getNodePage(pageIndex, NodeFile(int(fileID)))
         return nodePage.readNode(nodeIndex)
 
     # takes in a node object 
@@ -84,7 +86,8 @@ class NodeStorageManager():
 
         fileID = pageIndex / NodeFile.MAX_PAGES
 
-        nodePage = BufferManager.getNodePage(pageIndex, NodeFile(fileID))
+        print('getting node page for writing')
+        nodePage = BufferManager.getNodePage(pageIndex, NodeFile(int(fileID)))
 
         if create:
             nodePage.numEntries += 1
@@ -111,10 +114,11 @@ class NodeStorageManager():
 
     def createNode():
         nodeFile = NodeFile(0)
-
+        print('getting node page for creation')
         nodePage = BufferManager.getNodePage(0, nodeFile)
 
         node = Node(nodeFile, nodePage, [[0, 0], nodePage.numEntries])
+        print('creating node {0}'.format(nodePage.numEntries))
 
         NodeStorageManager.writeNode(node, True)
 

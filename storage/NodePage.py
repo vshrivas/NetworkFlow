@@ -35,8 +35,7 @@ class NodePage(DataPage):
         # read in number of entries
         nodeFile.seek(self.pageStart + self.NUM_ENTRIES_OFFSET)
         self.numEntries = int.from_bytes(nodeFile.read(DataPage.NUM_ENTRIES_SIZE), sys.byteorder, signed=True)
-        print('num entries:')
-        print(self.numEntries)
+        print('reading num entries:{0}'.format(self.numEntries))
 
         # read in owner of page
         nodeFile.seek(self.pageStart + self.OWNER_ID_OFFSET)
@@ -48,7 +47,6 @@ class NodePage(DataPage):
             self.nodeData.append(node)
 
     def readNode(self, nodeIndex):
-        print(len(self.nodeData))
         return self.nodeData[nodeIndex]
 
     # reads in node from page in file, using nodeIndex 
@@ -110,14 +108,14 @@ class NodePage(DataPage):
         nodeFile.seek(self.pageStart + DataPage.NUM_ENTRIES_OFFSET)
 
         print('writing num entries as {0}'.format(self.numEntries))
-        nodeFile.write((self.numEntries).to_bytes(Node.nodeIDByteLen,
+        nodeFile.write((self.numEntries).to_bytes(DataPage.NUM_ENTRIES_SIZE,
             byteorder = sys.byteorder, signed=True))
 
         # write owner ID
         nodeFile.seek(self.pageStart + DataPage.OWNER_ID_OFFSET)
 
         print('writing owner ID as {0}'.format(self.ownerID))
-        nodeFile.write((self.ownerID).to_bytes(Node.nodeIDByteLen,
+        nodeFile.write((self.ownerID).to_bytes(DataPage.OWNER_ID_SIZE,
             byteorder = sys.byteorder, signed=True))
 
         print('writing all nodes...')
