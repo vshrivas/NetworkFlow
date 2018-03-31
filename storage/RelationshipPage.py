@@ -25,6 +25,7 @@ class RelationshipPage(DataPage):
     # reads in all of the relationship objects stored in this page
     # stores them in self.relationshipData
     def readPageData(self):
+        print('reading rel page data...')
         # open relationship file
         filePath = (self.file).getFilePath()
         relationshipFile = open(filePath, 'rb')
@@ -39,6 +40,7 @@ class RelationshipPage(DataPage):
 
         # read in all data items
         for relationshipIndex in range(0, self.numEntries):
+            print('reading rel {0}'.format(relationshipIndex))
             relationship = self.readRelationshipData(relationshipIndex)
             self.relationshipData.append(relationship)
 
@@ -95,7 +97,8 @@ class RelationshipPage(DataPage):
         print('read {0} type for rel'.format(relType))
 
         relationshipStore.seek(relationshipStartOffset + Relationship.PROPERTY_ID_OFFSET)
-        propertyID = int.from_bytes(relationshipStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
+        propertyIndex = int.from_bytes(relationshipStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
+        propertyID = [[2,0], propertyIndex]
 
         # create relationship and add to node
         rel = Relationship(relID, node1ID, node2ID, node1NextRelID, node1PrevRelID,
@@ -119,6 +122,7 @@ class RelationshipPage(DataPage):
         self.writePageData()
 
     def writePageData(self):
+        print('writing rel page data...')
         filePath = (self.file).getFilePath()
         relFile = open(filePath, 'r+b')
 
@@ -133,6 +137,7 @@ class RelationshipPage(DataPage):
             byteorder = sys.byteorder, signed=True))
 
         for rel in self.relationshipData:
+            print('writing data for rel {0}'.format(rel.getID()[1]))
             self.writeRelationshipData(rel, relFile)
 
     def writeRelationshipData(self, rel, relationshipStore):
@@ -179,7 +184,7 @@ class RelationshipPage(DataPage):
         # write type of relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.RELATIONSHIP_TYPE_OFFSET)
         print('wrote {0} type for rel'.format(rel.type))
-        
+
         # type is not of max size
         if(sys.getsizeof(rel.type) != Relationship.MAX_TYPE_SIZE):
             # pad relationship type string up to max size
@@ -192,6 +197,7 @@ class RelationshipPage(DataPage):
         rel.type = rel.type.rstrip(' ')
 
         # write first property ID
+        print('writing first propertyID {0}'.format(rel.propertyID))
         relationshipStore.seek(relationshipStartOffset + Relationship.PROPERTY_ID_OFFSET)
         relationshipStore.write(rel.propertyID[1].to_bytes(Property.propIDByteLen, 
             byteorder = sys.byteorder, signed=True))

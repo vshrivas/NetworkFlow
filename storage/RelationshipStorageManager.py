@@ -78,7 +78,7 @@ class RelationshipStorageManager():
         relID = [[1, 0], relPage.numEntries]
 
         rel = Relationship(relID, node0.getID(), node1.getID(),
-            [[0,0],-1], [[0,0],-1], [[0,0],-1], [[0,0],-1], type, [[0,0],-1], relFile)
+            [[1,0],-1], [[1,0],-1], [[1,0],-1], [[1,0],-1], type, [[2,0],-1], relFile)
 
         print('creating relationship {0}'.format(relPage.numEntries))
 
