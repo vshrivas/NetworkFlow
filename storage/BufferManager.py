@@ -21,7 +21,7 @@ class BufferManager(object):
                 return cachedPages[key]
 
         return None'''
-        return NodePage(0, datafile, False)
+        return NodePage(pageIndex, datafile, False)
 
 
     def getRelationshipPage(pageIndex, datafile):

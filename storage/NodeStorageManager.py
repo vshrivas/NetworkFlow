@@ -6,6 +6,7 @@ from Label import Label
 from NodeFile import NodeFile
 from BufferManager import BufferManager
 from RelationshipStorageManager import RelationshipStorageManager
+from DataPage import DataPage
 import sys, struct, os
 
 # has metadata keeping track of number of node files
@@ -66,14 +67,14 @@ class NodeStorageManager():
 
         firstRelID = node.firstRelID
 
-        nodeRelationships = RelationshipStorageManager.getRelationshipChain(firstRelID, nodeIndex)
+        #nodeRelationships = RelationshipStorageManager.getRelationshipChain(firstRelID, nodeIndex)
         '''nodeProperties = PropertyStorageManager.getPropChain(firstPropID)
         nodeLabels = LabelStorageManager.getLabelChain(firstLabelID)'''
 
-        print('node has {0} relationships'.format(len(nodeRelationships)))
+        #print('node has {0} relationships'.format(len(nodeRelationships)))
         
-        for rel in nodeRelationships:
-            node.addRelationship(rel)
+        #for rel in nodeRelationships:
+            #node.addRelationship(rel)
         #node.addProperties(nodeProperties)
         #node.addLabels(nodeLabels)
 
@@ -135,6 +136,9 @@ class NodeStorageManager():
         lastFileID = NodeStorageManager.numNodeFiles - 1
         lastFile = NodeFile(lastFileID)
 
+        if lastFile.numPages == 0:
+            lastFile.createPage()
+
         # get last node page
         lastPage = BufferManager.getNodePage(lastFile.numPages - 1, lastFile)
         
@@ -183,3 +187,5 @@ class NodeStorageManager():
         print('creating node {0} in page {1}'.format(nodePage.numEntries, nodePage.pageID[1]))
 
         NodeStorageManager.writeNode(node, True)
+
+        return node

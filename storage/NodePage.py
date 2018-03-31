@@ -66,16 +66,22 @@ class NodePage(DataPage):
         
         # read first rel ID, first property ID, first label ID
         nodeFile.seek(nodeStartOffset + Node.REL_ID_OFFSET)
-        firstRelIndex = int.from_bytes(nodeFile.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
-        firstRelID = [[1, 0], firstRelIndex]
+        absFirstRelID = int.from_bytes(nodeFile.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
+        relPageIndex = int(absFirstRelID / DataPage.MAX_PAGE_ENTRIES)
+        relIndex = int(((absFirstRelID / DataPage.MAX_PAGE_ENTRIES) - relPageIndex) *  DataPage.MAX_PAGE_ENTRIES - 1)
+        firstRelID = [[1, relPageIndex], relIndex]
 
         nodeFile.seek(nodeStartOffset + Node.PROPERTY_ID_OFFSET)
-        firstPropIndex = int.from_bytes(nodeFile.read(Property.propIDByteLen), sys.byteorder, signed=True)
-        firstPropID = [[2, 0], firstPropIndex]
+        absFirstPropID = int.from_bytes(nodeFile.read(Property.propIDByteLen), sys.byteorder, signed=True)
+        propPageIndex = int(absFirstPropID / DataPage.MAX_PAGE_ENTRIES)
+        propIndex = int(((absFirstPropID / DataPage.MAX_PAGE_ENTRIES) - propPageIndex) *  DataPage.MAX_PAGE_ENTRIES - 1)
+        firstPropID = [[2, propPageIndex], propIndex]
 
         nodeFile.seek(nodeStartOffset + Node.LABEL_ID_OFFSET)
-        firstLabelIndex = int.from_bytes(nodeFile.read(Label.labelIDByteLen), sys.byteorder, signed=True)
-        firstLabelID = [[2, 0], firstLabelIndex]
+        absFirstLabelID = int.from_bytes(nodeFile.read(Label.labelIDByteLen), sys.byteorder, signed=True)
+        labelPageIndex = int(absFirstLabelID / DataPage.MAX_PAGE_ENTRIES)
+        labelIndex = int(((absFirstLabelID / DataPage.MAX_PAGE_ENTRIES) - labelPageIndex) *  DataPage.MAX_PAGE_ENTRIES - 1)
+        firstLabelID = [[3, labelPageIndex], labelIndex]
 
         node = Node(self.file, self, [self.pageID, nodeIndex])
 
@@ -139,8 +145,9 @@ class NodePage(DataPage):
         nodeStartOffset = self.pageStart + DataPage.DATA_OFFSET + nodeIndex * Node.storageSize
 
         # write node id
+        absNodeID = self.getPageIndex() * DataPage.MAX_PAGE_ENTRIES + node.nodeID[1]
         storeFile.seek(nodeStartOffset + Node.NODE_ID_OFFSET)
-        storeFile.write((node.nodeID[1]).to_bytes(Node.nodeIDByteLen,
+        storeFile.write((absNodeID).to_bytes(Node.nodeIDByteLen,
             byteorder = sys.byteorder, signed=True))
 
         #if DEBUG:
@@ -165,7 +172,8 @@ class NodePage(DataPage):
         # otherwise, write first relationship ID
         else:
             firstRel = node.relationships[0]
-            storeFile.write(firstRel.getID()[1].to_bytes(Relationship.relIDByteLen,
+            absFirstRelID = firstRel.getID()[0][1] * DataPage.MAX_PAGE_ENTRIES + firstRel.getID()[1]
+            storeFile.write(absFirstRelID.to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
             #if DEBUG:
                 #print("wrote first rel ID: {0}". format(firstRel.getID()))
@@ -182,7 +190,8 @@ class NodePage(DataPage):
         # otherwise, write first property ID
         else:
             firstProp = node.properties[0]
-            storeFile.write(firstProp.getID()[1].to_bytes(Property.propIDByteLen,
+            absFirstPropID = firstProp.getID()[0][1] * DataPage.MAX_PAGE_ENTRIES + firstProp.getID()[1]
+            storeFile.write(absFirstPropID.to_bytes(Property.propIDByteLen,
                 byteorder = sys.byteorder, signed=True))
             #if DEBUG:
                 #print("wrote first property ID: {0}". format(firstProp.getID()))
@@ -196,7 +205,8 @@ class NodePage(DataPage):
         # otherwise, write first label ID
         else:
             firstLabel = node.labels[0]
-            storeFile.write(firstLabel.getLabelID()[1].to_bytes(Label.LABEL_OFFSET,
+            absFirstLabelID = firstLabel.getID()[0][1] * DataPage.MAX_PAGE_ENTRIES + firstLabel.getID()[1]
+            storeFile.write(absFirstLabelID.to_bytes(Label.LABEL_OFFSET,
                 byteorder = sys.byteorder, signed=True))
 
     def createNode(self):

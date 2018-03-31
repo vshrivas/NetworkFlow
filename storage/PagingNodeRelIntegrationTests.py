@@ -16,29 +16,38 @@ node0 = NodeStorageManager.createNode()
 node0ID = [[0,0], 0]
 readNode0 = NodeStorageManager.readNode(node0ID)
 
+print('node ID is {0}'.format(node0.getID()))
+print('read node ID is {0}'.format(readNode0.getID()))
+print('node is in page {0}'.format(readNode0.nodeID[0][1]))
+
 assert(node0.getID()[1] == readNode0.getID()[1]), 'read and written nodes do not match!'
+assert(node0.getID()[0][1] == readNode0.getID()[0][1]), 'read and written nodes do not match!'
 
 ##################################################################################################
 
 node1 = NodeStorageManager.createNode()
 
-node1ID = [[0,0], 1]
+node1ID = [[0,1], 0]
 readNode1 = NodeStorageManager.readNode(node1ID)
+print('node is in page {0}'.format(readNode1.nodeID[0][1]))
 
 assert(node1.getID()[1] == readNode1.getID()[1]), 'read and written nodes do not match!'
+assert(node1.getID()[0][1] == readNode1.getID()[0][1]), 'read and written nodes do not match!'
 
 ##################################################################################################
 
 node2 = NodeStorageManager.createNode()
 
-node2ID = [[0,0], 2]
+node2ID = [[0,2], 0]
 readNode2 = NodeStorageManager.readNode(node2ID)
 
-assert(node2.getID()[1] == readNode2.getID()[1]), 'read and written nodes do not match!'
+print('node is in page {0}'.format(readNode2.nodeID[0][1]))
 
+assert(node2.getID()[1] == readNode2.getID()[1]), 'read and written nodes do not match!'
+assert(node2.getID()[0][1] == readNode2.getID()[0][1]), 'read and written nodes do not match!'
 ##################################################################################################
 
-rel0 = RelationshipStorageManager.createRelationship(node0, node1, 'friendship')
+'''rel0 = RelationshipStorageManager.createRelationship(node0, node1, 'friendship')
 
 rel0ID = [[1,0], 0]
 readRel0 = RelationshipStorageManager.readRelationship(rel0ID)
@@ -195,4 +204,4 @@ assert(rel1.secondNodeID[1] == readRel1.secondNodeID[1]), 'read and written rela
 
 print('rel1 rel type:{0}'.format(rel1.getRelType()))
 print('readRel1 rel type:{0}'.format(readRel1.getRelType()))
-assert(rel1.getRelType() == readRel1.getRelType()), 'read and written relationships do not match!'
+assert(rel1.getRelType() == readRel1.getRelType()), 'read and written relationships do not match!'''

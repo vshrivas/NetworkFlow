@@ -8,7 +8,7 @@ import threading
 class DataPage(object):
 	# static variables
 	# max page size is 4KB 
-	MAX_PAGE_ENTRIES = 10
+	MAX_PAGE_ENTRIES = 1
 
 	# meta data includes:
 		# number of entries in this page
