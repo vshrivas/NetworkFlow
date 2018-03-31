@@ -106,6 +106,91 @@ assert(rel2.getRelType() == readRel2.getRelType()), 'read and written relationsh
 
 node0.addRelationship(rel0)
 
+node0.addRelationship(rel1)
+
 NodeStorageManager.writeNode(node0, False)
 
 readNode0 = NodeStorageManager.readNode(node0ID)
+
+readRel0 = readNode0.relationships[0]
+
+readRel1 = readNode0.relationships[1]
+
+print('rel0 ID:{0}'.format(rel0.getID()[1]))
+print('readRel0 ID:{0}'.format(readRel0.getID()[1]))
+assert(rel0.getID()[1] == readRel0.getID()[1]), 'read and written relationships do not match!'
+
+print('rel0 first node ID:{0}'.format(rel0.firstNodeID[1]))
+print('readRel0 first node ID:{0}'.format(readRel0.firstNodeID[1]))
+assert(rel0.firstNodeID[1] == readRel0.firstNodeID[1]), 'read and written relationships do not match!'
+
+print('rel0 second node ID:{0}'.format(rel0.secondNodeID[1]))
+print('readRel0 second node ID:{0}'.format(readRel0.secondNodeID[1]))
+assert(rel0.secondNodeID[1] == readRel0.secondNodeID[1]), 'read and written relationships do not match!'
+
+print('rel0 rel type:{0}'.format(rel0.getRelType()))
+print('readRel0 rel type:{0}'.format(readRel0.getRelType()))
+assert(rel0.getRelType() == readRel0.getRelType()), 'read and written relationships do not match!'
+
+print('rel1 ID:{0}'.format(rel1.getID()[1]))
+print('readRel1 ID:{0}'.format(readRel1.getID()[1]))
+assert(rel1.getID()[1] == readRel1.getID()[1]), 'read and written relationships do not match!'
+
+print('rel1 first node ID:{0}'.format(rel1.firstNodeID[1]))
+print('readRel1 first node ID:{0}'.format(readRel1.firstNodeID[1]))
+assert(rel1.firstNodeID[1] == readRel1.firstNodeID[1]), 'read and written relationships do not match!'
+
+print('rel1 second node ID:{0}'.format(rel1.secondNodeID[1]))
+print('readRel1 second node ID:{0}'.format(readRel1.secondNodeID[1]))
+assert(rel1.secondNodeID[1] == readRel1.secondNodeID[1]), 'read and written relationships do not match!'
+
+print('rel1 rel type:{0}'.format(rel1.getRelType()))
+print('readRel1 rel type:{0}'.format(readRel1.getRelType()))
+assert(rel1.getRelType() == readRel1.getRelType()), 'read and written relationships do not match!'
+
+#######################################################################################################
+
+node2.addRelationship(rel2)
+
+node2.addRelationship(rel1)
+
+NodeStorageManager.writeNode(node2, False)
+
+readNode2 = NodeStorageManager.readNode(node2ID)
+
+readRel2 = readNode2.relationships[0]
+
+readRel1 = readNode2.relationships[1]
+
+print('rel2 ID:{0}'.format(rel2.getID()[1]))
+print('readRel2 ID:{0}'.format(readRel2.getID()[1]))
+assert(rel2.getID()[1] == readRel2.getID()[1]), 'read and written relationships do not match!'
+
+print('rel2 first node ID:{0}'.format(rel2.firstNodeID[1]))
+print('readRel2 first node ID:{0}'.format(readRel2.firstNodeID[1]))
+assert(rel2.firstNodeID[1] == readRel2.firstNodeID[1]), 'read and written relationships do not match!'
+
+print('rel2 second node ID:{0}'.format(rel2.secondNodeID[1]))
+print('readRel2 second node ID:{0}'.format(readRel2.secondNodeID[1]))
+assert(rel2.secondNodeID[1] == readRel2.secondNodeID[1]), 'read and written relationships do not match!'
+
+print('rel2 rel type:{0}'.format(rel2.getRelType()))
+print('readRel2 rel type:{0}'.format(readRel2.getRelType()))
+assert(rel2.getRelType() == readRel2.getRelType()), 'read and written relationships do not match!'
+
+
+print('rel1 ID:{0}'.format(rel1.getID()[1]))
+print('readRel1 ID:{0}'.format(readRel1.getID()[1]))
+assert(rel1.getID()[1] == readRel1.getID()[1]), 'read and written relationships do not match!'
+
+print('rel1 first node ID:{0}'.format(rel1.firstNodeID[1]))
+print('readRel1 first node ID:{0}'.format(readRel1.firstNodeID[1]))
+assert(rel1.firstNodeID[1] == readRel1.firstNodeID[1]), 'read and written relationships do not match!'
+
+print('rel1 second node ID:{0}'.format(rel1.secondNodeID[1]))
+print('readRel1 second node ID:{0}'.format(readRel1.secondNodeID[1]))
+assert(rel1.secondNodeID[1] == readRel1.secondNodeID[1]), 'read and written relationships do not match!'
+
+print('rel1 rel type:{0}'.format(rel1.getRelType()))
+print('readRel1 rel type:{0}'.format(readRel1.getRelType()))
+assert(rel1.getRelType() == readRel1.getRelType()), 'read and written relationships do not match!'

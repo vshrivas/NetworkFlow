@@ -66,17 +66,22 @@ class NodePage(DataPage):
         
         # read first rel ID, first property ID, first label ID
         nodeFile.seek(nodeStartOffset + Node.REL_ID_OFFSET)
-        firstRelID = int.from_bytes(nodeFile.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
+        firstRelIndex = int.from_bytes(nodeFile.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
+        firstRelID = [[1, 0], firstRelIndex]
 
         nodeFile.seek(nodeStartOffset + Node.PROPERTY_ID_OFFSET)
-        firstPropID = int.from_bytes(nodeFile.read(Property.propIDByteLen), sys.byteorder, signed=True)
+        firstPropIndex = int.from_bytes(nodeFile.read(Property.propIDByteLen), sys.byteorder, signed=True)
+        firstPropID = [[2, 0], firstPropIndex]
 
         nodeFile.seek(nodeStartOffset + Node.LABEL_ID_OFFSET)
-        firstLabelID = int.from_bytes(nodeFile.read(Label.labelIDByteLen), sys.byteorder, signed=True)
-
-        nodeAttributes = [firstRelID, firstPropID, firstLabelID]
+        firstLabelIndex = int.from_bytes(nodeFile.read(Label.labelIDByteLen), sys.byteorder, signed=True)
+        firstLabelID = [[2, 0], firstLabelIndex]
 
         node = Node(self.file, self, [self.pageID, nodeIndex])
+
+        node.firstRelID = firstRelID
+        node.firstPropID = firstPropID
+        node.firstLabelID = firstLabelID
 
         return node
 
@@ -160,7 +165,7 @@ class NodePage(DataPage):
         # otherwise, write first relationship ID
         else:
             firstRel = node.relationships[0]
-            storeFile.write(firstRel.getID().to_bytes(Relationship.relIDByteLen,
+            storeFile.write(firstRel.getID()[1].to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
             #if DEBUG:
                 #print("wrote first rel ID: {0}". format(firstRel.getID()))
@@ -177,7 +182,7 @@ class NodePage(DataPage):
         # otherwise, write first property ID
         else:
             firstProp = node.properties[0]
-            storeFile.write(firstProp.getID().to_bytes(Property.propIDByteLen,
+            storeFile.write(firstProp.getID()[1].to_bytes(Property.propIDByteLen,
                 byteorder = sys.byteorder, signed=True))
             #if DEBUG:
                 #print("wrote first property ID: {0}". format(firstProp.getID()))
@@ -191,7 +196,7 @@ class NodePage(DataPage):
         # otherwise, write first label ID
         else:
             firstLabel = node.labels[0]
-            storeFile.write(firstLabel.getLabelID().to_bytes(Label.LABEL_OFFSET,
+            storeFile.write(firstLabel.getLabelID()[1].to_bytes(Label.LABEL_OFFSET,
                 byteorder = sys.byteorder, signed=True))
 
     def createNode(self):

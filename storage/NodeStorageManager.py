@@ -62,15 +62,20 @@ class NodeStorageManager():
         nodePage = BufferManager.getNodePage(pageIndex, NodeFile(int(fileID)))
         node = nodePage.readNode(nodeIndex)
 
+        firstRelID = node.firstRelID
+
         nodeRelationships = RelationshipStorageManager.getRelationshipChain(firstRelID, nodeIndex)
         '''nodeProperties = PropertyStorageManager.getPropChain(firstPropID)
         nodeLabels = LabelStorageManager.getLabelChain(firstLabelID)'''
 
-        node.addRelationships(nodeRelationships)
+        print('node has {0} relationships'.format(len(nodeRelationships)))
+        
+        for rel in nodeRelationships:
+            node.addRelationship(rel)
         #node.addProperties(nodeProperties)
         #node.addLabels(nodeLabels)
 
-        return 
+        return node
 
     # takes in a node object 
     def writeNode(node, create):
@@ -109,19 +114,19 @@ class NodeStorageManager():
             print("writing relationships to relationship file ...")'''
 
         for rel in node.relationships:
-            RelationshipStoreManager.writeRelationship(rel)
+            RelationshipStorageManager.writeRelationship(rel, False)
         
         '''if DEBUG:
             print("writing properties to property file ...")'''
 
         for prop in node.properties:
-            PropertyStoreManager.writeProperty(prop)
+            PropertyStorageManager.writeProperty(prop, False)
 
         '''if DEBUG:
             print("writing labels to property file ...")'''
 
         for label in node.labels:
-            LabelStoreManager.writeLabel(label)
+            LabelStorageManager.writeLabel(label, False)
 
     def createNode():
         nodeFile = NodeFile(0)

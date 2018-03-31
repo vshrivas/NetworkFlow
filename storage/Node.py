@@ -110,7 +110,7 @@ class Node:
 
              # set previous relationship's next relID 
              # the node is the first node in the relationship
-             if node.getID()[1] == prevRel.firstNodeID[1]:
+             if self.getID()[1] == prevRel.firstNodeID[1]:
                 prevRel.node1NextRelID = rel.getID()
 
              # node is the second node in the relationship
@@ -120,22 +120,17 @@ class Node:
             firstRelID = rel.getID()
 
         # set this relationship's prev relID
-        if node.getID()[1] == rel.firstNodeID[1]:
+        if self.getID()[1] == rel.firstNodeID[1]:
             rel.node1PrevRelID = prevRelID
-
+            rel.node1NextRelID = [[1, 0], -1]
         else:
             rel.node2PrevRelID = prevRelID
-
-        rel.node1NextRelID = prevRelID
-        rel.node2NextRelID = prevRelID
+            rel.node2NextRelID = [[1, 0], -1]
+        
 
         """Adds a relationship to this node's relationship list."""
         self.relationships.append(rel)
 
-
-    def addRelationships(self, rels):
-        for rel in rels:
-            addRelationship(rel)
 
     def addProperty(self, prop):
         if len(self.properties) > 0:
@@ -147,9 +142,6 @@ class Node:
         """Add a property, which stores a key-value pair, to this node."""
         self.properties.append(prop)
 
-    def addProperties(self, props):
-        for props in props:
-            addProperty(prop)
 
     def addLabel(self, nodeLabel):
         """Add a label to this node and add node to appropriate labelIndex (index 
@@ -172,9 +164,6 @@ class Node:
         if self.nodeID not in labelIndex.getItems():
             labelIndex.addNode(self.nodeID)
 
-    def addLabels(self, lbls):
-        for lbl in lbls:
-            addLabel(self, lbl)
         
     def removeRelationship(self, relID):
         """Remove a relationship from this node and write the node"""

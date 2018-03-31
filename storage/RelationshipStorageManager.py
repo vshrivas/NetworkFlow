@@ -87,7 +87,11 @@ class RelationshipStorageManager():
         return rel
 
     def getRelationshipChain(firstRelID, nodeIndex):
+        relationshipChain = []
+
         nextRelID = firstRelID
+
+        print('first rel ID for node is {0}'.format(firstRelID))
 
         '''if DEBUG:
             print("reading relationships")'''
@@ -96,11 +100,8 @@ class RelationshipStorageManager():
         while nextRelID[1] != -1:
             '''if DEBUG:
                 print(nextRelID)'''
-
-            rel = RelationshipStorageManager.readRelationship(nextRelID)
-
-            #rel.relationshipID = nextRelID
-            node.addRelationship(rel)         
+            print('inside get rel chain loop')
+            rel = RelationshipStorageManager.readRelationship(nextRelID)        
 
             # find next rel ID
             if nodeIndex == rel.firstNodeID[1]:
@@ -108,6 +109,10 @@ class RelationshipStorageManager():
 
             else:
                 nextRelID = rel.node2NextRelID
+
+            relationshipChain.append(rel)
+
+        return relationshipChain
 
 
     # triggers writes for every page of these relationships
