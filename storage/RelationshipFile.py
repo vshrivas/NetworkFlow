@@ -6,18 +6,19 @@ class RelationshipFile:
     """RelationshipFile class: representation of relationship file, which stores info about all
     relationships.
     """
+    MAX_PAGES = 10
+    NUMPAGES_OFFSET = 0
+    PAGES_OFFSET = 100
 
-    numFiles = 0
+    directory = "relstore"
 
-    def __init__(self, createFile=True):
+    def __init__(self, fileID):
         """Constructor for RelationshipFile, which creates the backing file if necessary. """
-        RelationshipFile.numFiles += 1
         self.fileID = RelationshipFile.numFiles
 
         # create relationship file if it doesn't already exist
         self.fileName = "RelationshipFile{0}.store".format(self.fileID)
-        self.dir = "datafiles"
-        self.filePath = os.path.join(self.dir, self.fileName)
+        self.filePath = os.path.join(self.directory, self.fileName)
         
         if os.path.exists(self.filePath):
             relFile = open(self.filePath, 'r+b')

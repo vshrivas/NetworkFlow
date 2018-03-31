@@ -10,6 +10,7 @@ import sys, struct, os
 
 class NodePage(DataPage):
     ENTRY_SIZE = Node.storageSize
+    PAGES_OFFSET = 100
 
     # constructor for NodePage
     # takes in 
@@ -22,6 +23,8 @@ class NodePage(DataPage):
 
         self.nodeData = []  # list of node objects the page contains
 
+        self.pageStart = self.getPageIndex() * (self.MAX_PAGE_ENTRIES * Node.storageSize) + self.PAGES_OFFSET
+
         if create == False:
           # read in all page data
             self.readPageData()
@@ -32,19 +35,24 @@ class NodePage(DataPage):
         filePath = (self.file).getFilePath()
         nodeFile = open(filePath, 'rb')
 
+        print('reading file {0}'.format(filePath))
+
         # read in number of entries
-        nodeFile.seek(self.pageStart + self.NUM_ENTRIES_OFFSET)
+        nodeFile.seek(self.pageStart + DataPage.NUM_ENTRIES_OFFSET)
         self.numEntries = int.from_bytes(nodeFile.read(DataPage.NUM_ENTRIES_SIZE), sys.byteorder, signed=True)
-        print('reading num entries:{0}'.format(self.numEntries))
+        print('reading num entries as {0} at {1}'.format(self.numEntries, (self.pageStart + DataPage.NUM_ENTRIES_OFFSET)))
 
         # read in owner of page
-        nodeFile.seek(self.pageStart + self.OWNER_ID_OFFSET)
+        nodeFile.seek(self.pageStart + DataPage.OWNER_ID_OFFSET)
         self.ownerID = int.from_bytes(nodeFile.read(DataPage.OWNER_ID_SIZE), sys.byteorder, signed=True)
+        print('reading owner ID as {0} at {1}'.format(self.ownerID, (self.pageStart + DataPage.OWNER_ID_OFFSET)))
 
         # read in all data items
         for nodeIndex in range(0, self.numEntries):
             node = self.readNodeData(nodeIndex)
             self.nodeData.append(node)
+
+        nodeFile.close()
 
     def readNode(self, nodeIndex):
         return self.nodeData[nodeIndex]
@@ -100,21 +108,22 @@ class NodePage(DataPage):
     # syncs all page data to disk
     def writePageData(self):
         filePath = (self.file).getFilePath()
-        nodeFile = open(filePath, 'wb')
+        nodeFile = open(filePath, 'r+b')
 
+        print('writing file {0}'.format(filePath))
         print('writing page data...')
 
         # write number of entries
         nodeFile.seek(self.pageStart + DataPage.NUM_ENTRIES_OFFSET)
 
-        print('writing num entries as {0}'.format(self.numEntries))
+        print('writing num entries as {0} at {1}'.format(self.numEntries, self.pageStart + DataPage.NUM_ENTRIES_OFFSET))
         nodeFile.write((self.numEntries).to_bytes(DataPage.NUM_ENTRIES_SIZE,
             byteorder = sys.byteorder, signed=True))
 
         # write owner ID
         nodeFile.seek(self.pageStart + DataPage.OWNER_ID_OFFSET)
 
-        print('writing owner ID as {0}'.format(self.ownerID))
+        print('writing owner ID as {0} at {1}'.format(self.ownerID, (self.pageStart + DataPage.OWNER_ID_OFFSET)))
         nodeFile.write((self.ownerID).to_bytes(DataPage.OWNER_ID_SIZE,
             byteorder = sys.byteorder, signed=True))
 
@@ -123,6 +132,7 @@ class NodePage(DataPage):
             print('writing node {0}'.format(node.getID()[1]))
             self.writeNodeData(node.getID()[1], nodeFile)
 
+        nodeFile.close()
 
     # syncs node data to disk
     def writeNodeData(self, nodeIndex, storeFile):

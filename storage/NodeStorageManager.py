@@ -114,6 +114,10 @@ class NodeStorageManager():
 
     def createNode():
         nodeFile = NodeFile(0)
+        if nodeFile.numPages == 0:
+            print('creating new page')
+            nodeFile.createPage()
+
         print('getting node page for creation')
         nodePage = BufferManager.getNodePage(0, nodeFile)
 

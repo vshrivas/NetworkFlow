@@ -56,6 +56,18 @@ class RelationshipStorageManager():
         for prop in node.properties:
             PropertyStoreManager.writeProperty(prop)
 
+    def createRelationship():
+        nodeFile = NodeFile(0)
+        print('getting node page for creation')
+        nodePage = BufferManager.getNodePage(0, nodeFile)
+
+        node = Node(nodeFile, nodePage, [[0, 0], nodePage.numEntries])
+        print('creating node {0}'.format(nodePage.numEntries))
+
+        NodeStorageManager.writeNode(node, True)
+
+        return node
+
     def getRelationshipChain(firstRelID, nodeIndex):
         nextRelID = firstRelID
 

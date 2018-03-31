@@ -8,7 +8,7 @@ import threading
 class DataPage(object):
 	# static variables
 	# max page size is 4KB 
-	MAX_PAGE_SIZE = 4000
+	MAX_PAGE_ENTRIES = 10
 
 	# meta data includes:
 		# number of entries in this page
@@ -28,7 +28,6 @@ class DataPage(object):
 			# 2 Property
 			# 3 Label
 		self.pageID = pageID
-		self.pageStart = self.getPageIndex() * self.MAX_PAGE_SIZE
 		#self.pageLock = Lock()
 		self.dirty = True
 		self.file = datafile
