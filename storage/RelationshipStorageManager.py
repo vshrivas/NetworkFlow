@@ -67,7 +67,42 @@ class RelationshipStorageManager():
             PropertyStoreManager.writeProperty(prop)'''
 
     def createRelationship(node0, node1, type):
-        relFile = RelationshipFile(0)
+        # get rel file
+        lastFileID = RelationshipStorageManager.numRelFiles - 1
+        lastFile = RelationshipFile(lastFileID)
+
+        if lastFile.numPages == 0:
+            lastFile.createPage()
+
+        # get last rel page
+        lastPage = BufferManager.getRelationshipPage(lastFile.numPages - 1, lastFile)
+        
+        relPage = lastPage
+        relFile = lastFile
+
+        # if last page is full
+        if lastPage.numEntries == DataPage.MAX_PAGE_ENTRIES:
+            # if file is at max pages
+            if lastFile.numPages == RelationshipFile.MAX_PAGES:
+                # make a new file
+                newLastFile = RelationshipFile(lastFileID + 1)
+                RelationshipStorageManager.numRelFiles += 1
+
+                metadataFile = open(self.filePath, 'r+b')
+                metadataFile.write((RelationshipStorageManager.numNodeFiles).to_bytes(Relationship.relIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+
+                relFile = newLastFile
+
+                # make a new page in the file
+                newLastFile.createPage()
+                relPage = BufferManager.getRelationshipPage(newLastFile.numPages - 1, newLastFile)
+
+            # else make new page
+            else:
+                lastFile.createPage()
+                relPage = BufferManager.getRelationshipPage(lastFile.numPages - 1, lastFile)
+        '''relFile = RelationshipFile(0)
 
         if relFile.numPages == 0:
             relFile.createPage()
@@ -84,7 +119,16 @@ class RelationshipStorageManager():
 
         RelationshipStorageManager.writeRelationship(rel, True)
 
-        return rel
+        return rel'''
+
+        relID = [relPage.pageID, relPage.numEntries]
+
+        rel = Relationship(relID, node0.getID(), node1.getID(),
+            [[1,0],-1], [[1,0],-1], [[1,0],-1], [[1,0],-1], type, [[2,0],-1], relFile)
+
+        print('creating relationship {0} in page {1}'.format(relPage.numEntries, relPage.pageID[1]))
+
+        RelationshipStorageManager.writeRelationship(rel, True)
 
     def getRelationshipChain(firstRelID, nodeIndex):
         relationshipChain = []

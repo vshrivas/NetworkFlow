@@ -68,19 +68,19 @@ class NodePage(DataPage):
         nodeFile.seek(nodeStartOffset + Node.REL_ID_OFFSET)
         absFirstRelID = int.from_bytes(nodeFile.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
         relPageIndex = int(absFirstRelID / DataPage.MAX_PAGE_ENTRIES)
-        relIndex = int(((absFirstRelID / DataPage.MAX_PAGE_ENTRIES) - relPageIndex) *  DataPage.MAX_PAGE_ENTRIES - 1)
+        relIndex = int(((absFirstRelID / DataPage.MAX_PAGE_ENTRIES) - relPageIndex) *  DataPage.MAX_PAGE_ENTRIES)
         firstRelID = [[1, relPageIndex], relIndex]
 
         nodeFile.seek(nodeStartOffset + Node.PROPERTY_ID_OFFSET)
         absFirstPropID = int.from_bytes(nodeFile.read(Property.propIDByteLen), sys.byteorder, signed=True)
         propPageIndex = int(absFirstPropID / DataPage.MAX_PAGE_ENTRIES)
-        propIndex = int(((absFirstPropID / DataPage.MAX_PAGE_ENTRIES) - propPageIndex) *  DataPage.MAX_PAGE_ENTRIES - 1)
+        propIndex = int(((absFirstPropID / DataPage.MAX_PAGE_ENTRIES) - propPageIndex) *  DataPage.MAX_PAGE_ENTRIES)
         firstPropID = [[2, propPageIndex], propIndex]
 
         nodeFile.seek(nodeStartOffset + Node.LABEL_ID_OFFSET)
         absFirstLabelID = int.from_bytes(nodeFile.read(Label.labelIDByteLen), sys.byteorder, signed=True)
         labelPageIndex = int(absFirstLabelID / DataPage.MAX_PAGE_ENTRIES)
-        labelIndex = int(((absFirstLabelID / DataPage.MAX_PAGE_ENTRIES) - labelPageIndex) *  DataPage.MAX_PAGE_ENTRIES - 1)
+        labelIndex = int(((absFirstLabelID / DataPage.MAX_PAGE_ENTRIES) - labelPageIndex) *  DataPage.MAX_PAGE_ENTRIES)
         firstLabelID = [[3, labelPageIndex], labelIndex]
 
         node = Node(self.file, self, [self.pageID, nodeIndex])
