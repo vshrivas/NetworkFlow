@@ -9,6 +9,8 @@ from Label import Label
 from NodeStorageManager import NodeStorageManager
 from RelationshipStorageManager import RelationshipStorageManager
 
+NodeStorageManager()
+
 node0 = NodeStorageManager.createNode()
 
 node0ID = [[0,0], 0]

@@ -18,13 +18,13 @@ class NodeStorageManager():
     def __init__(self):
         # open node storage meta data file
         # read number of node files 
-        self.fileName = "nodestore_metadata"
+        self.fileName = "metadata"
         self.filePath = os.path.join(NodeStorageManager.directory, self.fileName)
 
         # storage manager metadata file exists
         if os.path.exists(self.filePath):
             metadataFile = open(self.filePath, 'r+b')
-            numNodeFiles = int.from_bytes(metadataFile.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
+            NodeStorageManager.numNodeFiles = int.from_bytes(metadataFile.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
 
         # storage manager metadata file does not exist
         else:
@@ -38,11 +38,13 @@ class NodeStorageManager():
             metadataFile.write((0).to_bytes(Node.nodeIDByteLen,
                 byteorder = sys.byteorder, signed=True))
 
+        # there are no node files
         if NodeStorageManager.numNodeFiles == 0:
+            # make a new one 
             NodeFile(0)
             NodeStorageManager.numNodeFiles += 1
 
-            metadataFile = open(self.filePath, 'wb')
+            metadataFile = open(self.filePath, 'r+b')
             metadataFile.write((NodeStorageManager.numNodeFiles).to_bytes(Node.nodeIDByteLen,
                 byteorder = sys.byteorder, signed=True))
 
@@ -129,7 +131,40 @@ class NodeStorageManager():
             LabelStorageManager.writeLabel(label, False)
 
     def createNode():
-        nodeFile = NodeFile(0)
+        # get node file
+        lastFileID = NodeStorageManager.numNodeFiles - 1
+        lastFile = NodeFile(lastFileID)
+
+        # get last node page
+        lastPage = BufferManager.getNodePage(lastFile.numPages - 1, lastFile)
+        
+        nodePage = lastPage
+        nodeFile = lastFile
+
+        # if last page is full
+        if lastPage.numEntries == DataPage.MAX_PAGE_ENTRIES:
+            # if file is at max pages
+            if lastFile.numPages == NodeFile.MAX_PAGES:
+                # make a new file
+                newLastFile = NodeFile(lastFileID + 1)
+                NodeStorageManager.numNodeFiles += 1
+
+                metadataFile = open(self.filePath, 'r+b')
+                metadataFile.write((NodeStorageManager.numNodeFiles).to_bytes(Node.nodeIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+
+                nodeFile = newLastFile
+
+                # make a new page in the file
+                newLastFile.createPage()
+                nodePage = BufferManager.getNodePage(newLastFile.numPages - 1, newLastFile)
+
+            # else make new page
+            else:
+                lastFile.createPage()
+                nodePage = BufferManager.getNodePage(lastFile.numPages - 1, lastFile)
+
+        '''nodeFile = NodeFile(0)
         if nodeFile.numPages == 0:
             print('creating new page')
             nodeFile.createPage()
@@ -142,4 +177,9 @@ class NodeStorageManager():
 
         NodeStorageManager.writeNode(node, True)
 
-        return node
+        return node'''
+        node = Node(nodeFile, nodePage, [nodePage.pageID, nodePage.numEntries])
+        
+        print('creating node {0} in page {1}'.format(nodePage.numEntries, nodePage.pageID[1]))
+
+        NodeStorageManager.writeNode(node, True)
