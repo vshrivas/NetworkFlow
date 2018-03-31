@@ -5,6 +5,7 @@ from Relationship import Relationship
 from Label import Label
 from NodeFile import NodeFile
 from BufferManager import BufferManager
+from RelationshipStorageManager import RelationshipStorageManager
 import sys, struct, os
 
 # has metadata keeping track of number of node files
@@ -59,7 +60,17 @@ class NodeStorageManager():
 
         print('getting node page for reading')
         nodePage = BufferManager.getNodePage(pageIndex, NodeFile(int(fileID)))
-        return nodePage.readNode(nodeIndex)
+        node = nodePage.readNode(nodeIndex)
+
+        nodeRelationships = RelationshipStorageManager.getRelationshipChain(firstRelID, nodeIndex)
+        '''nodeProperties = PropertyStorageManager.getPropChain(firstPropID)
+        nodeLabels = LabelStorageManager.getLabelChain(firstLabelID)'''
+
+        node.addRelationships(nodeRelationships)
+        #node.addProperties(nodeProperties)
+        #node.addLabels(nodeLabels)
+
+        return 
 
     # takes in a node object 
     def writeNode(node, create):

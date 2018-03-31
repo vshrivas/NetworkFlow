@@ -81,6 +81,10 @@ class Node:
         # set nodeFile for node
         self.nodeFile = nodeFile
 
+        self.firstRelID = [[1,0], -1]
+        self.firstPropID = [[2,0], -1]
+        self.firstLabelID = [[3,0], -1]
+
         # open node file
         storeFilePath = self.nodeFile.getFilePath()
         storeFile = open(storeFilePath, 'r+b')
@@ -96,7 +100,7 @@ class Node:
     
     def addRelationship(self, rel):
         prevRel = None
-        prevRelID = -1
+        prevRelID = [[1, 0], -1]
 
         # node had relationships before
         if (len(self.relationships) > 0):
@@ -112,13 +116,18 @@ class Node:
              # node is the second node in the relationship
              else:
                 prevRel.node2NextRelID = rel.getID()
+        else:
+            firstRelID = rel.getID()
 
         # set this relationship's prev relID
         if node.getID()[1] == rel.firstNodeID[1]:
-            rel.node1PrevRelId = prevRelID
+            rel.node1PrevRelID = prevRelID
 
         else:
             rel.node2PrevRelID = prevRelID
+
+        rel.node1NextRelID = prevRelID
+        rel.node2NextRelID = prevRelID
 
         """Adds a relationship to this node's relationship list."""
         self.relationships.append(rel)
@@ -131,7 +140,10 @@ class Node:
     def addProperty(self, prop):
         if len(self.properties) > 0:
             self.properties[len(self.properties) - 1].nextPropertyID = prop.getID()
+        else:
+            firstPropID = prop.getID()
 
+        prop.nextPropertyID = [[2, 0], -1]
         """Add a property, which stores a key-value pair, to this node."""
         self.properties.append(prop)
 
@@ -145,6 +157,11 @@ class Node:
         # set nextLabelID of last label to current label's labelID.
         if len(self.labels) > 0:
             self.labels[len(self.labels) - 1].nextLabelID = nodeLabel.labelID
+        else:
+            firstLabelID = nodeLabel.getID()
+
+        nodeLabel.nextLabelID = [[3,0], -1]
+
         # add label to labelID
         self.labels.append(nodeLabel)
 

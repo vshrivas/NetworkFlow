@@ -3,9 +3,6 @@ from Property import Property
 from Relationship import Relationship
 from Label import Label
 from DataPage import DataPage
-'''from RelationshipStorageManager import RelationshipStorageManager
-from PropertyStorageManager import PropertyStorageManager
-from LabelStorageManager import LabelStorageManager'''
 import sys, struct, os
 
 class NodePage(DataPage):
@@ -79,14 +76,7 @@ class NodePage(DataPage):
 
         nodeAttributes = [firstRelID, firstPropID, firstLabelID]
 
-        '''nodeRelationships = RelationshipStorageManager.getRelationshipChain(firstRelID, nodeIndex)
-        nodeProperties = PropertyStorageManager.getPropChain(firstPropID)
-        nodeLabels = LabelStorageManager.getLabelChain(firstLabelID)'''
-
         node = Node(self.file, self, [self.pageID, nodeIndex])
-        #node.addRelationships(nodeRelationships)
-        #node.addProperties(nodeProperties)
-        #node.addLabels(nodeLabels)
 
         return node
 

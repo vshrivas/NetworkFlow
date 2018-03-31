@@ -103,7 +103,7 @@ class RelationshipStorageManager():
             node.addRelationship(rel)         
 
             # find next rel ID
-            if nodeIndex == node1ID[1]:
+            if nodeIndex == rel.firstNodeID[1]:
                 nextRelID = rel.node1NextRelID
 
             else:
