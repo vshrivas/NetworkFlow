@@ -3,9 +3,9 @@ from Property import Property
 from Relationship import Relationship
 from Label import Label
 from DataPage import DataPage
-from RelationshipStorageManager import RelationshipStorageManager
+'''from RelationshipStorageManager import RelationshipStorageManager
 from PropertyStorageManager import PropertyStorageManager
-from LabelStorageManager import LabelStorageManager
+from LabelStorageManager import LabelStorageManager'''
 import sys, struct, os
 
 class NodePage(DataPage):

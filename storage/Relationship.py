@@ -49,7 +49,6 @@ class Relationship:
 
     # number of relationships ever created (used for auto-incrementing the relationship ID)
     storageSize = 130
-    numRelationships = 0
 
     relIDByteLen = 4
 
@@ -72,17 +71,6 @@ class Relationship:
         # set relationship ID
         self.relationshipID = relationshipID
 
-        # If relationshipFile object passed exists, get number of relationships 
-        if relationshipFile != "":
-            Relationship.numRelationships = relationshipFile.getNumRelationships()
-
-        if DEBUG:
-            print("**** Num Relationships = {0} *****".format(Relationship.numRelationships))
-
-        # if relationshipID is None, use auto-incrementing for relationship ID
-        if relationshipID is None:
-            relationshipID = Relationship.numRelationships
-
         # set first and second node IDs
         self.firstNodeID = node1ID
         self.secondNodeID = node2ID
@@ -100,24 +88,11 @@ class Relationship:
 
         self.properties = []
 
-        # increment number of relationships when new relationship created
-        if relationshipID != -1 and relationshipID >= Relationship.numRelationships:
-            Relationship.numRelationships += 1
-
         # set relationship file
         self.relationshipFile = relationshipFile
 
-        if relationshipFile != "":
-            # open relationship file
-            storeFilePath = self.relationshipFile.getFilePath()
-            storeFile = open(storeFilePath, 'r+b')
-
-            # write number of relationships to first 4 bytes of relationship file
-            storeFile.write((self.numRelationships).to_bytes(Relationship.relIDByteLen,
-                byteorder = sys.byteorder, signed=True))
-
         # set starting offset of relationship in relationship file
-        self.startOffset = self.relationshipID * Relationship.storageSize + Relationship.relIDByteLen
+        #self.startOffset = self.relationshipID * Relationship.storageSize + Relationship.relIDByteLen
 
     def getID(self):
         """Return relationship ID of relationship."""

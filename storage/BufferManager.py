@@ -1,4 +1,5 @@
 from NodePage import NodePage
+from RelationshipPage import RelationshipPage
 
 class BufferManager(object):
     # dictionary of buffered pages (shared across pages of nodes, relationships, properties, and labels)
@@ -21,6 +22,10 @@ class BufferManager(object):
 
         return None'''
         return NodePage(0, datafile, False)
+
+
+    def getRelationshipPage(pageIndex, datafile):
+        return RelationshipPage(0, datafile, False)
 
 
     def addPage(pageID):

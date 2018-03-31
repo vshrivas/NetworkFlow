@@ -1,3 +1,9 @@
+from RelationshipFile import RelationshipFile
+from Relationship import Relationship
+from BufferManager import BufferManager
+from Node import Node
+from Property import Property
+
 class RelationshipStorageManager():
     nodeFiles = []
     directory = "relstore"
@@ -29,44 +35,56 @@ class RelationshipStorageManager():
 
         pageIndex = pageID[1]
 
+        fileID = int(pageIndex / RelationshipFile.MAX_PAGES)
+
         # use buffer manager to retrieve page from memory
         # will load page into memory if wasn't there
-        relationshipPage = BufferManager.getRelationshipPage(pageIndex, self)
-        rel = relationshipPage.readRelationship(nodeIndex)
+        relationshipPage = BufferManager.getRelationshipPage(pageIndex, RelationshipFile(fileID))
+        rel = relationshipPage.readRelationship(relIndex)
 
-        properties = getPropertyChain(rel.propertyID)
+        '''properties = getPropertyChain(rel.propertyID)
 
-        rel.properties = properties
+        rel.properties = properties'''
 
         return rel
 
-    def writeRelationship(rel):
-        relID = rel.getRelID()
+    def writeRelationship(rel, create):
+        relID = rel.getID()
         pageID = relID[0]           # pageID[0] = 0, pageID[1] = pageIndex
 
         pageIndex = pageID[1]       # which page node is in, page IDs are unique across all files
 
-        relPage = BufferManager.getRelationshipPage(pageIndex, self)
+        fileID = int(pageIndex / RelationshipFile.MAX_PAGES)
 
-        relPage.writeRelationship(rel)
+        relPage = BufferManager.getRelationshipPage(pageIndex, RelationshipFile(fileID))
 
-        if DEBUG:
-            print("writing properties to property pages ...")
+        if create:
+            relPage.numEntries += 1
 
-        for prop in node.properties:
-            PropertyStoreManager.writeProperty(prop)
+        relPage.writeRelationship(rel, create)
 
-    def createRelationship():
-        nodeFile = NodeFile(0)
-        print('getting node page for creation')
-        nodePage = BufferManager.getNodePage(0, nodeFile)
+        '''for prop in node.properties:
+            PropertyStoreManager.writeProperty(prop)'''
 
-        node = Node(nodeFile, nodePage, [[0, 0], nodePage.numEntries])
-        print('creating node {0}'.format(nodePage.numEntries))
+    def createRelationship(node0, node1, type):
+        relFile = RelationshipFile(0)
 
-        NodeStorageManager.writeNode(node, True)
+        if relFile.numPages == 0:
+            relFile.createPage()
 
-        return node
+        print('getting rel page for creation')
+        relPage = BufferManager.getRelationshipPage(0, relFile)
+
+        relID = [[1, 0], relPage.numEntries]
+
+        rel = Relationship(relID, node0.getID(), node1.getID(),
+            [[0,0],-1], [[0,0],-1], [[0,0],-1], [[0,0],-1], type, [[0,0],-1], relFile)
+
+        print('creating relationship {0}'.format(relPage.numEntries))
+
+        RelationshipStorageManager.writeRelationship(rel, True)
+
+        return rel
 
     def getRelationshipChain(firstRelID, nodeIndex):
         nextRelID = firstRelID

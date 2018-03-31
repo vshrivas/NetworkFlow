@@ -1,157 +1,185 @@
+from DataPage import DataPage
+from Relationship import Relationship
+from Node import Node
+from Property import Property
+import sys, struct, os
+
 class RelationshipPage(DataPage):
-	def __init__(self, pageIndex, datafile):
-		# 1 indicates that this is a relationship page
-		pageID = [1, pageIndex]
-		super().__init__(pageID, datafile)
+    PAGES_OFFSET = 100
 
-		self.relationshipData = []  # list of relationship objects the page contains
-		# read in all page data
-		readPageData()
+    def __init__(self, pageIndex, datafile, create):
+        # 1 indicates that this is a relationship page
+        pageID = [1, pageIndex]
+        super().__init__(pageID, datafile)
 
-	# reads in all of the relationship objects stored in this page
-	# stores them in self.relationshipData
-	def readPageData(self):
-		# open relationship file
-		filePath = ((DataFile) self.file).getFilePath()
-		relationshipFile = open(filePath, 'rb')
+        self.pageStart = self.getPageIndex() * (self.MAX_PAGE_ENTRIES * Relationship.storageSize) + self.PAGES_OFFSET
 
-		# read in number of entries
-		relationshipFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
-		self.numEntries = int.from_bytes(relationshipFile.read(DataPage.NUM_ENTRIES_SIZE), sys.byteorder, signed=True)
+        self.relationshipData = []  # list of relationship objects the page contains
+        
+        if create == False:
+        # read in all page data
+            self.readPageData()
+        else:
+            self.writePageData()
 
-		# read in owner of page
-		relationshipFile.seek(self.pageStart + OWNER_ID_OFFSET)
-		self.ownerID = int.from_bytes(relationshipFile.read(DataPage.OWNER_ID_SIZE), sys.byteorder, signed=True)
+    # reads in all of the relationship objects stored in this page
+    # stores them in self.relationshipData
+    def readPageData(self):
+        # open relationship file
+        filePath = (self.file).getFilePath()
+        relationshipFile = open(filePath, 'rb')
 
-		# read in all data items
-		for relationshipIndex in range(0, self.numEntries):
-			relationship = readRelationshipData(relationshipIndex)
-			relationshipData.append(relationship)
+        # read in number of entries
+        relationshipFile.seek(self.pageStart + DataPage.NUM_ENTRIES_OFFSET)
+        self.numEntries = int.from_bytes(relationshipFile.read(DataPage.NUM_ENTRIES_SIZE), sys.byteorder, signed=True)
 
-	# returns relationship from relationshipIndex
-	# used while reading in page data
-	def readRelationshipData(self, relationshipIndex):
-		# open relationship file
-		filePath = ((DataFile) self.file).getFilePath()
-		relationshipStore = open(filePath, 'rb')
+        # read in owner of page
+        relationshipFile.seek(self.pageStart + DataPage.OWNER_ID_OFFSET)
+        self.ownerID = int.from_bytes(relationshipFile.read(DataPage.OWNER_ID_SIZE), sys.byteorder, signed=True)
 
-		# offset from start of file to start of node
-		relationshipStartOffset = self.pageStart + DATA_OFFSET + relationshipIndex * Relationship.storageSize
+        # read in all data items
+        for relationshipIndex in range(0, self.numEntries):
+            relationship = self.readRelationshipData(relationshipIndex)
+            self.relationshipData.append(relationship)
 
-		# find ID of relationship, technically should be index
-		relationshipStore.seek(relationshipStartOffset + Relationship.RELATIONSHIP_ID_OFFSET)
-		relID = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+    # returns relationship from relationshipIndex
+    # used while reading in page data
+    def readRelationshipData(self, relationshipIndex):
+        # open relationship file
+        filePath = (self.file).getFilePath()
+        relationshipStore = open(filePath, 'rb')
 
-		# find ID of first node in relationship
+        # offset from start of file to start of node
+        relationshipStartOffset = self.pageStart + DataPage.DATA_OFFSET + relationshipIndex * Relationship.storageSize
+
+        # find ID of relationship, technically should be index
+        relationshipStore.seek(relationshipStartOffset + Relationship.RELATIONSHIP_ID_OFFSET)
+        relIndex = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+        relID = [[1, 0], relIndex]
+
+        # find ID of first node in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_ID_OFFSET)
-        node1ID = int.from_bytes(relationshipStore.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
+        node1Index = int.from_bytes(relationshipStore.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
+        node1ID = [[0, 0], node1Index]
 
         # find ID of second node in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_ID_OFFSET)
-        node2ID = int.from_bytes(relationshipStore.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
+        node2Index = int.from_bytes(relationshipStore.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
+        node2ID = [[0, 0], node2Index]
 
         # find ID of next rel for node1 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
-        node1NextRelID = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+        node1NextRelIndex = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+        node1NextRelID = [[1, 0], node1NextRelIndex]
 
         # find ID of prev rel for node1 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_PREV_REL_ID_OFFSET)
-        node1PrevRelID = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+        node1PrevRelIndex = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+        node1PrevRelID = [[1, 0], node1PrevRelIndex]
 
         # find ID of next rel for node2 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
-        node2NextRelID = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+        node2NextRelIndex = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+        node2NextRelID = [[1, 0], node2NextRelIndex]
 
         # find ID of prev rel for node2 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
-        node2PrevRelID = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+        node2PrevRelIndex = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+        node2PrevRelID = [[1, 0], node2PrevRelIndex]
 
         # read in type of relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.RELATIONSHIP_TYPE_OFFSET)
         relType = relationshipStore.read(Relationship.MAX_TYPE_SIZE).decode("utf-8")
         relType = relType.rstrip(' ')
 
-        if DEBUG:
-            print('Node 1 id: {0}'.format(node1ID))
-            print('Node 2 id: {0}'.format(node2ID))
-            print('Relationship type: {0}'.format(relType))
+        print('read {0} type for rel'.format(relType))
 
         relationshipStore.seek(relationshipStartOffset + Relationship.PROPERTY_ID_OFFSET)
-       	propertyID = int.from_bytes(relationshipStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
+        propertyID = int.from_bytes(relationshipStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
 
         # create relationship and add to node
-        rel = Relationship(relID, node1ID, node2ID, relType, node1NextRelID, node1PrevRelID,
-        		node2NextRelID, node2PrevRelID, propertyID, datafile)
+        rel = Relationship(relID, node1ID, node2ID, node1NextRelID, node1PrevRelID,
+                node2NextRelID, node2PrevRelID, relType, propertyID, self.file)
 
         return rel
 
     def readRelationship(self, relationshipIndex):
-    	return relationshipData[relationshipIndex]
+        return self.relationshipData[relationshipIndex]
 
-    def writeRelationship(self, rel):
-    	relID = rel.getID()
+    def writeRelationship(self, rel, create):
+        relID = rel.getID()
 
         relIndex = relID[1]
-        relationshipData[relIndex] = rel
+
+        if create:
+            self.relationshipData.append(rel)
+        else:
+            self.relationshipData[relIndex] = rel
+
+        self.writePageData()
 
     def writePageData(self):
-    	filePath = ((RelationshipFile) self.datafile).getFilePath()
-		relFile = open(filePath, 'rb')
+        filePath = (self.file).getFilePath()
+        relFile = open(filePath, 'r+b')
 
-		# write number of entries
-        relFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
-        relFile.write((self.numEntries).to_bytes(Relationship.relIDByteLen,
+        # write number of entries
+        relFile.seek(self.pageStart + DataPage.NUM_ENTRIES_OFFSET)
+        relFile.write((self.numEntries).to_bytes(DataPage.NUM_ENTRIES_SIZE,
             byteorder = sys.byteorder, signed=True))
 
         # write owner ID
-        relFile.seek(self.pageStart + OWNER_ID_OFFSET)
-        relFile.write((self.ownerID).to_bytes(Relationship.relIDByteLen,
+        relFile.seek(self.pageStart + DataPage.OWNER_ID_OFFSET)
+        relFile.write((self.ownerID).to_bytes(DataPage.OWNER_ID_SIZE,
             byteorder = sys.byteorder, signed=True))
 
-    	for rel in relationshipData:
-    		writeRelationshipData(rel, relFile)
+        for rel in self.relationshipData:
+            self.writeRelationshipData(rel, relFile)
 
     def writeRelationshipData(self, rel, relationshipStore):
-    	# offset from start of file to start of node
-		relationshipStartOffset = self.pageStart + DATA_OFFSET + relationshipIndex * Relationship.storageSize
+        relationshipIndex = rel.getID()[1]
 
-		# write ID of relationship, technically should be index
-		relationshipStore.seek(relationshipStartOffset + Relationship.RELATIONSHIP_ID_OFFSET)
-		relationshipStore.write(rel.getID().to_bytes(Relationship.relIDByteLen, 
+        # offset from start of file to start of node
+        relationshipStartOffset = self.pageStart + DataPage.DATA_OFFSET + relationshipIndex * Relationship.storageSize
+
+        # write ID of relationship, technically should be index
+        relationshipStore.seek(relationshipStartOffset + Relationship.RELATIONSHIP_ID_OFFSET)
+        relationshipStore.write(rel.getID()[1].to_bytes(Relationship.relIDByteLen, 
             byteorder = sys.byteorder, signed=True))
 
-		# write ID of first node in relationship
+        # write ID of first node in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_ID_OFFSET)
-        relationshipStore.write(rel.firstNodeID.to_bytes(Node.nodeIDByteLen, 
+        relationshipStore.write(rel.firstNodeID[1].to_bytes(Node.nodeIDByteLen, 
             byteorder = sys.byteorder, signed=True))
 
         # write ID of second node in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_ID_OFFSET)
-        relationshipStore.write(rel.secondNodeID.to_bytes(Node.nodeIDByteLen, 
+        relationshipStore.write(rel.secondNodeID[1].to_bytes(Node.nodeIDByteLen, 
             byteorder = sys.byteorder, signed=True))
 
         # write ID of next rel for node1 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
-        relationshipStore.write(rel.node1NextRelID.to_bytes(Relationship.relIDByteLen, 
+        relationshipStore.write(rel.node1NextRelID[1].to_bytes(Relationship.relIDByteLen, 
             byteorder = sys.byteorder, signed=True))
 
         # write ID of prev rel for node1 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_PREV_REL_ID_OFFSET)
-        relationshipStore.write(rel.node1PrevRelID.to_bytes(Relationship.relIDByteLen, 
+        relationshipStore.write(rel.node1PrevRelID[1].to_bytes(Relationship.relIDByteLen, 
             byteorder = sys.byteorder, signed=True))
 
         # write ID of next rel for node2 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
-        relationshipStore.write(rel.node2NextRelID.to_bytes(Relationship.relIDByteLen, 
+        relationshipStore.write(rel.node2NextRelID[1].to_bytes(Relationship.relIDByteLen, 
             byteorder = sys.byteorder, signed=True))
 
         # write ID of prev rel for node2 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
-        relationshipStore.write(rel.node2PrevRelID.to_bytes(Relationship.relIDByteLen, 
+        relationshipStore.write(rel.node2PrevRelID[1].to_bytes(Relationship.relIDByteLen, 
             byteorder = sys.byteorder, signed=True))
 
         # write type of relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.RELATIONSHIP_TYPE_OFFSET)
+        print('wrote {0} type for rel'.format(rel.type))
+        
         # type is not of max size
         if(sys.getsizeof(rel.type) != Relationship.MAX_TYPE_SIZE):
             # pad relationship type string up to max size
@@ -159,16 +187,17 @@ class RelationshipPage(DataPage):
                 rel.type += ' '
 
         relationshipStore.write(bytearray(rel.type, 'utf8'))
+
         # strip out additional whitespace used for padding from type
         rel.type = rel.type.rstrip(' ')
 
         # write first property ID
         relationshipStore.seek(relationshipStartOffset + Relationship.PROPERTY_ID_OFFSET)
-        relationshipStore.write(rel.propertyID.to_bytes(Property.propIDByteLen, 
+        relationshipStore.write(rel.propertyID[1].to_bytes(Property.propIDByteLen, 
             byteorder = sys.byteorder, signed=True))
 
 
-	'''def OLDwriteRelationshipData(self, node, prevRel, nextRel):
+    '''def OLDwriteRelationshipData(self, node, prevRel, nextRel):
         """Write relationship to relationship file for specified node and relationship's 
         properties to property file.
 
