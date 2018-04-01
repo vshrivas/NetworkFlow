@@ -12,7 +12,7 @@ class RelationshipPage(DataPage):
         pageID = [1, pageIndex]
         super().__init__(pageID, datafile)
 
-        self.pageStart = self.getPageIndex() * (self.MAX_PAGE_ENTRIES * Relationship.storageSize) + self.PAGES_OFFSET
+        self.pageStart = self.getPageIndex() * (self.MAX_PAGE_ENTRIES * Relationship.storageSize + DataPage.DATA_OFFSET) + self.PAGES_OFFSET
 
         self.relationshipData = []  # list of relationship objects the page contains
         
@@ -78,30 +78,42 @@ class RelationshipPage(DataPage):
         # find ID of next rel for node1 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
         absNode1NextRelID = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
-        node1NextRelPageIndex = int(absNode1NextRelID / DataPage.MAX_PAGE_ENTRIES)
-        node1NextRelIndex = int((absNode1NextRelID  / DataPage.MAX_PAGE_ENTRIES - node1NextRelPageIndex) * DataPage.MAX_PAGE_ENTRIES)
-        node1NextRelID = [[1, node1NextRelPageIndex], node1NextRelIndex]
+        if absNode1NextRelID == -1:
+            node1NextRelID = [[1, 0], -1]
+        else:
+            node1NextRelPageIndex = int(absNode1NextRelID / DataPage.MAX_PAGE_ENTRIES)
+            node1NextRelIndex = int((absNode1NextRelID  / DataPage.MAX_PAGE_ENTRIES - node1NextRelPageIndex) * DataPage.MAX_PAGE_ENTRIES)
+            node1NextRelID = [[1, node1NextRelPageIndex], node1NextRelIndex]
 
         # find ID of prev rel for node1 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_PREV_REL_ID_OFFSET)
         absNode1PrevRelID = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
-        node1PrevRelPageIndex = int(absNode1PrevRelID / DataPage.MAX_PAGE_ENTRIES)
-        node1PrevRelIndex = int((absNode1PrevRelID  / DataPage.MAX_PAGE_ENTRIES - node1PrevRelPageIndex) * DataPage.MAX_PAGE_ENTRIES)
-        node1PrevRelID = [[1, node1PrevRelPageIndex], node1PrevRelIndex]
+        if absNode1PrevRelID == -1:
+            node1PrevRelID = [[1, 0], -1]
+        else:
+            node1PrevRelPageIndex = int(absNode1PrevRelID / DataPage.MAX_PAGE_ENTRIES)
+            node1PrevRelIndex = int((absNode1PrevRelID  / DataPage.MAX_PAGE_ENTRIES - node1PrevRelPageIndex) * DataPage.MAX_PAGE_ENTRIES)
+            node1PrevRelID = [[1, node1PrevRelPageIndex], node1PrevRelIndex]
 
         # find ID of next rel for node2 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
         absNode2NextRelID = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
-        node2NextRelPageIndex = int(absNode2NextRelID / DataPage.MAX_PAGE_ENTRIES)
-        node2NextRelIndex = int((absNode2NextRelID  / DataPage.MAX_PAGE_ENTRIES - node2NextRelPageIndex) * DataPage.MAX_PAGE_ENTRIES)
-        node2NextRelID = [[1, node2NextRelPageIndex], node2NextRelIndex]
+        if absNode2NextRelID == -1:
+            node2NextRelID = [[1, 0], -1]
+        else:
+            node2NextRelPageIndex = int(absNode2NextRelID / DataPage.MAX_PAGE_ENTRIES)
+            node2NextRelIndex = int((absNode2NextRelID  / DataPage.MAX_PAGE_ENTRIES - node2NextRelPageIndex) * DataPage.MAX_PAGE_ENTRIES)
+            node2NextRelID = [[1, node2NextRelPageIndex], node2NextRelIndex]
 
         # find ID of prev rel for node2 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
         absNode2PrevRelID = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
-        node2PrevRelPageIndex = int(absNode2PrevRelID / DataPage.MAX_PAGE_ENTRIES)
-        node2PrevRelIndex = int((absNode2PrevRelID  / DataPage.MAX_PAGE_ENTRIES - node2PrevRelPageIndex) * DataPage.MAX_PAGE_ENTRIES)
-        node2PrevRelID = [[1, node2PrevRelPageIndex], node2PrevRelIndex]
+        if absNode2PrevRelID == -1:
+            node2PrevRelID = [[1, 0], -1]
+        else:
+            node2PrevRelPageIndex = int(absNode2PrevRelID / DataPage.MAX_PAGE_ENTRIES)
+            node2PrevRelIndex = int((absNode2PrevRelID  / DataPage.MAX_PAGE_ENTRIES - node2PrevRelPageIndex) * DataPage.MAX_PAGE_ENTRIES)
+            node2PrevRelID = [[1, node2PrevRelPageIndex], node2PrevRelIndex]
 
         # read in type of relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.RELATIONSHIP_TYPE_OFFSET)
@@ -182,25 +194,37 @@ class RelationshipPage(DataPage):
 
         # write ID of next rel for node1 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
-        absNode1NextRelID = rel.node1NextRelID[0][1] * DataPage.MAX_PAGE_ENTRIES + rel.node1NextRelID[1]
+        if rel.node1NextRelID[1] == -1:
+            absNode1NextRelID = -1
+        else:
+            absNode1NextRelID = rel.node1NextRelID[0][1] * DataPage.MAX_PAGE_ENTRIES + rel.node1NextRelID[1]       
         relationshipStore.write(absNode1NextRelID.to_bytes(Relationship.relIDByteLen, 
-            byteorder = sys.byteorder, signed=True))
+                byteorder = sys.byteorder, signed=True))   
 
         # write ID of prev rel for node1 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE1_PREV_REL_ID_OFFSET)
-        absNode1PrevRelID = rel.node1PrevRelID[0][1] * DataPage.MAX_PAGE_ENTRIES + rel.node1PrevRelID[1]
+        if rel.node1PrevRelID[1] == -1:
+            absNode1PrevRelID = -1
+        else:
+            absNode1PrevRelID = rel.node1PrevRelID[0][1] * DataPage.MAX_PAGE_ENTRIES + rel.node1PrevRelID[1]
         relationshipStore.write(absNode1PrevRelID.to_bytes(Relationship.relIDByteLen, 
             byteorder = sys.byteorder, signed=True))
 
         # write ID of next rel for node2 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
-        absNode2NextRelID = rel.node2NextRelID[0][1] * DataPage.MAX_PAGE_ENTRIES + rel.node2NextRelID[1]
+        if rel.node2NextRelID[1] == -1:
+            absNode2NextRelID = -1
+        else:
+            absNode2NextRelID = rel.node2NextRelID[0][1] * DataPage.MAX_PAGE_ENTRIES + rel.node2NextRelID[1]
         relationshipStore.write(absNode2NextRelID.to_bytes(Relationship.relIDByteLen, 
             byteorder = sys.byteorder, signed=True))
 
         # write ID of prev rel for node2 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
-        absNode2PrevRelID = rel.node2PrevRelID[0][1] * DataPage.MAX_PAGE_ENTRIES + rel.node2PrevRelID[1]
+        if rel.node2PrevRelID[1] == -1:
+            absNode2PrevRelID = -1
+        else:
+            absNode2PrevRelID = rel.node2PrevRelID[0][1] * DataPage.MAX_PAGE_ENTRIES + rel.node2PrevRelID[1]
         relationshipStore.write(absNode2PrevRelID.to_bytes(Relationship.relIDByteLen, 
             byteorder = sys.byteorder, signed=True))
 

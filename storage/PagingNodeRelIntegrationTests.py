@@ -25,8 +25,17 @@ assert(node0.getID()[1] == readNode0.getID()[1]), 'read and written nodes do not
 assert(node0.getID()[0][1] == readNode0.getID()[0][1]), 'read and written nodes do not match!'
 
 ##################################################################################################
-
 node1 = NodeStorageManager.createNode()
+
+readNode0 = NodeStorageManager.readNode(node0ID)
+
+print('node ID is {0}'.format(node0.getID()))
+print('read node ID is {0}'.format(readNode0.getID()))
+print('node is in page {0}'.format(readNode0.nodeID[0][1]))
+
+assert(node0.getID()[1] == readNode0.getID()[1]), 'read and written nodes do not match!'
+assert(node0.getID()[0][1] == readNode0.getID()[0][1]), 'read and written nodes do not match!'
+##########################################################
 
 node1ID = [[0,1], 0]
 readNode1 = NodeStorageManager.readNode(node1ID)
@@ -37,6 +46,16 @@ assert(node1.getID()[0][1] == readNode1.getID()[0][1]), 'read and written nodes 
 
 ##################################################################################################
 
+readNode0 = NodeStorageManager.readNode(node0ID)
+
+print('node ID is {0}'.format(node0.getID()))
+print('read node ID is {0}'.format(readNode0.getID()))
+print('node is in page {0}'.format(readNode0.nodeID[0][1]))
+
+assert(node0.getID()[1] == readNode0.getID()[1]), 'read and written nodes do not match!'
+assert(node0.getID()[0][1] == readNode0.getID()[0][1]), 'read and written nodes do not match!'
+
+#####################################################
 node2 = NodeStorageManager.createNode()
 
 node2ID = [[0,2], 0]
@@ -116,13 +135,17 @@ assert(rel2.getRelType() == readRel2.getRelType()), 'read and written relationsh
 
 ###################################################################################################
 
-'''node0.addRelationship(rel0)
+print('***Testing Integration***')
+node0.addRelationship(rel0)
 
 node0.addRelationship(rel1)
 
 NodeStorageManager.writeNode(node0, False)
 
 readNode0 = NodeStorageManager.readNode(node0ID)
+
+assert(node0.getID()[1] == readNode0.getID()[1]), 'read and written nodes do not match!'
+assert(node0.getID()[0][1] == readNode0.getID()[0][1]), 'read and written nodes do not match!'
 
 readRel0 = readNode0.relationships[0]
 
@@ -205,4 +228,4 @@ assert(rel1.secondNodeID[1] == readRel1.secondNodeID[1]), 'read and written rela
 
 print('rel1 rel type:{0}'.format(rel1.getRelType()))
 print('readRel1 rel type:{0}'.format(readRel1.getRelType()))
-assert(rel1.getRelType() == readRel1.getRelType()), 'read and written relationships do not match!'''
+assert(rel1.getRelType() == readRel1.getRelType()), 'read and written relationships do not match!'
