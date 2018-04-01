@@ -98,3 +98,8 @@ u2.start()
 u3.start()
 u4.start()
 
+assert(rel0.type == 'friendship' or
+	   rel0.type == 'love' or
+	   rel0.type == 'acquiantance' or
+	   rel0.type == 'hate' or
+	   rel0.type == 'estrangement')
