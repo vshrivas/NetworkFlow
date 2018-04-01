@@ -21,7 +21,7 @@ class LockManager:
 		pageWaiting = tuple(userThread.waiting.pageID)
 
 		# page user thread is waiting on has no owners
-		if pageWaiting not in LockManager.pageOwners.keys():
+		if LockManager.pageOwners.get(pageWaiting) is None:
 			print('page not in keys, page has no owner')
 			#LockManager.pageOwnersLock.release()
 			return False
@@ -29,14 +29,14 @@ class LockManager:
 		# owner(s) of the page
 		# can have multiple if they are reading page
 		# only one if writing to page
-		owners = LockManager.pageOwners[pageWaiting]
-		print('owners are {0}'.format(owners))
+		owners = LockManager.pageOwners.get(pageWaiting)
+		print('for thread {0}: owners are {1}'.format(startThread.name, owners))
 
-		if owners is None:
-			return False
+		#if owners is None:
+			#return False
 
 		for owner in owners:
-			print('owner: {0}'.format(owner.name))
+			print('for thread {0}: owner: {1}'.format(startThread.name, owner.name))
 			# found cycle back to starting thread
 			if owner.name == startThread.name:
 				#LockManager.pageOwnersLock.release()
@@ -121,7 +121,7 @@ class LockManager:
 			print('page key was not in owner keys')
 			LockManager.pageOwners[pageKey] = [thread]
 		else:
-			LockManager.pageOwners[pageKey] = (LockManager.pageOwners.get(pageKey)).append(thread)
+			LockManager.pageOwners[pageKey].append(thread)
 
 		print('owners are: {0}'.format(LockManager.pageOwners))
 
@@ -133,14 +133,16 @@ class LockManager:
 
 		pageKey = tuple(page.pageID)
 
-		if pageKey not in LockManager.pageOwners.keys():
+		if LockManager.pageOwners.get(pageKey) is None:
 			return
+
+		print('owners are for {0}: {1}'.format(thread.name, LockManager.pageOwners))
 
 		LockManager.pageOwners[pageKey].remove(thread)
 
-		if len(LockManager.pageOwners[pageKey]) == 0:
+		if len(LockManager.pageOwners.get(pageKey)) == 0:
 			del LockManager.pageOwners[pageKey]
 
-		print('owners are: {0}'.format(LockManager.pageOwners[pageKey]))
+		print('owners are: {0}'.format(LockManager.pageOwners))
 
 		LockManager.pageOwnersLock.release()
