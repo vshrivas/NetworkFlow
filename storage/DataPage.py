@@ -28,7 +28,7 @@ class DataPage(object):
 			# 2 Property
 			# 3 Label
 		self.pageID = pageID
-		#self.pageLock = Lock()
+		self.pageLock = threading.Lock()
 		self.dirty = True
 		self.file = datafile
 		self.pageSize = 0
