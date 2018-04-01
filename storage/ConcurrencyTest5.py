@@ -32,7 +32,7 @@ class UserThread0(threading.Thread):
 
 		UserThread0.waiting = page0
 		print('thread 0 waiting on page {0}'.format(UserThread0.waiting.pageID[1]))
-		if LockManager.detectDeadlock(self):
+		if LockManager.detectRWDeadlock(self, self):
 			raise Exception('Deadlock detected!')
 
 		page0.pageLock.acquire_write()
@@ -41,7 +41,7 @@ class UserThread0(threading.Thread):
 
 		UserThread0.waiting = page1
 		print('thread 0 waiting on page {0}'.format(threading.currentThread().waiting.pageID[1]))
-		if LockManager.detectDeadlock(self):
+		if LockManager.detectRWDeadlock(self, self):
 			raise Exception('Deadlock detected!')
 
 		time.sleep(10)
@@ -76,7 +76,7 @@ class UserThread1(threading.Thread):
 
 		UserThread1.waiting = page1
 		print('thread 1 waiting on page {0}'.format(UserThread1.waiting.pageID[1]))
-		if LockManager.detectDeadlock(self):
+		if LockManager.detectRWDeadlock(self, self):
 			raise Exception('Deadlock detected!')
 
 		page1.pageLock.acquire_write()
@@ -85,7 +85,7 @@ class UserThread1(threading.Thread):
 
 		UserThread1.waiting = page2
 		print('thread 1 waiting on page {0}'.format(UserThread1.waiting.pageID[1]))
-		if LockManager.detectDeadlock(self):
+		if LockManager.detectRWDeadlock(self, self):
 			raise Exception('Deadlock detected!')
 
 		time.sleep(10)
@@ -121,7 +121,7 @@ class UserThread2(threading.Thread):
 
 		UserThread2.waiting = page2
 		print('thread 2 waiting on page {0}'.format(threading.currentThread().waiting.pageID[1]))
-		if LockManager.detectDeadlock(self):
+		if LockManager.detectRWDeadlock(self, self):
 			raise Exception('Deadlock detected!')
 
 		page2.pageLock.acquire_write()
@@ -130,7 +130,7 @@ class UserThread2(threading.Thread):
 
 		UserThread2.waiting = page0
 		print('thread 2 waiting on page {0}'.format(threading.currentThread().waiting.pageID[1]))
-		if LockManager.detectDeadlock(self):
+		if LockManager.detectRWDeadlock(self, self):
 			raise Exception('Deadlock detected!')
 
 		time.sleep(10)
