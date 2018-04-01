@@ -9,6 +9,7 @@ from RelationshipStorageManager import RelationshipStorageManager
 from UserThread import UserThread
 from NodeFile import NodeFile
 from BufferManager import BufferManager
+from LockManager import LockManager
 
 # creates a deadlock condition
 
@@ -32,21 +33,30 @@ class UserThread0(threading.Thread):
 
 		UserThread0.waiting = page0
 		print('thread 0 waiting on page {0}'.format(UserThread0.waiting.pageID[1]))
+		if LockManager.detectDeadlock(self):
+			raise Exception('Deadlock detected!')
 
 		page0.pageLock.acquire()
+		LockManager.makePageOwner(self, page0)
+		print('thread 0 got page 0')
 
 		UserThread0.waiting = page1
 		print('thread 0 waiting on page {0}'.format(threading.currentThread().waiting.pageID[1]))
+		if LockManager.detectDeadlock(self):
+			raise Exception('Deadlock detected!')
 
 		time.sleep(10)
 
 		page1.pageLock.acquire()
+		LockManager.makePageOwner(self, page1)
 		print('thread 0 got page 1')
 
 		threading.currentThread().waiting = None
 
 		page1.pageLock.release()
+		LockManager.removePageOwner(page1)
 		page0.pageLock.release()
+		LockManager.removePageOwner(page0)
 
 class UserThread1(threading.Thread):
 	waiting = None
@@ -67,23 +77,31 @@ class UserThread1(threading.Thread):
 
 		UserThread1.waiting = page1
 		print('thread 1 waiting on page {0}'.format(UserThread1.waiting.pageID[1]))
+		if LockManager.detectDeadlock(self):
+			raise Exception('Deadlock detected!')
 
 		page1.pageLock.acquire()
+		LockManager.makePageOwner(self, page1)
 		print('thread 1 got page 1')
 
 		UserThread1.waiting = page2
 		print('thread 1 waiting on page {0}'.format(UserThread1.waiting.pageID[1]))
+		if LockManager.detectDeadlock(self):
+			raise Exception('Deadlock detected!')
 
 		time.sleep(10)
 
 		page2.pageLock.acquire()
+		LockManager.makePageOwner(self, page2)
 		print('thread 1 got page 2')
 
 		threading.currentThread().waiting = None
 
 		page2.pageLock.release()
+		LockManager.removePageOwner(page2)
 
 		page1.pageLock.release()
+		LockManager.removePageOwner(page2)
 
 class UserThread2(threading.Thread):
 	waiting = None
@@ -104,23 +122,31 @@ class UserThread2(threading.Thread):
 
 		threading.currentThread().waiting = page2
 		print('thread 2 waiting on page {0}'.format(threading.currentThread().waiting.pageID[1]))
+		if LockManager.detectDeadlock(self):
+			raise Exception('Deadlock detected!')
 
 		page2.pageLock.acquire()
+		LockManager.makePageOwner(self, page2)
 		print('thread 2 got page 2')
 
 		threading.currentThread().waiting = page0
 		print('thread 2 waiting on page {0}'.format(threading.currentThread().waiting.pageID[1]))
+		if LockManager.detectDeadlock(self):
+			raise Exception('Deadlock detected!')
 
 		time.sleep(10)
 
 		page0.pageLock.acquire()
+		LockManager.makePageOwner(self, page0)
 		print('thread 2 got page 0')
 
 		threading.currentThread().waiting = None
 
 		page0.pageLock.release()
+		LockManager.removePageOwner(page0)
 
 		page2.pageLock.release()
+		LockManager.removePageOwner(page2)
 
 NodeStorageManager()
 

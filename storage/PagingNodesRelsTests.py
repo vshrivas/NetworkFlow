@@ -20,7 +20,7 @@ assert(node0.getID()[1] == readNode0.getID()[1]), 'read and written nodes do not
 
 node1 = NodeStorageManager.createNode()
 
-node1ID = [[0,0], 1]
+node1ID = [[0,1], 0]
 readNode1 = NodeStorageManager.readNode(node1ID)
 
 assert(node1.getID()[1] == readNode1.getID()[1]), 'read and written nodes do not match!'
@@ -29,7 +29,7 @@ assert(node1.getID()[1] == readNode1.getID()[1]), 'read and written nodes do not
 
 node2 = NodeStorageManager.createNode()
 
-node2ID = [[0,0], 2]
+node2ID = [[0,2], 0]
 readNode2 = NodeStorageManager.readNode(node2ID)
 
 assert(node2.getID()[1] == readNode2.getID()[1]), 'read and written nodes do not match!'
@@ -61,7 +61,7 @@ assert(rel0.getRelType() == readRel0.getRelType()), 'read and written relationsh
 
 rel1 = RelationshipStorageManager.createRelationship(node0, node2, 'animosity')
 
-rel1ID = [[1,0], 1]
+rel1ID = [[1,1], 0]
 readRel1 = RelationshipStorageManager.readRelationship(rel1ID)
 
 print('rel1 ID:{0}'.format(rel1.getID()[1]))
@@ -83,7 +83,7 @@ assert(rel1.getRelType() == readRel1.getRelType()), 'read and written relationsh
 ###################################################################################################
 rel2 = RelationshipStorageManager.createRelationship(node1, node2, 'pet')
 
-rel2ID = [[1,0], 2]
+rel2ID = [[1,2], 0]
 readRel2 = RelationshipStorageManager.readRelationship(rel2ID)
 
 print('rel2 ID:{0}'.format(rel2.getID()[1]))

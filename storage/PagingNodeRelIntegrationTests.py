@@ -9,6 +9,9 @@ from Label import Label
 from NodeStorageManager import NodeStorageManager
 from RelationshipStorageManager import RelationshipStorageManager
 
+
+# increase DataPage.MAX_PAGE_ENTRIES to 5
+
 NodeStorageManager()
 RelationshipStorageManager()
 
