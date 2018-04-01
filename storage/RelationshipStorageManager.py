@@ -18,16 +18,28 @@ class RelationshipStorageManager():
 
         if os.path.exists(self.filePath):
             metadataFile = open(self.filePath, 'r+b')
-            numRelFiles = int.from_bytes(metadataFile.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+            RelationshipStorageManager.numRelFiles = int.from_bytes(metadataFile.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
 
         else:
+            # rel store directory does not exist, make it
+            if not os.path.exists(self.directory):
+                os.makedirs(RelationshipStorageManager.directory)
+
+            # open metadata file    
             metadataFile = open(self.filePath, 'wb')
             # write number of rel files to first 3 bytes of rel storage metadata file
             metadataFile.write((0).to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
 
-        if numRelFiles == 0:
+        # there are no rel files
+        if RelationshipStorageManager.numNodeFiles == 0:
+            # make a new one 
             RelationshipFile(0)
+            RelationshipStorageManager.numNodeFiles += 1
+
+            metadataFile = open(self.filePath, 'r+b')
+            metadataFile.write((RelationshipStorageManager.numNodeFiles).to_bytes(Relationship.relIDByteLen,
+                byteorder = sys.byteorder, signed=True))
 
     def readRelationship(relID):
         pageID = relID[0]
