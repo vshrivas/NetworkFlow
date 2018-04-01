@@ -67,14 +67,14 @@ class NodeStorageManager():
 
         firstRelID = node.firstRelID
 
-        #nodeRelationships = RelationshipStorageManager.getRelationshipChain(firstRelID, nodeIndex)
+        nodeRelationships = RelationshipStorageManager.getRelationshipChain(firstRelID, nodeIndex)
         '''nodeProperties = PropertyStorageManager.getPropChain(firstPropID)
         nodeLabels = LabelStorageManager.getLabelChain(firstLabelID)'''
 
         #print('node has {0} relationships'.format(len(nodeRelationships)))
         
-        #for rel in nodeRelationships:
-            #node.addRelationship(rel)
+        for rel in nodeRelationships:
+            node.addRelationship(rel)
         #node.addProperties(nodeProperties)
         #node.addLabels(nodeLabels)
 
@@ -132,6 +132,8 @@ class NodeStorageManager():
             LabelStorageManager.writeLabel(label, False)
 
     def createNode():
+        print('***creating node****')
+
         # get node file
         lastFileID = NodeStorageManager.numNodeFiles - 1
         lastFile = NodeFile(lastFileID)
