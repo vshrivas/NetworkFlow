@@ -55,7 +55,7 @@ class RelationshipStorageManager():
         # will load page into memory if wasn't there
         relationshipPage = BufferManager.getRelationshipPage(pageIndex, RelationshipFile(fileID))
 
-        relationshipPage.pageLock.acquire()
+        relationshipPage.pageLock.acquire_read()
 
         rel = relationshipPage.readRelationship(relIndex)
 
@@ -63,7 +63,7 @@ class RelationshipStorageManager():
 
         rel.properties = properties'''
 
-        relationshipPage.pageLock.release()
+        relationshipPage.pageLock.release_read()
 
         return rel
 
@@ -77,14 +77,14 @@ class RelationshipStorageManager():
 
         relPage = BufferManager.getRelationshipPage(pageIndex, RelationshipFile(fileID))
 
-        relPage.pageLock.acquire()
+        relPage.pageLock.acquire_write()
 
         if create:
             relPage.numEntries += 1
 
         relPage.writeRelationship(rel, create)
 
-        relPage.pageLock.release()
+        relPage.pageLock.release_write()
 
         '''for prop in node.properties:
             PropertyStoreManager.writeProperty(prop)'''

@@ -64,7 +64,7 @@ class NodeStorageManager():
         print('getting node page for reading')
         nodePage = BufferManager.getNodePage(pageIndex, NodeFile(int(fileID)))
 
-        nodePage.pageLock.acquire()
+        nodePage.pageLock.acquire_read()
 
         node = nodePage.readNode(nodeIndex)
 
@@ -81,7 +81,7 @@ class NodeStorageManager():
         #node.addProperties(nodeProperties)
         #node.addLabels(nodeLabels)
 
-        nodePage.pageLock.release()
+        nodePage.pageLock.release_read()
 
         return node
 
@@ -113,7 +113,7 @@ class NodeStorageManager():
         print('getting node page for writing')
         nodePage = BufferManager.getNodePage(pageIndex, NodeFile(int(fileID)))
 
-        nodePage.pageLock.acquire()
+        nodePage.pageLock.acquire_write()
 
         if create:
             nodePage.numEntries += 1
@@ -138,7 +138,7 @@ class NodeStorageManager():
         for label in node.labels:
             LabelStorageManager.writeLabel(label, False)
 
-        nodePage.pageLock.release()
+        nodePage.pageLock.release_write()
 
         return node
 

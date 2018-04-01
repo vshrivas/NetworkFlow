@@ -4,6 +4,7 @@
 
 # page IDs are unique across files, and allow storage managers to determine which file a page is in 
 import threading 
+from RWLock import RWLock
 
 class DataPage(object):
 	# static variables
@@ -28,7 +29,7 @@ class DataPage(object):
 			# 2 Property
 			# 3 Label
 		self.pageID = pageID
-		self.pageLock = threading.Lock()
+		self.pageLock = RWLock()
 		self.dirty = True
 		self.file = datafile
 		self.pageSize = 0
