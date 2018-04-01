@@ -51,7 +51,7 @@ class NodeFile(object):
         nodeFile.close()
 
     def createPage(self):
-        NodePage(self.numPages, self, True)
+        nodePage = NodePage(self.numPages, self, True)
         self.numPages += 1
             
         nodeFile = open(self.filePath, 'r+b')
@@ -59,6 +59,8 @@ class NodeFile(object):
                 byteorder = sys.byteorder, signed=True))
 
         nodeFile.close()
+
+        return nodePage
 
     def getFileName(self):
         """Return file name of backing file."""
