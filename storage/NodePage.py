@@ -66,7 +66,7 @@ class NodePage(DataPage):
         
         # read first rel ID, first property ID, first label ID
         nodeFile.seek(nodeStartOffset + Node.REL_ID_OFFSET)
-        absFirstRelID = int.from_bytes(nodeFile.read(Node.nodeIDByteLen), sys.byteorder, signed=True)
+        absFirstRelID = int.from_bytes(nodeFile.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
         relPageIndex = int(absFirstRelID / DataPage.MAX_PAGE_ENTRIES)
         relIndex = int(((absFirstRelID / DataPage.MAX_PAGE_ENTRIES) - relPageIndex) *  DataPage.MAX_PAGE_ENTRIES)
         firstRelID = [[1, relPageIndex], relIndex]
