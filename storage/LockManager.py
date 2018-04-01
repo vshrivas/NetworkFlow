@@ -4,9 +4,56 @@ import random
 import threading
 
 class LockManager:
-	# dictionary of pageID and owner 
-	pageOwners = {}
+	# dictionary of pageID and owner(s) 
+	pageOwners = {} # key: tuple(pageID), value: list of owners
 	pageOwnersLock = threading.Lock()
+
+	def detectRWDeadlock(userThread, startThread):
+		print('inside detect deadlock for {0}'.format(startThread.name))
+		#LockManager.pageOwnersLock.acquire()
+
+		# user thread isn't trying to wait for any page, no deadlock
+		if userThread.waiting is None:
+			print('thread not waiting for any page')
+			#LockManager.pageOwnersLock.release()
+			return False
+
+		pageWaiting = tuple(userThread.waiting.pageID)
+
+		# page user thread is waiting on has no owners
+		if pageWaiting not in LockManager.pageOwners.keys():
+			print('page not in keys, page has no owner')
+			#LockManager.pageOwnersLock.release()
+			return False
+
+		# owner(s) of the page
+		# can have multiple if they are reading page
+		# only one if writing to page
+		owners = LockManager.pageOwners[pageWaiting]
+		print('owners are {0}'.format(owners))
+
+		if owners is None:
+			return False
+
+		for owner in owners:
+			print('owner: {0}'.format(owner.name))
+			# found cycle back to starting thread
+			if owner.name == startThread.name:
+				#LockManager.pageOwnersLock.release()
+				print('Deadlock detected!')
+				return True
+
+			# check if cycle can be found in future levels of this owner
+			isDeadLocked = LockManager.detectRWDeadlock(owner, startThread)
+			
+			# found cycle at some future level
+			if isDeadLocked:
+				#LockManager.pageOwnersLock.release()
+				print('Deadlock detected!')
+				return True
+
+		#LockManager.pageOwnersLock.release()
+		return False
 
 	# checks if there is a potential for deadlock
 	# returns false if there isn't deadlock
@@ -65,11 +112,35 @@ class LockManager:
 
 
 	def makePageOwner(thread, page):
+		print('making {0} owner of page {1}'.format(thread.name, page.pageID[1]))
 		LockManager.pageOwnersLock.acquire()
-		LockManager.pageOwners[tuple(page.pageID)] = thread
+
+		pageKey = tuple(page.pageID)
+
+		if LockManager.pageOwners.get(pageKey) is None:
+			print('page key was not in owner keys')
+			LockManager.pageOwners[pageKey] = [thread]
+		else:
+			LockManager.pageOwners[pageKey] = (LockManager.pageOwners.get(pageKey)).append(thread)
+
+		print('owners are: {0}'.format(LockManager.pageOwners))
+
 		LockManager.pageOwnersLock.release()
 
-	def removePageOwner(page):
+	def removePageOwner(thread, page):
+		print('removing {0} owner of page {1}'.format(thread.name, page.pageID[1]))
 		LockManager.pageOwnersLock.acquire()
-		del LockManager.pageOwners[tuple(page.pageID)]
+
+		pageKey = tuple(page.pageID)
+
+		if pageKey not in LockManager.pageOwners.keys():
+			return
+
+		LockManager.pageOwners[pageKey].remove(thread)
+
+		if len(LockManager.pageOwners[pageKey]) == 0:
+			del LockManager.pageOwners[pageKey]
+
+		print('owners are: {0}'.format(LockManager.pageOwners[pageKey]))
+
 		LockManager.pageOwnersLock.release()

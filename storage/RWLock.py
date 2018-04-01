@@ -4,8 +4,8 @@ import threading
 
 class RWLock:
 	def __init__(self):
-		self.lockReadersProtect = threading.lock()
-		self.lockWritersExclude = threading.lock()
+		self.lockReadersProtect = threading.Lock()
+		self.lockWritersExclude = threading.Lock()
 		self.numReaders = 0
 
 	def acquire_read(self):
