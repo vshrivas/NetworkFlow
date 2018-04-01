@@ -25,7 +25,7 @@ class BufferManager(object):
 
 
     def getRelationshipPage(pageIndex, datafile):
-        return RelationshipPage(0, datafile, False)
+        return RelationshipPage(pageIndex, datafile, False)
 
 
     def addPage(pageID):
