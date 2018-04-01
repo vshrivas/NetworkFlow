@@ -10,6 +10,7 @@ from NodeStorageManager import NodeStorageManager
 from RelationshipStorageManager import RelationshipStorageManager
 
 NodeStorageManager()
+RelationshipStorageManager()
 
 node0 = NodeStorageManager.createNode()
 
@@ -47,7 +48,7 @@ assert(node2.getID()[1] == readNode2.getID()[1]), 'read and written nodes do not
 assert(node2.getID()[0][1] == readNode2.getID()[0][1]), 'read and written nodes do not match!'
 ##################################################################################################
 
-'''rel0 = RelationshipStorageManager.createRelationship(node0, node1, 'friendship')
+rel0 = RelationshipStorageManager.createRelationship(node0, node1, 'friendship')
 
 rel0ID = [[1,0], 0]
 readRel0 = RelationshipStorageManager.readRelationship(rel0ID)
@@ -72,7 +73,7 @@ assert(rel0.getRelType() == readRel0.getRelType()), 'read and written relationsh
 
 rel1 = RelationshipStorageManager.createRelationship(node0, node2, 'animosity')
 
-rel1ID = [[1,0], 1]
+rel1ID = [[1,1], 0]
 readRel1 = RelationshipStorageManager.readRelationship(rel1ID)
 
 print('rel1 ID:{0}'.format(rel1.getID()[1]))
@@ -94,7 +95,7 @@ assert(rel1.getRelType() == readRel1.getRelType()), 'read and written relationsh
 ###################################################################################################
 rel2 = RelationshipStorageManager.createRelationship(node1, node2, 'pet')
 
-rel2ID = [[1,0], 2]
+rel2ID = [[1,2], 0]
 readRel2 = RelationshipStorageManager.readRelationship(rel2ID)
 
 print('rel2 ID:{0}'.format(rel2.getID()[1]))
@@ -115,7 +116,7 @@ assert(rel2.getRelType() == readRel2.getRelType()), 'read and written relationsh
 
 ###################################################################################################
 
-node0.addRelationship(rel0)
+'''node0.addRelationship(rel0)
 
 node0.addRelationship(rel1)
 

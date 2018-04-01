@@ -98,7 +98,7 @@ class RelationshipPage(DataPage):
 
         # find ID of prev rel for node2 in relationship
         relationshipStore.seek(relationshipStartOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
-        absNode2PrevRelIndex = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
+        absNode2PrevRelID = int.from_bytes(relationshipStore.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
         node2PrevRelPageIndex = int(absNode2PrevRelID / DataPage.MAX_PAGE_ENTRIES)
         node2PrevRelIndex = int((absNode2PrevRelID  / DataPage.MAX_PAGE_ENTRIES - node2PrevRelPageIndex) * DataPage.MAX_PAGE_ENTRIES)
         node2PrevRelID = [[1, node2PrevRelPageIndex], node2PrevRelIndex]
