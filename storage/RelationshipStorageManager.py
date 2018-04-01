@@ -3,6 +3,8 @@ from Relationship import Relationship
 from BufferManager import BufferManager
 from Node import Node
 from Property import Property
+from DataPage import DataPage
+import sys, struct, os
 
 class RelationshipStorageManager():
     nodeFiles = []
@@ -32,13 +34,13 @@ class RelationshipStorageManager():
                 byteorder = sys.byteorder, signed=True))
 
         # there are no rel files
-        if RelationshipStorageManager.numNodeFiles == 0:
+        if RelationshipStorageManager.numRelFiles == 0:
             # make a new one 
             RelationshipFile(0)
-            RelationshipStorageManager.numNodeFiles += 1
+            RelationshipStorageManager.numRelFiles += 1
 
             metadataFile = open(self.filePath, 'r+b')
-            metadataFile.write((RelationshipStorageManager.numNodeFiles).to_bytes(Relationship.relIDByteLen,
+            metadataFile.write((RelationshipStorageManager.numRelFiles).to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
 
     def readRelationship(relID):
@@ -141,6 +143,8 @@ class RelationshipStorageManager():
         print('creating relationship {0} in page {1}'.format(relPage.numEntries, relPage.pageID[1]))
 
         RelationshipStorageManager.writeRelationship(rel, True)
+
+        return rel
 
     def getRelationshipChain(firstRelID, nodeIndex):
         relationshipChain = []
