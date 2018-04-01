@@ -12,6 +12,28 @@ from LockManager import LockManager
 
 # creates a deadlock condition
 
+###### Expected Result Example ############
+'''
+inside detect deadlock for Thread-3
+for thread Thread-3: owners are [<UserThread2(Thread-3, started 123145318068224)>]
+for thread Thread-3: owner: Thread-3
+Deadlock detected!
+Deadlock detected!
+Deadlock detected!
+Exception in thread Thread-3:
+Traceback (most recent call last):
+  File "/Users/vshrivas/anaconda3/lib/python3.6/threading.py", line 916, in _bootstrap_inner
+    self.run()
+  File "ConcurrencyTest5.py", line 134, in run
+    raise Exception('Deadlock detected!')
+Exception: Deadlock detected!
+'''
+'''
+This is just the bottom snippet of one example run through.
+The top lines can vary depending on what order the threads execute in, but test should end with
+an exception being thrown when deadlock condition is detected. 
+'''
+
 class UserThread0(threading.Thread):
 	waiting = None
 

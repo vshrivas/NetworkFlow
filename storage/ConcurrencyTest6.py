@@ -33,10 +33,11 @@ Exception: Deadlock detected!
 '''
 
 '''
-The top line can vary depending on what order the threads execute in, but test should end with
-and exception thrown when deadlock condition is detected. The test also pauses for a while, this
-doesn't mean the test is broken, just wait for a few seconds. Threads are made to sleep to create a 
-deadlock condition.
+This is just the bottom snippet of one example run through.
+The top lines can vary depending on what order the threads execute in, but test should end with
+an exception being thrown when deadlock condition is detected. The test also pauses for a while, this
+doesn't mean the test is broken, just wait for a few seconds. This happens because threads are 
+made to sleep to create a deadlock condition.
 '''
 
 class UserThread0(threading.Thread):

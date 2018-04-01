@@ -10,7 +10,15 @@ from NodeFile import NodeFile
 from BufferManager import BufferManager
 from LockManager import LockManager
 
-# creates a deadlock condition
+# creates a deadlock condition and then detects it 
+'''
+This test is now deprecated. 
+Was used to test LockManager.detectDeadlock method when LockManager
+only detected deadlock for write locks. Now we have transitioned to using the
+LockManager.detectRWDeadlock to detect multi-path deadlock where each page can have multiple
+owners due to reads, and the LockManager.detectDeadlock method is deprecated. The test is included
+just to provide a progression for concurrency testing.
+'''
 
 class UserThread0(threading.Thread):
 	waiting = None
