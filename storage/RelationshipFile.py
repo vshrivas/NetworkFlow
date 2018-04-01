@@ -1,5 +1,5 @@
-from Relationship import Relationship
-from RelationshipPage import RelationshipPage
+from .Relationship import Relationship
+from .RelationshipPage import RelationshipPage
 import sys, os
 
 class RelationshipFile:

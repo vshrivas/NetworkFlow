@@ -1,9 +1,9 @@
-from RelationshipFile import RelationshipFile
-from Relationship import Relationship
-from BufferManager import BufferManager
-from Node import Node
-from Property import Property
-from DataPage import DataPage
+from .RelationshipFile import RelationshipFile
+from .Relationship import Relationship
+from .BufferManager import BufferManager
+from .Node import Node
+from .Property import Property
+from .DataPage import DataPage
 import sys, struct, os
 
 class RelationshipStorageManager():

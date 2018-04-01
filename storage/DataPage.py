@@ -4,7 +4,7 @@
 
 # page IDs are unique across files, and allow storage managers to determine which file a page is in 
 import threading 
-from RWLock import RWLock
+from .RWLock import RWLock
 
 class DataPage(object):
 	# static variables

@@ -1,7 +1,7 @@
-from DataPage import DataPage
-from Relationship import Relationship
-from Node import Node
-from Property import Property
+from .DataPage import DataPage
+from .Relationship import Relationship
+from .Node import Node
+from .Property import Property
 import sys, struct, os
 
 class RelationshipPage(DataPage):

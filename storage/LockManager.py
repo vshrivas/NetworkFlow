@@ -1,5 +1,5 @@
-from NodePage import NodePage
-from RelationshipPage import RelationshipPage
+from .NodePage import NodePage
+from .RelationshipPage import RelationshipPage
 import random
 import threading
 

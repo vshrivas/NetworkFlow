@@ -1,4 +1,4 @@
-from Property import Property
+from .Property import Property
 import sys
 
 DEBUG = False

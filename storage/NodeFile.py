@@ -1,8 +1,8 @@
-from Node import Node
-from Property import Property
-from Relationship import Relationship
-from Label import Label
-from NodePage import NodePage
+from .Node import Node
+from .Property import Property
+from .Relationship import Relationship
+from .Label import Label
+from .NodePage import NodePage
 import sys, struct, os
 
 DEBUG = False

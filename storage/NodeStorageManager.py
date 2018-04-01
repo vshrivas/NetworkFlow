@@ -1,12 +1,12 @@
-from Node import Node
-from NodePage import NodePage
-from Property import Property
-from Relationship import Relationship
-from Label import Label
-from NodeFile import NodeFile
-from BufferManager import BufferManager
-from RelationshipStorageManager import RelationshipStorageManager
-from DataPage import DataPage
+from .Node import Node
+from .NodePage import NodePage
+from .Property import Property
+from .Relationship import Relationship
+from .Label import Label
+from .NodeFile import NodeFile
+from .BufferManager import BufferManager
+from .RelationshipStorageManager import RelationshipStorageManager
+from .DataPage import DataPage
 import sys, struct, os
 
 # has metadata keeping track of number of node files
