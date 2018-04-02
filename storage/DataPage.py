@@ -8,7 +8,7 @@ from .RWLock import RWLock
 class DataPage(object):
 	# static variables
 	# max page size 
-	MAX_PAGE_ENTRIES = 5
+	MAX_PAGE_ENTRIES = 1
 
 	# meta data includes:
 		# number of entries in this page
