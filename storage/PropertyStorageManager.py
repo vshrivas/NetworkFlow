@@ -7,14 +7,20 @@ from .NodeFile import NodeFile
 from .BufferManager import BufferManager
 from .RelationshipStorageManager import RelationshipStorageManager
 from .DataPage import DataPage
+from .LockManager import LockManager
+import threading
 import sys, struct, os
 
+
+''' PropertyStorageManager is responsible for handling the top level methods for creating, reading,
+and writing properties. Creates new property pages and files when necessary. Has a meta data file
+to keep track of number of property files. '''
 class PropertyStorageManager():
     numPropFiles = 0
     directory = "propstore"
 
     def __init__(self):
-        # open node storage meta data file
+        # open property storage meta data file
         # read number of node files 
         self.fileName = "metadata"
         self.filePath = os.path.join(PropertyStorageManager.directory, self.fileName)
@@ -26,7 +32,7 @@ class PropertyStorageManager():
 
         # storage manager metadata file does not exist
         else:
-            # node store directory does not exist, make it
+            # property store directory does not exist, make it
             if not os.path.exists(self.directory):
                 os.makedirs(PropertyStorageManager.directory)
 
@@ -36,7 +42,7 @@ class PropertyStorageManager():
             metadataFile.write((0).to_bytes(Property.propIDByteLen,
                 byteorder = sys.byteorder, signed=True))
 
-        # there are no node files
+        # there are no property files
         if PropertyStorageManager.numPropFiles == 0:
             # make a new one 
             PropertyFile(0)
@@ -46,6 +52,7 @@ class PropertyStorageManager():
             metadataFile.write((PropertyStorageManager.numPropFiles).to_bytes(Property.propIDByteLen,
                 byteorder = sys.byteorder, signed=True))
 
+    # takes in property ID, reads and returns property
     def readProperty(propertyID):
         pageID = propertyID[0]
         propertyIndex = propertyID[1]
@@ -53,38 +60,64 @@ class PropertyStorageManager():
         pageIndex = pageID[1]
 
         fileID = pageIndex / PropertyFile.MAX_PAGES
+
         # use buffer manager to retrieve page from memory
         # will load page into memory if wasn't there
         propertyPage = BufferManager.getPropertyPage(pageIndex, PropertyFile(int(fileID)))
 
+        # detect potential deadlock
+        threading.currentThread().waiting = propertyPage
+        if LockManager.detectRWDeadlock(threading.currentThread(), threading.currentThread()):
+            raise Exception('Deadlock detected!')
+
+        # acquire read lock
         propertyPage.pageLock.acquire_read()
+        threading.currentThread().waiting = None
+        LockManager.makePageOwner(threading.currentThread(), propertyPage)
 
         property = propertyPage.readNode(nodeIndex)
 
+        # release lock
         propertyPage.pageLock.release_read()
+        LockManager.removePageOwner(threading.currentThread(), propertyPage)
+        return property
 
+    # takes in property to write or create, returns same property
     def writeProperty(property, create):
         propID = property.getID()
         pageID = propID[0]           # pageID[0] = 0, pageID[1] = pageIndex
 
-        pageIndex = pageID[1]        # which page node is in, page IDs are unique across all files
+        pageIndex = pageID[1]        
 
         fileID = pageIndex / PropertyFile.MAX_PAGES
+
         # use buffer manager to retrieve page from memory
         # will load page into memory if wasn't there
         propPage = BufferManager.getPropertyPage(pageIndex, PropertyFile(int(fileID)))
 
+        # check for potential deadlock 
+        threading.currentThread().waiting = propPage
+        if LockManager.detectRWDeadlock(threading.currentThread(), threading.currentThread()):
+            raise Exception('Deadlock detected!')
+
+        # acquire write lock
         propPage.pageLock.acquire_write()
+        threading.currentThread().waiting = None
+        LockManager.makePageOwner(threading.currentThread(), propPage)
 
         propPage.writeProperty(property, create)
 
+        # release write lock
         propPage.pageLock.release_write()
+        LockManager.removePageOwner(threading.currentThread(), propPage)
+        return property
 
+    # returns list of linked properties based on first property ID
     def getPropertyChain(firstPropID):
         nextPropID = firstPropID
         chainedProperties = []
 
-        # while there is a next property for the relationship
+        # while there is a next property
         while nextPropID[1] != -1:
             prop = PropertyStorageManager.readProperty(nextPropID)
             chainedProperties.append(prop)
@@ -93,6 +126,7 @@ class PropertyStorageManager():
 
         return chainedProperties
 
+    # creates a property based on a given key and value
     def createProperty(key, value):
         # get prop file
         lastFileID = PropertyStorageManager.numPropFiles - 1
@@ -101,7 +135,7 @@ class PropertyStorageManager():
         if lastFile.numPages == 0:
             lastFile.createPage()
 
-        # get last node page
+        # get last property page
         lastPage = BufferManager.getPropertyPage(lastFile.numPages - 1, lastFile)
         
         propPage = lastPage

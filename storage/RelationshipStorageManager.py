@@ -4,20 +4,24 @@ from .BufferManager import BufferManager
 from .Node import Node
 from .Property import Property
 from .DataPage import DataPage
+from .LockManager import LockManager
+import threading
 import sys, struct, os
 
+''' RelationshipStorageManager is responsible for handling the top level methods for creating, reading,
+and writing relationships. Creates new relationship pages and files when necessary. Has a meta data file
+to keep track of number of relationship file. '''
 class RelationshipStorageManager():
-    nodeFiles = []
     directory = "relstore"
 
     numRelFiles = 0
 
     def __init__(self):
         # open relationship storage meta data file
-        # read number of relationship files 
         self.fileName = "metadata"
         self.filePath = os.path.join(RelationshipStorageManager.directory, self.fileName)
 
+        # file exists, read number of relationship files 
         if os.path.exists(self.filePath):
             metadataFile = open(self.filePath, 'r+b')
             RelationshipStorageManager.numRelFiles = int.from_bytes(metadataFile.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
@@ -27,9 +31,9 @@ class RelationshipStorageManager():
             if not os.path.exists(self.directory):
                 os.makedirs(RelationshipStorageManager.directory)
 
-            # open metadata file    
+            # create and open metadata file    
             metadataFile = open(self.filePath, 'wb')
-            # write number of rel files to first 3 bytes of rel storage metadata file
+            # write number of rel files 
             metadataFile.write((0).to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
 
@@ -43,53 +47,70 @@ class RelationshipStorageManager():
             metadataFile.write((RelationshipStorageManager.numRelFiles).to_bytes(Relationship.relIDByteLen,
                 byteorder = sys.byteorder, signed=True))
 
+    ''' Takes in a relationship ID and returns the corresponding relationship by reading it from the DB '''
     def readRelationship(relID):
+        # get relationship and page indexes
         pageID = relID[0]
         relIndex = relID[1]
-
         pageIndex = pageID[1]
 
+        # get file ID
         fileID = int(pageIndex / RelationshipFile.MAX_PAGES)
 
         # use buffer manager to retrieve page from memory
         # will load page into memory if wasn't there
         relationshipPage = BufferManager.getRelationshipPage(pageIndex, RelationshipFile(fileID))
 
+        # thread is waiting on lock
+        threading.currentThread().waiting = relationshipPage
+        # check for deadlock
+        if LockManager.detectRWDeadlock(threading.currentThread(), threading.currentThread()):
+            raise Exception('Deadlock detected!')
+        # acquire lock
         relationshipPage.pageLock.acquire_read()
+        threading.currentThread().waiting = None
+        LockManager.makePageOwner(threading.currentThread(), relationshipPage)
 
         rel = relationshipPage.readRelationship(relIndex)
 
-        '''properties = getPropertyChain(rel.propertyID)
-
-        rel.properties = properties'''
-
+        # release lock
         relationshipPage.pageLock.release_read()
-
+        LockManager.removePageOwner(threading.currentThread(), relationshipPage)
         return rel
 
+    ''' Takes in a relationship and either creates a new rel, or replaces the one with this ID '''
     def writeRelationship(rel, create):
+        # get relationship and page indexes
         relID = rel.getID()
         pageID = relID[0]           # pageID[0] = 0, pageID[1] = pageIndex
+        pageIndex = pageID[1]       
 
-        pageIndex = pageID[1]       # which page node is in, page IDs are unique across all files
-
+        # get page ID
         fileID = int(pageIndex / RelationshipFile.MAX_PAGES)
 
         relPage = BufferManager.getRelationshipPage(pageIndex, RelationshipFile(fileID))
 
+        threading.currentThread().waiting = relPage
+        # check for deadlock
+        if LockManager.detectRWDeadlock(threading.currentThread(), threading.currentThread()):
+            raise Exception('Deadlock detected!')
+
+        # acquire lock
         relPage.pageLock.acquire_write()
+        threading.currentThread().waiting = None
+        LockManager.makePageOwner(threading.currentThread(), relPage)
 
         if create:
             relPage.numEntries += 1
 
         relPage.writeRelationship(rel, create)
 
+        # release lock
         relPage.pageLock.release_write()
-
-        '''for prop in node.properties:
-            PropertyStoreManager.writeProperty(prop)'''
+        LockManager.removePageOwner(threading.currentThread(), relPage)
         return rel
 
+    ''' Takes in both nodes of relationship and relationship type, creates the relationship in the DB '''
     def createRelationship(node0, node1, type):
         # get rel file
         lastFileID = RelationshipStorageManager.numRelFiles - 1
@@ -126,25 +147,8 @@ class RelationshipStorageManager():
             else:
                 lastFile.createPage()
                 relPage = BufferManager.getRelationshipPage(lastFile.numPages - 1, lastFile)
-        '''relFile = RelationshipFile(0)
 
-        if relFile.numPages == 0:
-            relFile.createPage()
-
-        print('getting rel page for creation')
-        relPage = BufferManager.getRelationshipPage(0, relFile)
-
-        relID = [[1, 0], relPage.numEntries]
-
-        rel = Relationship(relID, node0.getID(), node1.getID(),
-            [[1,0],-1], [[1,0],-1], [[1,0],-1], [[1,0],-1], type, [[2,0],-1], relFile)
-
-        print('creating relationship {0}'.format(relPage.numEntries))
-
-        RelationshipStorageManager.writeRelationship(rel, True)
-
-        return rel'''
-
+        # make relationship
         relID = [relPage.pageID, relPage.numEntries]
 
         rel = Relationship(relID, node0.getID(), node1.getID(),
@@ -156,6 +160,7 @@ class RelationshipStorageManager():
 
         return rel
 
+    ''' Takes in first relationship ID for a given node and finds full chain of relationships for node'''
     def getRelationshipChain(firstRelID, nodeIndex):
         relationshipChain = []
 
@@ -163,14 +168,11 @@ class RelationshipStorageManager():
 
         print('first rel ID for node is {0}'.format(firstRelID))
 
-        '''if DEBUG:
-            print("reading relationships")'''
-
         # while there is a next relationship
         while nextRelID[1] != -1:
-            '''if DEBUG:
-                print(nextRelID)'''
             print('inside get rel chain loop')
+
+            # read relationship
             rel = RelationshipStorageManager.readRelationship(nextRelID)        
 
             # find next rel ID
@@ -183,37 +185,3 @@ class RelationshipStorageManager():
             relationshipChain.append(rel)
 
         return relationshipChain
-
-
-    # triggers writes for every page of these relationships
-    '''def writeRelationships(relationships):
-        # write relationships to relationship file
-        for relIndex in range(0, len(relationships)):
-            if DEBUG:
-                print("writing {0} relationship ".format(relIndex))
-            rel = relationships[relIndex]
-
-            # write first relationship
-            if relIndex == 0:
-                # A placeholder relationship in case there is no previous or next relationship
-                nullRelationship = Relationship(-1, -1, "", "",-1)
-                # no next relationship
-                if relIndex == len(relationships) - 1:
-                    if DEBUG:
-                        print("only one relationship")
-                    rel.writeRelationship(node, nullRelationship, nullRelationship)
-                # there is a next relationship
-                else:
-                    nullRelationship = Relationship(-1, -1, "", "", -1)
-                    rel.writeRelationship(node, nullRelationship, relationships[relIndex + 1])
-            # write last relationship
-            elif relIndex == len(relationships) - 1:
-                # A placeholder relationship in case there is no previous or next relationship
-                nullRelationship = Relationship(-1, -1, "", "", -1)
-                rel.writeRelationship(node, relationships[relIndex - 1], nullRelationship)
-            # write relationship that's not first or last relationship
-            else:
-                rel.writeRelationship(node, relationships[relIndex - 1],
-                    relationships[relIndex + 1])'''
-
-    

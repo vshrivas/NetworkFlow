@@ -5,7 +5,7 @@ import sys, os
 class RelationshipFile:
 
     """RelationshipFile class: representation of relationship file, which stores info about all
-    relationships.
+    relationships, including number of pages.
     """
     MAX_PAGES = 10
     NUMPAGES_OFFSET = 0
@@ -41,6 +41,7 @@ class RelationshipFile:
 
         relFile.close()
 
+    # creates a rel page
     def createPage(self):
         RelationshipPage(self.numPages, self, True)
         self.numPages += 1

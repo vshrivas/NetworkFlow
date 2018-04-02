@@ -6,6 +6,10 @@ from storage.Label import Label
 from storage.NodeStorageManager import NodeStorageManager
 from storage.RelationshipStorageManager import RelationshipStorageManager
 
+''' Creates 5 user threads each manipulating same field of same relationships.
+Checks that field is not corrupted at the end of the test. Test passes if 
+assertion passes. '''
+
 def user0(rel):
 	rel.type = 'friendship'
 	print('user 0 writing rel...')

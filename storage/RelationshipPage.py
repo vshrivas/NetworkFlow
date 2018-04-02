@@ -4,9 +4,15 @@ from .Node import Node
 from .Property import Property
 import sys, struct, os
 
+# Relationship Page handles the byte-level reads and writes of relationships from files
 class RelationshipPage(DataPage):
     PAGES_OFFSET = 100
 
+    # constructor for RelationshipPage
+    # takes in 
+    # pageIndex: index of page 
+    # datafile: relFile containing page
+    # create: true if creating new page
     def __init__(self, pageIndex, datafile, create):
         # 1 indicates that this is a relationship page
         pageID = [1, pageIndex]
@@ -134,9 +140,11 @@ class RelationshipPage(DataPage):
 
         return rel
 
+    # given page index, returns relationship
     def readRelationship(self, relationshipIndex):
         return self.relationshipData[relationshipIndex]
 
+    # adds a relationship to pages data
     def writeRelationship(self, rel, create):
         relID = rel.getID()
 
@@ -149,6 +157,7 @@ class RelationshipPage(DataPage):
 
         self.writePageData()
 
+    # writes all of page data to disk
     def writePageData(self):
         print('writing rel page data...')
         filePath = (self.file).getFilePath()
@@ -168,6 +177,7 @@ class RelationshipPage(DataPage):
             print('writing data for rel {0}'.format(rel.getID()[1]))
             self.writeRelationshipData(rel, relFile)
 
+    # writes data for a given relationship
     def writeRelationshipData(self, rel, relationshipStore):
         relationshipIndex = rel.getID()[1]
 
@@ -249,122 +259,3 @@ class RelationshipPage(DataPage):
         absPropID = rel.propertyID[0][1] * DataPage.MAX_PAGE_ENTRIES + rel.propertyID[1]
         relationshipStore.write(rel.propertyID[1].to_bytes(Property.propIDByteLen, 
             byteorder = sys.byteorder, signed=True))
-
-
-    '''def OLDwriteRelationshipData(self, node, prevRel, nextRel):
-        """Write relationship to relationship file for specified node and relationship's 
-        properties to property file.
-
-        Arguments:
-        node: node relationship being written for
-        prevRel: previous relationship for specified node
-        nextRel: next relationship for specified node
-        """
-        # open relationship file
-        if DEBUG:
-            print(self.relationshipFile)
-        storeFilePath = self.relationshipFile.getFilePath()
-        storeFile = open(storeFilePath, 'r+b')
-
-        # seek to location for relationship
-        storeFile.seek(self.startOffset)
-
-        # write relationship ID
-        storeFile.write(self.relationshipID.to_bytes(Relationship.relIDByteLen, 
-            byteorder = sys.byteorder, signed=True))
-        if DEBUG:
-            print("wrote relationship id")
-
-        # write node 1 id
-        storeFile.seek(self.startOffset + Relationship.NODE1_ID_OFFSET)
-        storeFile.write(self.firstNodeID.to_bytes(3, 
-            byteorder = sys.byteorder, signed=True))
-        if DEBUG:
-            print("wrote first node id")
-
-        # write node 2 id
-        storeFile.seek(self.startOffset + Relationship.NODE2_ID_OFFSET)
-        storeFile.write(self.secondNodeID.to_bytes(3, 
-            byteorder = sys.byteorder, signed=True))
-        if DEBUG:
-            print("wrote second node id")
-
-        # find which node relationship is being written for and write next and previous 
-        # relationship IDs appropriately
-        if node.getID() == self.firstNodeID:
-            if DEBUG:
-                print("writing relationship for first node")
-
-            storeFile.seek(self.startOffset + Relationship.NODE1_NEXT_REL_ID_OFFSET)
-            storeFile.write(nextRel.getID().to_bytes(Relationship.relIDByteLen, 
-                byteorder = sys.byteorder, signed=True))
-
-            storeFile.seek(self.startOffset + Relationship.NODE1_PREV_REL_ID_OFFSET)
-            storeFile.write(prevRel.getID().to_bytes(Relationship.relIDByteLen, 
-                byteorder = sys.byteorder, signed=True))
-
-        else:
-            if DEBUG:
-                print("writing relationship for second node")
-            storeFile.seek(self.startOffset + Relationship.NODE2_NEXT_REL_ID_OFFSET)
-            storeFile.write(nextRel.getID().to_bytes(Relationship.relIDByteLen, 
-                byteorder = sys.byteorder, signed = True))
-
-            storeFile.seek(self.startOffset + Relationship.NODE2_PREV_REL_ID_OFFSET)
-            storeFile.write(prevRel.getID().to_bytes(Relationship.relIDByteLen, 
-                byteorder = sys.byteorder, signed = True))
-
-        # write relationship type
-        if DEBUG:
-            print("writing relationship type")
-        storeFile.seek(self.startOffset + Relationship.RELATIONSHIP_TYPE_OFFSET)
-
-        # type is not of max size
-        if(sys.getsizeof(self.type) != self.MAX_TYPE_SIZE):
-            # pad relationship type string up to max size
-            while len(self.type.encode('utf-8')) != self.MAX_TYPE_SIZE:
-                self.type += ' '
-
-        storeFile.write(bytearray(self.type, 'utf8'))
-        # strip out additional whitespace used for padding from type
-        self.type = self.type.rstrip(' ')
-
-        # write first property ID
-        storeFile.seek(self.startOffset + Relationship.PROPERTY_ID_OFFSET)
-
-        # if no properties write -1 for first ID
-        if len(self.properties) == 0:
-            firstProp = -1
-            storeFile.write((-1).to_bytes(Property.propIDByteLen,
-                byteorder = sys.byteorder, signed=True))
-            if DEBUG:
-                print("wrote first property ID: -1")
-        # otherwise write id of first property
-        else:
-            firstProp = self.properties[0]
-            storeFile.write(firstProp.getID().to_bytes(Property.propIDByteLen,
-                byteorder = sys.byteorder, signed=True))
-            if DEBUG:
-                print("wrote first property ID: {0}". format(firstProp.getID()))
-
-
-        # write properties to property file
-        if DEBUG:
-            print("writing properties to property file ...")
-
-        # write properties to property file
-        for propIndex in range(0, len(self.properties)):
-            prop = self.properties[propIndex]
-            if DEBUG:
-                print("writing {0} property ".format(prop.getID()))
-
-            # case of no next property
-            if propIndex == len(self.properties) - 1:
-                if DEBUG:
-                    print("no next property")
-                # A placeholder property since there is no next property
-                nullProperty = Property("", "", "", -1)
-                prop.writeProperty(nullProperty)
-            # case of next property
-            else:
-                prop.writeProperty(self.properties[propIndex + 1])'''

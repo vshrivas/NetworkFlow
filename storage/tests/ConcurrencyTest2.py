@@ -6,6 +6,10 @@ from storage.Label import Label
 from storage.NodeStorageManager import NodeStorageManager
 from storage.RelationshipStorageManager import RelationshipStorageManager
 
+''' Creates 5 user threads each manipulating same field of same relationships.
+Each thread adds a letter to the relationship type. Make sure all letters are
+present in type at the end. Test passes if assertion passes. '''
+
 def user0(rel):
 	rel.type += 'a'
 	print('user 0 writing rel...')

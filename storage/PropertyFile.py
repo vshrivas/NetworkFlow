@@ -8,10 +8,9 @@ import sys, struct, os
 class PropertyFile:
 
     """PropertyFile class: representation of property file, which stores info about all
-    properties.
+    properties, and number of pages.
     """
 
-    # number of property files
     MAX_PAGES = 10
     NUMPAGES_OFFSET = 0
     PAGES_OFFSET = 100
@@ -46,6 +45,7 @@ class PropertyFile:
 
         propertyFile.close()
 
+    # creates new property page
     def createPage(self):
         propertyPage = PropertyPage(self.numPages, self, True)
         self.numPages += 1

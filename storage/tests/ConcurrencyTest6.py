@@ -10,7 +10,8 @@ from storage.NodeFile import NodeFile
 from storage.BufferManager import BufferManager
 from storage.LockManager import LockManager
 
-# creates a deadlock condition
+# Creates a more complex deadlock condition, involving read locks and write locks, with
+# multiple paths, and detects it.
 
 ##### Expected Result #########
 '''

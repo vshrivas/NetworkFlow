@@ -11,7 +11,7 @@ class NodeFile(object):
 
     """NodeFile class: representation of node file, which stores info about all
     nodes. A NodeFile object can read nodes from the backing node file and stores 
-    the current number of nodes.
+    the number of pages.
     """
 
     MAX_PAGES = 10
@@ -48,6 +48,7 @@ class NodeFile(object):
 
         nodeFile.close()
 
+    # creates a new node page
     def createPage(self):
         nodePage = NodePage(self.numPages, self, True)
         self.numPages += 1
@@ -72,54 +73,6 @@ class NodeFile(object):
         nodeFile = open(self.filePath, 'r+b')
         numNodes = int.from_bytes(nodeFile.read(Node.nodeIDByteLen), byteorder=sys.byteorder, signed=True)
         return numNodes
-
-    '''def readNode(pageID, nodeID):
-        
-
-    def writeNode(node):
-        pageID = node.nodeID[0]          # pageID[0] = 0, pageID[1] = pageIndex
-        nodePage = BufferManager.getNodePage(pageID, self)
-
-        nodePage.writeNode(node)
-
-    def createNode():
-        # check if last page has space
-        # if not, create 
-
-    # checks if file has space
-    # if so, returns page with space
-    # else returns None
-    def hasSpace():
-        # index of last page
-        lastPageIndex = self.numPages - 1
-        startLastPage = PAGES_OFFSET + DataPage.MAX_PAGE_SIZE * lastPageIndex
-
-        # read number of nodes in last page
-        file = open(self.filePath, 'rb')
-        file.seek(startLastPage)
-        numNodes = int.from_bytes(file.read(Node.nodeIDByteLen), byteorder=sys.byteorder, signed=True)
-
-        # page isn't full
-        if (numNodes < (DataPage.MAX_PAGE_SIZE/ Node.storageSize)):
-            lastPage = BufferManager.getNodePage(lastPageIndex)
-        # page is full
-        else:
-            # file is full
-            if lastPageIndex == DataFile.MAX_FILE_PAGES - 1:
-                return None
-            # make a new page
-            else:
-                newPage = NodePage(lastPageIndex + 1)
-                return newPage'''
-
-
-
-
-
-
-
-
-
 
 
 

@@ -7,9 +7,13 @@ from .NodeFile import NodeFile
 from .BufferManager import BufferManager
 from .RelationshipStorageManager import RelationshipStorageManager
 from .DataPage import DataPage
+from .LockManager import LockManager
+import threading
 import sys, struct, os
 
-# has metadata keeping track of number of node files
+''' NodeStorageManager is responsible for handling the top level methods for creating, reading,
+and writing of node. Creates new node pages and files when necessary. Has a meta data file
+to keep track of number of node files. '''
 class NodeStorageManager():
     numNodeFiles = 0
     directory = "nodestore"
@@ -50,7 +54,7 @@ class NodeStorageManager():
                 byteorder = sys.byteorder, signed=True))
 
 
-    # returns node, given nodeID
+    # Takes in nodeID, read corresponding node from DB and returns
     def readNode(nodeID):
         pageID = nodeID[0]          # pageID[0] = 0, pageID[1] = pageIndex
         nodeIndex = nodeID[1]
@@ -58,51 +62,39 @@ class NodeStorageManager():
         pageIndex = pageID[1]       # which page node is in, page IDs are unique across all files
 
         fileID = pageIndex / NodeFile.MAX_PAGES
+       
         # use buffer manager to retrieve page from memory
         # will load page into memory if wasn't there
-
         print('getting node page for reading')
         nodePage = BufferManager.getNodePage(pageIndex, NodeFile(int(fileID)))
 
+        # check for potential deadlock
+        threading.currentThread().waiting = nodePage
+        if LockManager.detectRWDeadlock(threading.currentThread(), threading.currentThread()):
+            raise Exception('Deadlock detected!')
+
+        # acquire read lock
         nodePage.pageLock.acquire_read()
+        threading.currentThread().waiting = None
+        LockManager.makePageOwner(threading.currentThread(), nodePage)
 
         node = nodePage.readNode(nodeIndex)
 
         firstRelID = node.firstRelID
 
+        # get chain of relationships for node
         nodeRelationships = RelationshipStorageManager.getRelationshipChain(firstRelID, nodeIndex)
-        '''nodeProperties = PropertyStorageManager.getPropChain(firstPropID)
-        nodeLabels = LabelStorageManager.getLabelChain(firstLabelID)'''
-
-        #print('node has {0} relationships'.format(len(nodeRelationships)))
         
         for rel in nodeRelationships:
             node.addRelationship(rel)
-        #node.addProperties(nodeProperties)
-        #node.addLabels(nodeLabels)
 
+        # release lock
         nodePage.pageLock.release_read()
-
+        LockManager.removePageOwner(threading.currentThread(), nodePage)
         return node
 
-    # takes in a node object 
+    # takes in a node object to write or create, and returns when done 
     def writeNode(node, create):
-        """Writes this node to the node's node file according to the storage 
-        format given in the class description and writes this node's relationships, 
-        properties, and labels to the node's relationship file, property file, and 
-        label file, respectively.
-        """
-        '''if DEBUG:
-            print("properties in node")
-            for prop in node.properties:
-                print(prop.getID())
-
-            print("labels in node:")
-            for label in node.labels:
-                print(label.getLabelID())
-
-            print("writing node...")'''
-
         nodeID = node.getID()
         pageID = nodeID[0]          # pageID[0] = 0, pageID[1] = pageIndex
 
@@ -111,37 +103,41 @@ class NodeStorageManager():
         fileID = pageIndex / NodeFile.MAX_PAGES
 
         print('getting node page for writing')
+
+        # get page from buffer
         nodePage = BufferManager.getNodePage(pageIndex, NodeFile(int(fileID)))
 
+        # check for deadlock
+        threading.currentThread().waiting = nodePage
+        if LockManager.detectRWDeadlock(threading.currentThread(), threading.currentThread()):
+            raise Exception('Deadlock detected!')
+
+        # acquire write lock
         nodePage.pageLock.acquire_write()
+        threading.currentThread().waiting = None
+        LockManager.makePageOwner(threading.currentThread(), nodePage)
 
         if create:
             nodePage.numEntries += 1
 
         nodePage.writeNode(node, create)
 
-        '''if DEBUG:
-            print("writing relationships to relationship file ...")'''
-
+        # write rels, props, and labels of node to their files
         for rel in node.relationships:
             RelationshipStorageManager.writeRelationship(rel, False)
-        
-        '''if DEBUG:
-            print("writing properties to property file ...")'''
 
         for prop in node.properties:
             PropertyStorageManager.writeProperty(prop, False)
-
-        '''if DEBUG:
-            print("writing labels to property file ...")'''
 
         for label in node.labels:
             LabelStorageManager.writeLabel(label, False)
 
         nodePage.pageLock.release_write()
+        LockManager.removePageOwner(threading.currentThread(), nodePage)
 
         return node
 
+    # creates a new node and returns it
     def createNode():
         print('***creating node****')
 
@@ -181,25 +177,12 @@ class NodeStorageManager():
                 lastFile.createPage()
                 nodePage = BufferManager.getNodePage(lastFile.numPages - 1, lastFile)
 
-        '''nodeFile = NodeFile(0)
-        if nodeFile.numPages == 0:
-            print('creating new page')
-            nodeFile.createPage()
-
-        print('getting node page for creation')
-        nodePage = BufferManager.getNodePage(0, nodeFile)
-
-        node = Node(nodeFile, nodePage, [[0, 0], nodePage.numEntries])
-        print('creating node {0}'.format(nodePage.numEntries))
-
-        NodeStorageManager.writeNode(node, True)
-
-        return node'''
-
+        # create node object
         node = Node(nodeFile, nodePage, [nodePage.pageID, nodePage.numEntries])
         
         print('creating node {0} in page {1}'.format(nodePage.numEntries, nodePage.pageID[1]))
 
+        # write node object
         NodeStorageManager.writeNode(node, True)
 
         return node

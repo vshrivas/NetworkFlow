@@ -5,9 +5,15 @@ from .Label import Label
 from .DataPage import DataPage
 import sys, struct, os
 
+# Label Page handles the byte-level reads and writes of labels from files
 class LabelPage(DataPage):
     PAGES_OFFSET = 100
 
+    # constructor for LabelPage
+    # takes in 
+    # pageIndex: index of page 
+    # datafile: labelFile containing page
+    # create: true if creating new page
     def __init__(self, pageIndex, datafile, create):
         # 3 indicates that this is a property page
         pageID = [3, pageIndex]
@@ -43,8 +49,8 @@ class LabelPage(DataPage):
             label = self.readLabelData(labelIndex)
             self.labelData.append(label)
 
+    # reads data from disk for a given label
     def readLabelData(self, labelID):
-        """Reads label corresponding to label ID and returns a label object for label."""
         labelStore = open(self.filePath, 'rb')
         # Starting offset for label 
         labelStartOffset = self.pageStart + self.DATA_OFFSET + labelID * Label.storageSize
@@ -67,10 +73,11 @@ class LabelPage(DataPage):
         label = Label(labelString, datafile, labelID, nextLabelID)
         return label
 
-
+    # given label index returns label
     def readLabel(self, labelIndex):
         return self.labelData[labelIndex]
 
+    # writes label by adding to label data
     def writeLabel(self, label, create):
         labelID = label.getID()
 
@@ -83,6 +90,7 @@ class LabelPage(DataPage):
 
         self.writePageData()
 
+    # writes full data of page to disk
     def writePageData(self):
         filePath = (self.file).getFilePath()
         labelFile = open(filePath, 'r+b')
@@ -100,6 +108,7 @@ class LabelPage(DataPage):
         for label in labelData:
             self.writeLabelData(label, labelFile)
 
+    # writes data of a single label to disk
     def writeLabelData(self, label, storeFile):
         labelIndex = label.getID()[1]
         

@@ -10,7 +10,7 @@ from storage.NodeFile import NodeFile
 from storage.BufferManager import BufferManager
 from storage.LockManager import LockManager
 
-# creates a deadlock condition and then detects it 
+# Creates a deadlock condition and then detects it.
 '''
 This test is now deprecated. 
 Was used to test LockManager.detectDeadlock method when LockManager

@@ -6,7 +6,7 @@ from .LabelPage import LabelPage
 class LabelFile:
 
     """LabelFile class: representation of label file, which stores info about all
-    labels.
+    labels, including number of pages.
     """
     MAX_PAGES = 10
     NUMPAGES_OFFSET = 0
@@ -42,6 +42,7 @@ class LabelFile:
 
         labelFile.close()
 
+    # creates a label page
     def createPage(self):
         labelPage = LabelPage(self.numPages, self, True)
         self.numPages += 1

@@ -1,6 +1,5 @@
-# Data pages are 4KB divisions of files that store a fixed number of records.
-# Pages should record the number of records, page owner, and other metadata 
-# at the beginning of the page
+# Data pages are divisions of files that store a fixed number of records.
+# Pages record the number of entries and owner id of page.
 
 # page IDs are unique across files, and allow storage managers to determine which file a page is in 
 import threading 
@@ -8,8 +7,8 @@ from .RWLock import RWLock
 
 class DataPage(object):
 	# static variables
-	# max page size is 4KB 
-	MAX_PAGE_ENTRIES = 1
+	# max page size 
+	MAX_PAGE_ENTRIES = 5
 
 	# meta data includes:
 		# number of entries in this page
@@ -36,23 +35,16 @@ class DataPage(object):
 		self.numEntries = 0
 		self.ownerID = -1
 
-	# read data object method
-
-	# write data object method
-
-	# create data object method
-
-	# checks if page is empty
 	def isEmpty(self):
 		return (MAX_PAGE_SIZE - curr_page_size) > ENTRY_SIZE
 
-		def getPageIndex():
-			return pageID[1]
+	def getPageIndex():
+		return pageID[1]
 
 	# acquire lock for given thread
-	def lockPage(self, ownerID):
+	'''def lockPage(self, ownerID):
 		self.pageLock.acquire()
-		self.ownerID = ownerID
+		self.ownerID = ownerID'''
 
 	def getPageIndex(self):
 		return self.pageID[1]

@@ -5,14 +5,16 @@ from .Label import Label
 from .DataPage import DataPage
 import sys, struct, os
 
+# Node Page handles the byte-level reads and writes of nodes from files
 class NodePage(DataPage):
     ENTRY_SIZE = Node.storageSize
     PAGES_OFFSET = 100
 
     # constructor for NodePage
     # takes in 
-    # pageIndex: index of page (unique across nodeFiles)
+    # pageIndex: index of page 
     # datafile: nodeFile containing page
+    # create: true if creating new page
     def __init__(self, pageIndex, datafile, create):
         # 0 indicates that this is a node page
         pageID = [0, pageIndex]
@@ -28,6 +30,7 @@ class NodePage(DataPage):
         else:
             self.writePageData()
 
+    # read full page
     def readPageData(self):
         filePath = (self.file).getFilePath()
         nodeFile = open(filePath, 'rb')
@@ -51,20 +54,19 @@ class NodePage(DataPage):
 
         nodeFile.close()
 
+    # takes in node index, returns corresponding node
     def readNode(self, nodeIndex):
         return self.nodeData[nodeIndex]
 
     # reads in node from page in file, using nodeIndex 
     # used when loading page data into memory
-    # takes in nodeIndex
-    # returns node
     def readNodeData(self, nodeIndex):
         filePath = (self.file).getFilePath()
         nodeFile = open(filePath, 'rb')
 
         nodeStartOffset = self.pageStart + self.DATA_OFFSET + nodeIndex * Node.storageSize
         
-        # read first rel ID, first property ID, first label ID
+        # read first rel ID
         nodeFile.seek(nodeStartOffset + Node.REL_ID_OFFSET)
         absFirstRelID = int.from_bytes(nodeFile.read(Relationship.relIDByteLen), sys.byteorder, signed=True)
         if absFirstRelID == -1:
@@ -74,6 +76,7 @@ class NodePage(DataPage):
             relIndex = int(((absFirstRelID / DataPage.MAX_PAGE_ENTRIES) - relPageIndex) *  DataPage.MAX_PAGE_ENTRIES)
             firstRelID = [[1, relPageIndex], relIndex]
 
+        # read first prop ID
         nodeFile.seek(nodeStartOffset + Node.PROPERTY_ID_OFFSET)
         absFirstPropID = int.from_bytes(nodeFile.read(Property.propIDByteLen), sys.byteorder, signed=True)
         if absFirstPropID == -1:
@@ -83,6 +86,7 @@ class NodePage(DataPage):
             propIndex = int(((absFirstPropID / DataPage.MAX_PAGE_ENTRIES) - propPageIndex) *  DataPage.MAX_PAGE_ENTRIES)
             firstPropID = [[2, propPageIndex], propIndex]
 
+        # read first label ID
         nodeFile.seek(nodeStartOffset + Node.LABEL_ID_OFFSET)
         absFirstLabelID = int.from_bytes(nodeFile.read(Label.labelIDByteLen), sys.byteorder, signed=True)
         if absFirstLabelID == -1:
@@ -108,8 +112,10 @@ class NodePage(DataPage):
 
         nodeIndex = nodeID[1]
 
+        # if creating append node
         if create:
             self.nodeData.append(node)
+        # replace node
         else:
             self.nodeData[nodeIndex] = node
 
@@ -217,7 +223,3 @@ class NodePage(DataPage):
             absFirstLabelID = firstLabel.getID()[0][1] * DataPage.MAX_PAGE_ENTRIES + firstLabel.getID()[1]
             storeFile.write(absFirstLabelID.to_bytes(Label.LABEL_OFFSET,
                 byteorder = sys.byteorder, signed=True))
-
-    def createNode(self):
-        # create a new node object
-        newNode = Node()

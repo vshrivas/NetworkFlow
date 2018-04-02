@@ -9,7 +9,7 @@ from storage.RelationshipStorageManager import RelationshipStorageManager
 from storage.NodeFile import NodeFile
 from storage.BufferManager import BufferManager
 
-# creates a deadlock condition, just to demonstrate that it does indeed deadlock
+# Test creates a deadlock condition, just to demonstrate that it does indeed deadlock
 # NOTE: This test is only to create a deadlock condition, not break it, so the
 # test will appear to stop indefinitely as the threads deadlock. This condition
 # is broken in later tests.

@@ -5,9 +5,15 @@ from .Label import Label
 from .DataPage import DataPage
 import sys, struct, os
 
+# Property Page handles the byte-level reads and writes of relationships from files
 class PropertyPage(DataPage):
     PAGES_OFFSET = 100
 
+    # constructor for PropertyPage
+    # takes in 
+    # pageIndex: index of page 
+    # datafile: propertyFile containing page
+    # create: true if creating new page
     def __init__(self, pageIndex, datafile, create):
         # 2 indicates that this is a property page
         pageID = [2, pageIndex]
@@ -43,6 +49,7 @@ class PropertyPage(DataPage):
             property = self.readPropertyData(propertyIndex)
             self.propertyData.append(property)
 
+    # reads data for single property
     def readPropertyData(self, propertyIndex):
         filePath = (self.file).getFilePath()
         propertyStore = open(filePath, 'rb')
@@ -107,9 +114,11 @@ class PropertyPage(DataPage):
 
         return prop
 
+    # returns property given index
     def readProperty(self, propertyIndex):
         return self.propertyData[propertyIndex]
 
+    # writes or creates property given property
     def writeProperty(self, property, create):
         propID = property.getID()
 
@@ -122,6 +131,7 @@ class PropertyPage(DataPage):
 
         self.writePageData()
 
+    # writes data for full page
     def writePageData(self):
         filePath = (self.file).getFilePath()
         propFile = open(filePath, 'r+b')
@@ -139,6 +149,7 @@ class PropertyPage(DataPage):
         for prop in propertyData:
             self.writePropertyData(prop, propertyFile)
 
+    # writes data for single property
     def writePropertyData(self, prop, storeFile):
         propertyIndex = prop.getID()[1]
 
