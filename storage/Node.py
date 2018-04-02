@@ -44,8 +44,6 @@ class Node:
     nodeIDByteLen = 3
 
     storageSize = 16
-    # number of nodes ever created (used for auto-incrementing the node ID)
-    numNodes = 0
 
     # node ID is a list of 2 elements 
     # nodeID[0] = pageID
@@ -58,9 +56,6 @@ class Node:
         nodeID: the ID of the Node to be initialized; default nodeID of None 
         means the Node will be assigned an auto-incrementing node ID
         """
-        Node.numNodes = nodeFile.getNumNodes()
-        if DEBUG:
-            print("**** Num Nodes = {0} *****".format(Node.numNodes))
 
         # if nodeID is None, use auto-incrementing for nodeID
         #if nodeID is None:
@@ -85,16 +80,8 @@ class Node:
         self.firstPropID = [[2,0], -1]
         self.firstLabelID = [[3,0], -1]
 
-        # open node file
-        storeFilePath = self.nodeFile.getFilePath()
-        storeFile = open(storeFilePath, 'r+b')
-
-        # write number of nodes to first 3 bytes of node file
-        storeFile.write((self.numNodes).to_bytes(Node.nodeIDByteLen,
-            byteorder = sys.byteorder, signed=True))
-
         # set starting offset of node in NodeFile
-        nodeIndex = self.nodeID[1]
+        self.nodeIndex = self.nodeID[1]
         #self.startOffset = nodeIndex * Node.storageSize + Node.nodeIDByteLen
 
     

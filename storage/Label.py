@@ -30,7 +30,7 @@ class Label:
     storageSize = 106
 
 
-    def __init__(self, label, labelFile, labelID=None, nextLabelID=-1):
+    def __init__(self, label, labelFile, labelID, nextLabelID):
         """Constructor for Labels. Initializes a Label using the given label string and  
         writes it to the specified labelFile (a LabelFile object that represents a
         file storing Labels) based on the specified labelID. The next label ID is 
@@ -57,17 +57,6 @@ class Label:
 
         # set labelFile for label
         self.labelFile = labelFile
-
-        # open label file
-        storeFilePath = self.labelFile.getFilePath()
-        storeFile = open(storeFilePath, 'r+b')
-
-        # write number of labels to first 3 bytes of label file
-        storeFile.write((self.numLabels).to_bytes(Label.labelIDByteLen,
-            byteorder = sys.byteorder, signed=True))
-
-        # set starting offset for label in label file
-        self.startOffset = self.labelID * Label.storageSize + Label.labelIDByteLen
 
         # set next label ID
         self.nextLabelID = nextLabelID

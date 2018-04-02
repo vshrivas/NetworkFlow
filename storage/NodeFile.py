@@ -14,8 +14,6 @@ class NodeFile(object):
     the current number of nodes.
     """
 
-    # number of node files
-    #numFiles = 0
     MAX_PAGES = 10
     NUMPAGES_OFFSET = 0
     PAGES_OFFSET = 100

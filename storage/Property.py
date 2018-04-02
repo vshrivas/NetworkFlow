@@ -42,8 +42,6 @@ class Property:
     TYPE_BOOL = 3
 
     storageSize = 209
-    # number of properties ever created (used for auto-incrementing the property ID)
-    numProperties = 0
     propIDByteLen = 4
     typeByteLen = 1
 
@@ -61,11 +59,7 @@ class Property:
         propertyID: the ID of the Property to be initialized; default propertyID of None 
         means the Property will be assigned an auto-incrementing property ID
         """
-        # If propertyFile object passed exists, get number of properties
-        if propertyFile != "":
-            Property.numProperties = propertyFile.getNumProperties()
-            if DEBUG:
-                print("****** Num properties = {0} ******".format(Property.numProperties))
+
         # Note: For reading properties from files, we assume keys and values to be ints.
         # TODO: Support reading keys and values of other types
         # if propertyID is None, use auto-incrementing for property ID            
@@ -87,25 +81,8 @@ class Property:
 
         self.nextPropertyID = nextPropertyID
 
-        # property isn't the null property and is a new property
-        if self.getpropertyIndex() != -1 and self.getPropertyIndex() >= self.numProperties:
-            Property.numProperties += 1
-
         # set property file
         self.propertyFile = propertyFile
-
-        # If propertyFile object passed exists
-        if self.propertyFile != "":
-            # open property file
-            storeFilePath = self.propertyFile.getFilePath()
-            storeFile = open(storeFilePath, 'r+b')
-
-            # write number of properties to first 4 bytes of property file
-            storeFile.write((Property.numProperties).to_bytes(Property.propIDByteLen,
-                byteorder = sys.byteorder, signed=True))
-
-        # starting offset for property in property file
-        self.startOffset = self.getPropertyIndex() * Property.storageSize + Property.propIDByteLen
 
     def getPropertyIndex(self):
         return propertyID[1]

@@ -1,5 +1,9 @@
+from .Node import Node
 from .Property import Property
-import sys, os
+from .Relationship import Relationship
+from .Label import Label
+from .NodePage import NodePage
+import sys, struct, os
 
 class PropertyFile:
 
@@ -8,26 +12,51 @@ class PropertyFile:
     """
 
     # number of property files
-    numFiles = 0
+    MAX_PAGES = 10
+    NUMPAGES_OFFSET = 0
+    PAGES_OFFSET = 100
 
-    def __init__(self, createFile=True):
+    NUMPAGES_SIZE = 100
+
+    directory = "propertystore"
+
+    def __init__(self, fileID):
         """Constructor for PropertyFile, which creates the backing file if necessary. """
-        PropertyFile.numFiles += 1
-        self.fileID = PropertyFile.numFiles
+        self.fileID = fileID
 
         # create property file if it doesn't already exist
         self.fileName = "PropertyFile{0}.store".format(self.fileID)
-        self.dir = "datafiles"
-        self.filePath = os.path.join(self.dir, self.fileName)
+        self.filePath = os.path.join(self.directory, self.fileName)
+
+        self.numPages = 0
 
         if os.path.exists(self.filePath):
-            propertyFile = open(self.filePath, 'r+b')
+            print('property file exists')
+            propertyFile = open(self.filePath, 'rb')
+            self.numPages = int.from_bytes(propertyFile.read(self.NUMPAGES_SIZE), sys.byteorder, signed=True)
+            print('has {0} pages'.format(self.numPages))
         else:
+            print('creating new property file')
+            if not os.path.exists(self.directory):
+                os.makedirs(self.directory)
             propertyFile = open(self.filePath, 'wb')
-            # write number of properties to first 4 bytes of property file
-            propertyFile.write((0).to_bytes(Property.propIDByteLen,
+            # write number of pages to first 3 bytes of node file
+            propertyFile.write((0).to_bytes(self.NUMPAGES_SIZE,
                 byteorder = sys.byteorder, signed=True))
+
         propertyFile.close()
+
+    def createPage(self):
+        propertyPage = PropertyPage(self.numPages, self, True)
+        self.numPages += 1
+            
+        propertyFile = open(self.filePath, 'r+b')
+        propertyFile.write((self.numPages).to_bytes(self.NUMPAGES_SIZE,
+                byteorder = sys.byteorder, signed=True))
+
+        propertyFile.close()
+
+        return propertyPage
 
     def getFileName(self):
         """Return file name of backing file."""

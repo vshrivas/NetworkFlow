@@ -1,50 +1,63 @@
+from .Node import Node
 from .Property import Property
+from .Relationship import Relationship
+from .Label import Label
+from .DataPage import DataPage
+import sys, struct, os
 
 class PropertyPage(DataPage):
-	def __init__(self, pageIndex, datafile):
-		# 2 indicates that this is a property page
-		pageID = [2, pageIndex]
-		super().__init__(pageID, datafile)
+    PAGES_OFFSET = 100
 
-		self.propertyData = []  # list of property objects the page contains
-		# read in all page data
-		readPageData()
+    def __init__(self, pageIndex, datafile, create):
+        # 2 indicates that this is a property page
+        pageID = [2, pageIndex]
+        super().__init__(pageID, datafile)
 
-	# reads in all of the property objects stored in this page
-	# stores them in self.propertyData
-	def readPageData(self):
-		# open property file
-		filePath = ((DataFile) self.file).getFilePath()
-		propertyFile = open(filePath, 'rb')
+        self.propertyData = []  # list of property objects the page contains
+        
+        self.pageStart = self.getPageIndex() * (self.MAX_PAGE_ENTRIES * Property.storageSize + DataPage.DATA_OFFSET) + self.PAGES_OFFSET
 
-		# read in number of entries
-		propertyFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
-		self.numEntries = int.from_bytes(propertyFile.read(DataPage.NUM_ENTRIES_SIZE), sys.byteorder, signed=True)
+        if create == False:
+          # read in all page data
+            self.readPageData()
+        else:
+            self.writePageData()
 
-		# read in owner of page
-		propertyFile.seek(self.pageStart + OWNER_ID_OFFSET)
-		self.ownerID = int.from_bytes(propertyFile.read(DataPage.OWNER_ID_SIZE), sys.byteorder, signed=True)
+    # reads in all of the property objects stored in this page
+    # stores them in self.propertyData
+    def readPageData(self):
+        # open property file
+        filePath = (self.file).getFilePath()
+        propertyFile = open(filePath, 'rb')
 
-		# read in all data items
-		for propertyIndex in range(0, self.numEntries):
-			property = readPropertyData(propertyIndex)
-			propertyData.append(property)
+        # read in number of entries
+        propertyFile.seek(self.pageStart + DataPage.NUM_ENTRIES_OFFSET)
+        self.numEntries = int.from_bytes(propertyFile.read(DataPage.NUM_ENTRIES_SIZE), sys.byteorder, signed=True)
 
-	def readPropertyData(self, propertyIndex):
-		filePath = ((PropertyFile) self.file).getFilePath()
-		propertyStore = open(filePath, 'rb')
+        # read in owner of page
+        propertyFile.seek(self.pageStart + DataPage.OWNER_ID_OFFSET)
+        self.ownerID = int.from_bytes(propertyFile.read(DataPage.OWNER_ID_SIZE), sys.byteorder, signed=True)
 
-		propertyStartOffset = self.pageStart + DATA_OFFSET  + propertyIndex * Property.storageSize
-		# find ID
-        propertyStore.seek(propertyStartOffset)
+        # read in all data items
+        for propertyIndex in range(0, self.numEntries):
+            property = self.readPropertyData(propertyIndex)
+            self.propertyData.append(property)
+
+    def readPropertyData(self, propertyIndex):
+        filePath = (self.file).getFilePath()
+        propertyStore = open(filePath, 'rb')
+
+        propertyStartOffset = self.pageStart + self.DATA_OFFSET  + propertyIndex * Property.storageSize
+        # find ID
+        propertyStore.seek(propertyStartOffset + PROPERTY_ID_OFFSET)
 
         if DEBUG:
             print("seek to {0} for ID". format(propertyStartOffset))
 
-        propID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
-
-        if DEBUG:
-            print('id: {0}'.format(ID))
+        absPropID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
+        propPageIndex = int(absPropID / DataPage.MAX_PAGE_ENTRIES)
+        propIndex = int(((absPropID / DataPage.MAX_PAGE_ENTRIES) - propPageIndex) *  DataPage.MAX_PAGE_ENTRIES)
+        propID = [[2, propPageIndex], propIndex]
 
         # find type
         propertyStore.seek(propertyStartOffset + Property.TYPE_OFFSET)
@@ -81,39 +94,60 @@ class PropertyPage(DataPage):
             print('value: {0}'.format(value))
 
         propertyStore.seek(propertyStartOffset + NEXT_PROPERTY_ID_OFFSET)
-        nextPropID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
+        absNextPropID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
+        if absNextPropID == -1:
+            nextPropID = [[2, 0], -1]
+        else:
+            nextPropPageIndex = int(absNextPropID / DataPage.MAX_PAGE_ENTRIES)
+            nextPropIndex = int(((absNextPropID / DataPage.MAX_PAGE_ENTRIES) - nextPropPageIndex) *  DataPage.MAX_PAGE_ENTRIES)
+            nextPropID = [[2, nextPropPageIndex], nextPropIndex]
+
         # initialize property object with key and value and add to relationship
         prop = Property(key, value, datafile, propID, nextPropID)
 
         return prop
 
     def readProperty(self, propertyIndex):
-    	return propertyData[propertyIndex]
+        return self.propertyData[propertyIndex]
+
+    def writeProperty(self, property, create):
+        propID = property.getID()
+
+        propIndex = propID[1]
+
+        if create:
+            self.propertyData.append(property)
+        else:
+            self.propertyData[propIndex] = property
+
+        self.writePageData()
 
     def writePageData(self):
-        filePath = ((PropertyFile) self.datafile).getFilePath()
-        propFile = open(filePath, 'rb')
+        filePath = (self.file).getFilePath()
+        propFile = open(filePath, 'r+b')
 
         # write number of entries
-        propFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
-        propFile.write((self.numEntries).to_bytes(Property.nodeIDByteLen,
+        propFile.seek(self.pageStart + DataPage.NUM_ENTRIES_OFFSET)
+        propFile.write((self.numEntries).to_bytes(DataPage.NUM_ENTRIES_SIZE,
             byteorder = sys.byteorder, signed=True))
 
         # write owner ID
-        propFile.seek(self.pageStart + OWNER_ID_OFFSET)
-        propFile.write((self.ownerID).to_bytes(Property.nodeIDByteLen,
+        propFile.seek(self.pageStart + DataPage.OWNER_ID_OFFSET)
+        propFile.write((self.ownerID).to_bytes(DataPage.OWNER_ID_SIZE,
             byteorder = sys.byteorder, signed=True))
 
         for prop in propertyData:
-            writePropertyData(prop, propertyFile)
+            self.writePropertyData(prop, propertyFile)
 
-	def writePropertyData(self, prop, storeFile):
-        propertyStartOffset = self.pageStart + DATA_OFFSET  + propertyIndex * Property.storageSize
+    def writePropertyData(self, prop, storeFile):
+        propertyIndex = prop.getID()[1]
 
-        if DEBUG:
+        propertyStartOffset = self.pageStart + DataPage.DATA_OFFSET  + propertyIndex * Property.storageSize
+
         # write property id
         storeFile.seek(propertyStartOffset + Property.PROPERTY_ID_OFFSET)
-        storeFile.write(prop.getID().to_bytes(Property.propIDByteLen, 
+        absPropID = self.getPageIndex() * DataPage.MAX_PAGE_ENTRIES + propertyIndex
+        storeFile.write(absPropID.to_bytes(Property.propIDByteLen, 
                 byteorder = sys.byteorder, signed = True))
 
         # write property value type
@@ -130,16 +164,10 @@ class PropertyPage(DataPage):
             while len(prop.key.encode('utf-8')) != prop.MAX_KEY_SIZE:
                 prop.key += ' '
 
-        if DEBUG:
-            print("writing key {0} at {1}".format(prop.key, propertyStartOffset + Property.KEY_OFFSET))
-
         storeFile.write(bytearray(prop.key, 'utf8'))
 
         # write value
         storeFile.seek(propertyStartOffset + Property.VALUE_OFFSET)
-        
-        if DEBUG:
-            print("writing value {0} at {1}".format(prop.value, propertyStartOffset + Property.VALUE_OFFSET))
 
         # Write property values of different types (strings, ints, floats, and booleans)
         if prop.type == Property.TYPE_STRING:
@@ -161,12 +189,12 @@ class PropertyPage(DataPage):
 
         # write next property id
         storeFile.seek(propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET)
-        if DEBUG:
-            print("next property has index:{0}".format(prop.nextPropertyID))
+        if prop.nextPropertyID[1] == -1:
+            absNextPropID = -1
+        else:
+            absNextPropID = prop.nextPropertyID[0][1] * DataPage.MAX_PAGE_ENTRIES + prop.nextPropertyID[1]
 
-            print("writing next property index {0} at {1}".format(prop.nextPropertyID, propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET))
-        storeFile.write(prop.nextPropertyID.to_bytes(Property.propIDByteLen, 
+        print("writing next property ID {0} at {1}".format(absNextPropID, propertyStartOffset + Property.NEXT_PROPERTY_ID_OFFSET))
+        storeFile.write(absNextPropID.to_bytes(Property.propIDByteLen, 
                 byteorder = sys.byteorder, signed = True))
 
-        if DEBUG:
-            print()

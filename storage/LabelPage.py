@@ -1,44 +1,53 @@
+from .Node import Node
+from .Property import Property
+from .Relationship import Relationship
+from .Label import Label
+from .DataPage import DataPage
+import sys, struct, os
+
 class LabelPage(DataPage):
-	def __init__(self, pageIndex, datafile):
-		# 3 indicates that this is a property page
-		pageID = [3, pageIndex]
-		super().__init__(pageID, datafile)
+    PAGES_OFFSET = 100
 
-		self.labelData = []  # list of label objects the page contains
-		# read in all page data
-		readPageData()
+    def __init__(self, pageIndex, datafile, create):
+        # 3 indicates that this is a property page
+        pageID = [3, pageIndex]
+        super().__init__(pageID, datafile)
 
-	# reads in all of the label objects stored in this page
-	# stores them in self.labelData
-	def readPageData(self):
-		# open property file
-		filePath = ((DataFile) self.file).getFilePath()
-		labelFile = open(filePath, 'rb')
+        self.labelData = []  # list of label objects the page contains
 
-		# read in number of entries
-		labelFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
-		self.numEntries = int.from_bytes(labelFile.read(DataPage.NUM_ENTRIES_SIZE), sys.byteorder, signed=True)
+        self.pageStart = self.getPageIndex() * (self.MAX_PAGE_ENTRIES * Label.storageSize + DataPage.DATA_OFFSET) + self.PAGES_OFFSET
+        
+        if create == False:
+          # read in all page data
+            self.readPageData()
+        else:
+            self.writePageData()
 
-		# read in owner of page
-		labelFile.seek(self.pageStart + OWNER_ID_OFFSET)
-		self.ownerID = int.from_bytes(labelFile.read(DataPage.OWNER_ID_SIZE), sys.byteorder, signed=True)
+    # reads in all of the label objects stored in this page
+    # stores them in self.labelData
+    def readPageData(self):
+        # open property file
+        filePath = (self.file).getFilePath()
+        labelFile = open(filePath, 'rb')
 
-		# read in all data items
-		for labelIndex in range(0, self.numEntries):
-			label = readPropertyData(labelIndex)
-			labelData.append(label)
+        # read in number of entries
+        labelFile.seek(self.pageStart + DataPage.NUM_ENTRIES_OFFSET)
+        self.numEntries = int.from_bytes(labelFile.read(DataPage.NUM_ENTRIES_SIZE), sys.byteorder, signed=True)
 
+        # read in owner of page
+        labelFile.seek(self.pageStart + DataPage.OWNER_ID_OFFSET)
+        self.ownerID = int.from_bytes(labelFile.read(DataPage.OWNER_ID_SIZE), sys.byteorder, signed=True)
 
-	def readLabelData(self, labelID):
+        # read in all data items
+        for labelIndex in range(0, self.numEntries):
+            label = self.readLabelData(labelIndex)
+            self.labelData.append(label)
+
+    def readLabelData(self, labelID):
         """Reads label corresponding to label ID and returns a label object for label."""
         labelStore = open(self.filePath, 'rb')
         # Starting offset for label 
-        labelStartOffset = self.pageStart + DATA_OFFSET + labelID * Label.storageSize
-
-        # Read label ID
-        labelStore.seek(labelStartOffset + Label.LABEL_ID_OFFSET)
-        # Requires Python >= 3.2 for the function int.from_bytes
-        labelID = int.from_bytes(labelStore.read(3), byteorder=sys.byteorder, signed=True)
+        labelStartOffset = self.pageStart + self.DATA_OFFSET + labelID * Label.storageSize
 
         # Read label string
         labelStore.seek(labelStartOffset + Label.LABEL_OFFSET)
@@ -47,39 +56,60 @@ class LabelPage(DataPage):
 
         # Read next label ID
         labelStore.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
-        nextLabelID = int.from_bytes(labelStore.read(3), byteorder=sys.byteorder, signed=True)
+        absNextLabelID = int.from_bytes(labelStore.read(Label.storageSize), byteorder=sys.byteorder, signed=True)
+        if absNextLabelID == -1:
+            nextLabelID = [[3, 0], -1]
+        else:
+            labelPageIndex = int(absNextLabelID / DataPage.MAX_PAGE_ENTRIES)
+            labelIndex = int(((absNextLabelID / DataPage.MAX_PAGE_ENTRIES) - labelPageIndex) *  DataPage.MAX_PAGE_ENTRIES)
+            nextLabelID = [[3, labelPageIndex], labelIndex]
 
         label = Label(labelString, datafile, labelID, nextLabelID)
         return label
 
 
     def readLabel(self, labelIndex):
-    	return labelData[labelIndex]
+        return self.labelData[labelIndex]
+
+    def writeLabel(self, label, create):
+        labelID = label.getID()
+
+        labelIndex = labelID[1]
+        
+        if create:
+            self.labelData.append(label)
+        else:
+            self.labelData[labelIndex] = label
+
+        self.writePageData()
 
     def writePageData(self):
-    	filePath = ((LabelFile) self.datafile).getFilePath()
-		labelFile = open(filePath, 'rb')
+        filePath = (self.file).getFilePath()
+        labelFile = open(filePath, 'r+b')
 
-		# write number of entries
-        labelFile.seek(self.pageStart + NUM_ENTRIES_OFFSET)
-        labelFile.write((self.numEntries).to_bytes(Label.nodeIDByteLen,
+        # write number of entries
+        labelFile.seek(self.pageStart + DataPage.NUM_ENTRIES_OFFSET)
+        labelFile.write((self.numEntries).to_bytes(DataPage.NUM_ENTRIES_SIZE,
             byteorder = sys.byteorder, signed=True))
 
         # write owner ID
-        labelFile.seek(self.pageStart + OWNER_ID_OFFSET)
-        labelFile.write((self.ownerID).to_bytes(Label.nodeIDByteLen,
+        labelFile.seek(self.pageStart + DataPage.OWNER_ID_OFFSET)
+        labelFile.write((self.ownerID).to_bytes(DataPage.OWNER_ID_SIZE,
             byteorder = sys.byteorder, signed=True))
 
-    	for label in labelData:
-    		writeLabelData(label, labelFile)
+        for label in labelData:
+            self.writeLabelData(label, labelFile)
 
-    def writeLabelData(label, storeFile):
-    	# Starting offset for label 
-        labelStartOffset = self.pageStart + DATA_OFFSET + labelID * Label.storageSize
+    def writeLabelData(self, label, storeFile):
+        labelIndex = label.getID()[1]
+        
+        # Starting offset for label 
+        labelStartOffset = self.pageStart + DataPage.DATA_OFFSET + labelIndex * Label.storageSize
 
         # seek to location for label and write label ID
         storeFile.seek(labelStartOffset + Label.LABEL_ID_OFFSET)
-        storeFile.write(self.labelID.to_bytes(Label.labelIDByteLen, byteorder = sys.byteorder, signed=True))
+        absLabelID = self.getPageIndex() * DataPage.MAX_PAGE_ENTRIES + label.labelID[1]
+        storeFile.write(self.absLabelID.to_bytes(Label.labelIDByteLen, byteorder = sys.byteorder, signed=True))
 
         # write label
         storeFile.seek(labelStartOffset + Label.LABEL_OFFSET)
@@ -92,13 +122,8 @@ class LabelPage(DataPage):
 
         # write next label's ID
         storeFile.seek(labelStartOffset + Label.NEXT_LABEL_ID_OFFSET)
-
-        if DEBUG:
-            print("writing next label id: {0}".format(nextLabelID))
+        if label.nextLabelID[1] == -1:
+            absNextLabelID = -1
+        else:
+            absNextLabelID = label.nextLabelID[0][1] * DataPage.MAX_PAGE_ENTRIES + label.nextLabelID[1]
         storeFile.write(nextLabelID.to_bytes(Label.labelIDByteLen, byteorder = sys.byteorder, signed=True))
-
-    def writeLabel(label):
-    	labelID = label.getID()
-
-        labelIndex = labelID[1]
-        labelData[labelIndex] = label

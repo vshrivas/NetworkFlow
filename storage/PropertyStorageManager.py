@@ -1,100 +1,140 @@
+from .Node import Node
+from .NodePage import NodePage
+from .Property import Property
+from .Relationship import Relationship
+from .Label import Label
+from .NodeFile import NodeFile
+from .BufferManager import BufferManager
+from .RelationshipStorageManager import RelationshipStorageManager
+from .DataPage import DataPage
+import sys, struct, os
+
 class PropertyStorageManager():
+    numPropFiles = 0
+    directory = "propstore"
+
+    def __init__(self):
+        # open node storage meta data file
+        # read number of node files 
+        self.fileName = "metadata"
+        self.filePath = os.path.join(PropertyStorageManager.directory, self.fileName)
+
+        # storage manager metadata file exists
+        if os.path.exists(self.filePath):
+            metadataFile = open(self.filePath, 'r+b')
+            PropertyStorageManager.numPropFiles = int.from_bytes(metadataFile.read(Property.propIDByteLen), sys.byteorder, signed=True)
+
+        # storage manager metadata file does not exist
+        else:
+            # node store directory does not exist, make it
+            if not os.path.exists(self.directory):
+                os.makedirs(PropertyStorageManager.directory)
+
+            # open metadata file    
+            metadataFile = open(self.filePath, 'wb')
+            # write number of node files to first 3 bytes of node storage metadata file
+            metadataFile.write((0).to_bytes(Property.propIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+
+        # there are no node files
+        if PropertyStorageManager.numPropFiles == 0:
+            # make a new one 
+            PropertyFile(0)
+            PropertyStorageManager.numPropFiles += 1
+
+            metadataFile = open(self.filePath, 'r+b')
+            metadataFile.write((PropertyStorageManager.numPropFiles).to_bytes(Property.propIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+
     def readProperty(propertyID):
         pageID = propertyID[0]
         propertyIndex = propertyID[1]
 
         pageIndex = pageID[1]
 
+        fileID = pageIndex / PropertyFile.MAX_PAGES
         # use buffer manager to retrieve page from memory
         # will load page into memory if wasn't there
-        propertyPage = BufferManager.getPropertyPage(pageIndex, self)
-        return propertyPage.readNode(nodeIndex)
+        propertyPage = BufferManager.getPropertyPage(pageIndex, PropertyFile(int(fileID)))
 
-    def writeProperty(property):
+        propertyPage.pageLock.acquire_read()
+
+        property = propertyPage.readNode(nodeIndex)
+
+        propertyPage.pageLock.release_read()
+
+    def writeProperty(property, create):
         propID = property.getID()
         pageID = propID[0]           # pageID[0] = 0, pageID[1] = pageIndex
 
         pageIndex = pageID[1]        # which page node is in, page IDs are unique across all files
 
-        propPage = BufferManager.getPropertyPage(pageIndex, self)
+        fileID = pageIndex / PropertyFile.MAX_PAGES
+        # use buffer manager to retrieve page from memory
+        # will load page into memory if wasn't there
+        propPage = BufferManager.getPropertyPage(pageIndex, PropertyFile(int(fileID)))
 
-        propPage.writeProperty(property)
+        propPage.pageLock.acquire_write()
+
+        propPage.writeProperty(property, create)
+
+        propPage.pageLock.release_write()
 
     def getPropertyChain(firstPropID):
         nextPropID = firstPropID
         chainedProperties = []
 
         # while there is a next property for the relationship
-        while nextPropID != -1:
-            prop = readProperty(nextPropID)
+        while nextPropID[1] != -1:
+            prop = PropertyStorageManager.readProperty(nextPropID)
             chainedProperties.append(prop)
 
             nextPropID = prop.nextPropertyID
 
         return chainedProperties
 
-    '''def writeProperties(properties):
-        # write properties to property file
-        for propIndex in range(0, len(properties)):
-            prop = properties[propIndex]
-            if DEBUG:
-                print("writing {0} property ".format(prop.getID()))
+    def createProperty(key, value):
+        # get prop file
+        lastFileID = PropertyStorageManager.numPropFiles - 1
+        lastFile = PropertyFile(lastFileID)
 
-            # write last property
-            if propIndex == len(properties) - 1:
-                if DEBUG:
-                    print("no next property")
-                # A placeholder property since there is no next property
-                nullProperty = Property("", "", "", -1)
-                self.writeProperty(prop, nullProperty)
-            # write property that's not last property
+        if lastFile.numPages == 0:
+            lastFile.createPage()
+
+        # get last node page
+        lastPage = BufferManager.getPropertyPage(lastFile.numPages - 1, lastFile)
+        
+        propPage = lastPage
+        propFile = lastFile
+
+        # if last page is full
+        if lastPage.numEntries == DataPage.MAX_PAGE_ENTRIES:
+            # if file is at max pages
+            if lastFile.numPages == PropertyFile.MAX_PAGES:
+                # make a new file
+                newLastFile = PropertyFile(lastFileID + 1)
+                PropertyStorageManager.numPropFiles += 1
+
+                metadataFile = open(self.filePath, 'r+b')
+                metadataFile.write((PropertyStorageManager.numPropFiles).to_bytes(Property.propIDByteLen,
+                byteorder = sys.byteorder, signed=True))
+
+                propFile = newLastFile
+
+                # make a new page in the file
+                newLastFile.createPage()
+                propPage = BufferManager.getPropertyPage(newLastFile.numPages - 1, newLastFile)
+
+            # else make new page
             else:
-                self.writeProperty(prop, properties[propIndex + 1])'''
+                lastFile.createPage()
+                propPage = BufferManager.getPropertyPage(lastFile.numPages - 1, lastFile)
 
-    '''def getProperty(propID, propertyStore, propertyStartOffset):
-        # find ID
-        propertyStore.seek(propertyStartOffset)
+        propID = [[2, propPage.pageID[1]], propPage.numEntries]
+        prop = Property(key, value, propFile, propID, [[2, 0], -1])
+        
+        print('creating prop {0} in page {1}'.format(propPage.numEntries, propPage.pageID[1]))
 
-        if DEBUG:
-            print("seek to {0} for ID". format(propertyStartOffset))
+        PropertyStorageManager.writeProperty(prop, True)
 
-        ID = int.from_bytes(propertyStore.read(Property.propIDByteLen), sys.byteorder, signed=True)
-        if DEBUG:
-            print('id: {0}'.format(ID))
-
-        # find type
-        propertyStore.seek(propertyStartOffset + Property.TYPE_OFFSET)
-        print("seek to {0} for type". format(propertyStartOffset + Property.TYPE_OFFSET))
-        type = int.from_bytes(propertyStore.read(Property.typeByteLen), sys.byteorder, signed=True)
-        #key = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
-        print('type: {0}'.format(type))
-
-        # find key
-        propertyStore.seek(propertyStartOffset + Property.KEY_OFFSET)
-        if DEBUG:
-            print("seek to {0} for key". format(propertyStartOffset + Property.KEY_OFFSET))
-        key = propertyStore.read(Property.MAX_KEY_SIZE).decode("utf-8")
-        # strip padding from key
-        key = key.rstrip(' ')
-        if DEBUG:
-            print('key: {0}'.format(key))
-
-        # find value
-        propertyStore.seek(propertyStartOffset + Property.VALUE_OFFSET)
-        if DEBUG:
-            print("seek to {0} for value". format(propertyStartOffset + Property.VALUE_OFFSET))
-        # read value (way value is read depends on its type)
-        if type == Property.TYPE_STRING:
-            value = propertyStore.read(Property.MAX_VALUE_SIZE).decode("utf-8")
-            value = value.rstrip(' ')
-        elif type == Property.TYPE_INT:
-            value = int.from_bytes(propertyStore.read(4), sys.byteorder, signed=True)
-        elif type == Property.TYPE_FLOAT:
-            value = struct.unpack('d', propertyStore.read(8))[0]
-        else:
-            value = bool(int.from_bytes(propertyStore.read(1), sys.byteorder, signed=True))
-        if DEBUG:
-            print('value: {0}'.format(value))
-
-        # initialize property object with key and value and add to relationship
-        prop = Property(key, value, propertyFile, nextPropID)'''
+        return prop
